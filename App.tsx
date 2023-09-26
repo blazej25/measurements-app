@@ -5,55 +5,64 @@
  * @format
  */
 
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
+  Button,
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {AspirationScreen} from './src/screens/AspirationScreen';
+import {EquipmentBaseScreen} from './src/screens/EquipmentBaseScreen';
+import {FlowsScreen} from './src/screens/FlowsScreen';
+import {GasAnalyzerCheckScreen} from './src/screens/GasAnalyzerCheckScreen';
+import {H2O_14790_Screen} from './src/screens/H20_14790_Screen';
+import {MeasurementScreen as MeasurementsScreen} from './src/screens/MeasurementScreen';
+import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const Stack = createNativeStackNavigator();
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const HomeScreen = ({navigation}: {navigation: any}) => {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Welcome to the Measurements App!</Text>
+      <View style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
+        <Button
+          title="Measurements"
+          onPress={() => navigation.navigate('Measurements')}
+        />
+        <Button title="Flows" onPress={() => navigation.navigate('Flows')} />
+        <Button
+          title="Aspiration"
+          onPress={() => navigation.navigate('Aspiration')}
+        />
+        <Button
+          title="H2O_14790"
+          onPress={() => navigation.navigate('H2O_14790')}
+        />
+        <Button
+          title="GasAnalyzerCheck"
+          onPress={() => navigation.navigate('GasAnalyzerCheck')}
+        />
+        <Button
+          title="Utilities"
+          onPress={() => navigation.navigate('Utilities')}
+        />
+        <Button
+          title="EquipmentBase"
+          onPress={() => navigation.navigate('EquipmentBase')}
+        />
+      </View>
     </View>
   );
-}
+};
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -63,36 +72,25 @@ function App(): JSX.Element {
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{title: 'Welcome'}}
+        />
+        <Stack.Screen name="Measurements" component={MeasurementsScreen} />
+        <Stack.Screen name="Flows" component={FlowsScreen} />
+        <Stack.Screen name="Aspiration" component={AspirationScreen} />
+        <Stack.Screen name="H2O_14790" component={H2O_14790_Screen} />
+        <Stack.Screen
+          name="GasAnalyzerCheck"
+          component={GasAnalyzerCheckScreen}
+        />
+        <Stack.Screen name="Utilities" component={UtilitiesScreen} />
+        <Stack.Screen name="EquipmentBase" component={EquipmentBaseScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
