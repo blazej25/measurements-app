@@ -20,6 +20,7 @@ import {
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {AspirationScreen} from './src/screens/AspirationScreen';
+import { DustScreen } from './src/screens/DustScreen';
 import {EquipmentBaseScreen} from './src/screens/EquipmentBaseScreen';
 import {FlowsScreen} from './src/screens/FlowsScreen';
 import {GasAnalyzerCheckScreen} from './src/screens/GasAnalyzerCheckScreen';
@@ -29,15 +30,12 @@ import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
 
 const Stack = createNativeStackNavigator();
 
-const HomeScreen = ({navigation}: {navigation: any}) => {
+
+
+const MeasurementTypeButtonSection = ({navigation}: {navigation: any}) => {
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Welcome to the Measurements App!</Text>
-      <View style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
-        <Button
-          title="Measurements"
-          onPress={() => navigation.navigate('Measurements')}
-        />
+      <View
+        style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
         <Button title="Flows" onPress={() => navigation.navigate('Flows')} />
         <Button
           title="Aspiration"
@@ -46,6 +44,24 @@ const HomeScreen = ({navigation}: {navigation: any}) => {
         <Button
           title="H2O_14790"
           onPress={() => navigation.navigate('H2O_14790')}
+        />
+        <Button
+          title="Dust"
+          onPress={() => navigation.navigate('Dust')}
+        />
+      </View>);
+  };
+
+const HomeScreen = ({navigation}: {navigation: any}) => {
+  return (
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Welcome to the Measurements App!</Text>
+      <MeasurementTypeButtonSection navigation={navigation}/>
+      <View
+        style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
+        <Button
+          title="Measurements"
+          onPress={() => navigation.navigate('Measurements')}
         />
         <Button
           title="GasAnalyzerCheck"
@@ -67,10 +83,6 @@ const HomeScreen = ({navigation}: {navigation: any}) => {
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -82,6 +94,7 @@ function App(): JSX.Element {
         <Stack.Screen name="Measurements" component={MeasurementsScreen} />
         <Stack.Screen name="Flows" component={FlowsScreen} />
         <Stack.Screen name="Aspiration" component={AspirationScreen} />
+        <Stack.Screen name="Dust" component={DustScreen} />
         <Stack.Screen name="H2O_14790" component={H2O_14790_Screen} />
         <Stack.Screen
           name="GasAnalyzerCheck"
