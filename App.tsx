@@ -10,15 +10,12 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import {
   Button,
-  SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {AspirationScreen} from './src/screens/AspirationScreen';
 import { DustScreen } from './src/screens/DustScreen';
 import {EquipmentBaseScreen} from './src/screens/EquipmentBaseScreen';
@@ -28,8 +25,15 @@ import {H2O_14790_Screen} from './src/screens/H20_14790_Screen';
 import {MeasurementScreen as MeasurementsScreen} from './src/screens/MeasurementScreen';
 import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
 
-const Stack = createNativeStackNavigator();
+import Localization from 'expo-localization'
+import I18n from 'i18n-js'
+import {en, pl} from './src/i18n/supportedLanguages'
 
+I18n.enableFallback = true;
+I18n.translations = { en, pl };
+I18n.locale = Localization.locale;
+
+const Stack = createNativeStackNavigator();
 
 
 const MeasurementTypeButtonSection = ({navigation}: {navigation: any}) => {
@@ -38,7 +42,7 @@ const MeasurementTypeButtonSection = ({navigation}: {navigation: any}) => {
         style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
         <Button title="Flows" onPress={() => navigation.navigate('Flows')} />
         <Button
-          title="Aspiration"
+          title={I18n.translate('aspiration')}
           onPress={() => navigation.navigate('Aspiration')}
         />
         <Button
