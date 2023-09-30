@@ -25,24 +25,22 @@ import {H2O_14790_Screen} from './src/screens/H20_14790_Screen';
 import {MeasurementScreen as MeasurementsScreen} from './src/screens/MeasurementScreen';
 import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
 
-import Localization from 'expo-localization'
-import {I18n} from 'i18n-js'
-import {en, pl} from './src/i18n/supportedLanguages'
 
-I18n.enableFallback = true;
-I18n.translations = { en, pl };
-I18n.locale = Localization.locale;
+import i18next from './src/i18n/localization';
+
+import { useTranslation } from 'react-i18next';
 
 const Stack = createNativeStackNavigator();
 
 
 const MeasurementTypeButtonSection = ({navigation}: {navigation: any}) => {
+
   return (
       <View
         style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
         <Button title="Flows" onPress={() => navigation.navigate('Flows')} />
         <Button
-          title={('aspiration')}
+          title={i18next.t('aspiration')}
           onPress={() => navigation.navigate('Aspiration')}
         />
         <Button
