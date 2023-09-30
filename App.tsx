@@ -26,7 +26,7 @@ import {MeasurementScreen as MeasurementsScreen} from './src/screens/Measurement
 import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
 
 import Localization from 'expo-localization'
-import I18n from 'i18n-js'
+import {I18n} from 'i18n-js'
 import {en, pl} from './src/i18n/supportedLanguages'
 
 I18n.enableFallback = true;
@@ -42,7 +42,7 @@ const MeasurementTypeButtonSection = ({navigation}: {navigation: any}) => {
         style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
         <Button title="Flows" onPress={() => navigation.navigate('Flows')} />
         <Button
-          title={I18n.translate('aspiration')}
+          title={('aspiration')}
           onPress={() => navigation.navigate('Aspiration')}
         />
         <Button
