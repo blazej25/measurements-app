@@ -8,16 +8,10 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {
-  Button,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {Button, StyleSheet, Text, useColorScheme, View} from 'react-native';
 
 import {AspirationScreen} from './src/screens/AspirationScreen';
-import { DustScreen } from './src/screens/DustScreen';
+import {DustScreen} from './src/screens/DustScreen';
 import {EquipmentBaseScreen} from './src/screens/EquipmentBaseScreen';
 import {FlowsScreen} from './src/screens/FlowsScreen';
 import {GasAnalyzerCheckScreen} from './src/screens/GasAnalyzerCheckScreen';
@@ -25,40 +19,33 @@ import {H2O_14790_Screen} from './src/screens/H20_14790_Screen';
 import {MeasurementScreen as MeasurementsScreen} from './src/screens/MeasurementScreen';
 import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
 
-
 import i18next from './src/i18n/localization';
-
-import { useTranslation } from 'react-i18next';
 
 const Stack = createNativeStackNavigator();
 
-
 const MeasurementTypeButtonSection = ({navigation}: {navigation: any}) => {
-
   return (
-      <View
-        style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
-        <Button title="Flows" onPress={() => navigation.navigate('Flows')} />
-        <Button
-          title={i18next.t('aspiration')}
-          onPress={() => navigation.navigate('Aspiration')}
-        />
-        <Button
-          title="H2O_14790"
-          onPress={() => navigation.navigate('H2O_14790')}
-        />
-        <Button
-          title="Dust"
-          onPress={() => navigation.navigate('Dust')}
-        />
-      </View>);
-  };
+    <View
+      style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
+      <Button title="Flows" onPress={() => navigation.navigate('Flows')} />
+      <Button
+        title={i18next.t('aspiration')}
+        onPress={() => navigation.navigate('Aspiration')}
+      />
+      <Button
+        title={i18next.t('H2O_14790')}
+        onPress={() => navigation.navigate('H2O_14790')}
+      />
+      <Button title="Dust" onPress={() => navigation.navigate('Dust')} />
+    </View>
+  );
+};
 
 const HomeScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Welcome to the Measurements App!</Text>
-      <MeasurementTypeButtonSection navigation={navigation}/>
+      <MeasurementTypeButtonSection navigation={navigation} />
       <View
         style={{flex: 1, alignItems: 'flex-start', justifyContent: 'flex-end'}}>
         <Button
