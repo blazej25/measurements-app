@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Text, View} from 'react-native';
+import {Button, Text, TextInput, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
@@ -25,6 +25,7 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
         <Text style={{fontSize: 22, fontWeight: 'bold'}}>
           {t('translation:welcome')}
         </Text>
+        <CommonDataInput/>
         <MeasurementTypeSelector navigation={navigation} />
       </View>
     </>
@@ -32,34 +33,45 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
 };
 
 const CommonDataInput = () => {
-}
+  return (
+    <View>
+      <TextInput placeholder="Data" />
+      <TextInput placeholder="Data" />
+      <TextInput placeholder="Data" />
+      <TextInput placeholder="Data" />
+      <TextInput placeholder="Data" />
+    </View>
+  );
+};
 
 const MeasurementTypeSelector = ({navigation}: {navigation: any}) => {
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'flex-end',
-        marginBottom: 15,
-      }}>
-      <NavigationButton
-        navigation={navigation}
-        destinationScreen={Screens.flows}
-      />
-      <NavigationButton
-        navigation={navigation}
-        destinationScreen={Screens.aspiration}
-      />
-      <NavigationButton
-        navigation={navigation}
-        destinationScreen={Screens.H2O}
-      />
-      <NavigationButton
-        navigation={navigation}
-        destinationScreen={Screens.dust}
-      />
-    </View>
+    <>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'flex-end',
+          justifyContent: 'flex-end',
+          marginBottom: 15,
+        }}>
+        <NavigationButton
+          navigation={navigation}
+          destinationScreen={Screens.flows}
+        />
+        <NavigationButton
+          navigation={navigation}
+          destinationScreen={Screens.aspiration}
+        />
+        <NavigationButton
+          navigation={navigation}
+          destinationScreen={Screens.H2O}
+        />
+        <NavigationButton
+          navigation={navigation}
+          destinationScreen={Screens.dust}
+        />
+      </View>
+    </>
   );
 };

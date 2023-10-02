@@ -8,6 +8,7 @@ import {styles} from '../styles/common-styles';
  * the required screen. The destinationScreen prop needs to correspond to the name
  * of the screen as defined in constants.ts.
  * */
+
 export const NavigationButton = ({
   navigation,
   destinationScreen,
