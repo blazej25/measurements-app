@@ -2,26 +2,25 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Text, TouchableOpacity} from 'react-native';
 import { styles } from '../styles/common-styles';
+
 /**
  * A reusable navigation button. It depends on the navigation object to navigate to
- * the required screen. The buttonTitle prop needs to be present in the localization
- * config so that it can be translated based on the language settings.
- */
+ * the required screen. The destinationScreen prop needs to correspond to the name
+ * of the screen as defined in constants.ts.
+ * */
 export const NavigationButton = ({
   navigation,
-  buttonTitle,
-  destinationScreen: destination,
+  destinationScreen,
 }: {
   navigation: any;
-  buttonTitle: string;
-  destinationScreen: string;
+  destinationScreen: string,
 }) => {
   const {t} = useTranslation();
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate(destination)}
+      onPress={() => navigation.navigate(destinationScreen)}
       style={styles.roundedButton1}>
-      <Text style={{color: 'white'}}>{t(`translation:${buttonTitle}`)}</Text>
+      <Text style={styles.buttonText1}>{t(`translation:${destinationScreen}`)}</Text>
     </TouchableOpacity>
   );
 };

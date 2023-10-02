@@ -3,5 +3,10 @@ export default {
   aspiration: 'Aspiracja',
   flows: 'Przepływy',
   dust: 'Pyły',
-  h20: 'H20',
+  H2O: 'H2O 14790',
+  home: 'Strona główna',
+  measurements: 'Pomiary',
+  gasAnalyzerCheck: 'Sprawdzenie analizatora gazu',
+  utilities: 'Pomocnicze',
+  equipmentBase: 'Baza sprzętu',
 };

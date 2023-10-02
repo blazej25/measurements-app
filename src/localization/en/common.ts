@@ -1,7 +1,12 @@
 export default {
   welcome: 'Welcome',
-  aspiration: 'AspirationTest',
+  aspiration: 'Aspiration',
   flows: 'Flows',
   dust: 'Dust',
-  h20: 'H20',
+  H2O: 'H2O 14790',
+  home: 'Home',
+  measurements: 'Measurements',
+  gasAnalyzerCheck: 'Gas Analyzer Check',
+  utilities: 'Utilities',
+  equipmentBase: 'Equipment Base',
 };

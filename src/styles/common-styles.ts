@@ -7,4 +7,5 @@ export const styles = StyleSheet.create({
     backgroundColor: '#147EFB',
     marginRight: 5,
   },
+  buttonText1: {color: 'white', textTransform: 'uppercase', fontWeight: 'bold'},
 });

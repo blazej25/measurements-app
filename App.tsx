@@ -12,24 +12,65 @@ import {H2O_14790_Screen} from './src/screens/H20_14790_Screen';
 import {MeasurementsScreen} from './src/screens/MeasurementScreen';
 import {HomeScreen} from './src/screens/HomeScreen';
 import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
+import {useTranslation} from 'react-i18next';
+import { Screens } from './src/constants';
 
 const Stack = createNativeStackNavigator();
+
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
+  const {t} = useTranslation();
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Measurements" component={MeasurementsScreen} />
-        <Stack.Screen name="Flows" component={FlowsScreen} />
-        <Stack.Screen name="Aspiration" component={AspirationScreen} />
-        <Stack.Screen name="Dust" component={DustScreen} />
-        <Stack.Screen name="H2O_14790" component={H2O_14790_Screen} />
-        <Stack.Screen name="GasAnalyzerCheck" component={GasAnalyzerScreen} />
-        <Stack.Screen name="Utilities" component={UtilitiesScreen} />
-        <Stack.Screen name="EquipmentBase" component={EquipmentBaseScreen} />
+        <Stack.Screen
+          name={Screens.home}
+          component={HomeScreen}
+          options={{title: t(`translation:${Screens.home}`)}}
+        />
+        <Stack.Screen
+          name={Screens.measurements}
+          component={MeasurementsScreen}
+          options={{title: t(`translation:${Screens.measurements}`)}}
+        />
+        <Stack.Screen
+          name={Screens.flows}
+          component={FlowsScreen}
+          options={{title: t(`translation:${Screens.flows}`)}}
+        />
+        <Stack.Screen
+          name={Screens.aspiration}
+          component={AspirationScreen}
+          options={{title: t(`translation:${Screens.aspiration}`)}}
+        />
+        <Stack.Screen
+          name={Screens.dust}
+          component={DustScreen}
+          options={{title: t(`translation:${Screens.dust}`)}}
+        />
+        <Stack.Screen
+          name={Screens.H2O}
+          component={H2O_14790_Screen}
+          options={{title: t(`translation:${Screens.H2O}`)}}
+        />
+        <Stack.Screen
+          name={Screens.gasAnalyzerCheck}
+          component={GasAnalyzerScreen}
+          options={{title: t(`translation:${Screens.gasAnalyzerCheck}`)}}
+        />
+        <Stack.Screen
+          name={Screens.utilities}
+          component={UtilitiesScreen}
+          options={{title: t(`translation:${Screens.utilities}`)}}
+        />
+        <Stack.Screen
+          name={Screens.equipmentBase}
+          component={EquipmentBaseScreen}
+          options={{title: t(`translation:${Screens.equipmentBase}`)}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
