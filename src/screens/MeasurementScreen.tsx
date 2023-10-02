@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, Text, View} from 'react-native';
 
-export const MeasurementScreen = ({navigation}: {navigation: any}) => {
+export const MeasurementsScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Próba</Text>
