@@ -1,7 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Text, TouchableOpacity} from 'react-native';
-import { styles } from '../styles/common-styles';
+import {styles} from '../styles/common-styles';
 
 /**
  * A reusable navigation button. It depends on the navigation object to navigate to
@@ -13,14 +13,16 @@ export const NavigationButton = ({
   destinationScreen,
 }: {
   navigation: any;
-  destinationScreen: string,
+  destinationScreen: string;
 }) => {
   const {t} = useTranslation();
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate(destinationScreen)}
       style={styles.roundedButton1}>
-      <Text style={styles.buttonText1}>{t(`translation:${destinationScreen}`)}</Text>
+      <Text style={styles.buttonText1}>
+        {t(`translation:${destinationScreen}`)}
+      </Text>
     </TouchableOpacity>
   );
 };

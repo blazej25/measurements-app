@@ -12,6 +12,7 @@ import {H2O_14790_Screen} from './src/screens/H20_14790_Screen';
 import {MeasurementsScreen} from './src/screens/MeasurementScreen';
 import {HomeScreen} from './src/screens/HomeScreen';
 import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
+import {SettingsScreen} from './src/screens/SettingsScreen';
 import {useTranslation} from 'react-i18next';
 import { Screens } from './src/constants';
 
@@ -70,6 +71,11 @@ function App(): JSX.Element {
           name={Screens.equipmentBase}
           component={EquipmentBaseScreen}
           options={{title: t(`translation:${Screens.equipmentBase}`)}}
+        />
+        <Stack.Screen
+          name={Screens.settings}
+          component={SettingsScreen}
+          options={{title: t(`translation:${Screens.settings}`)}}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -10,5 +10,9 @@ export const en = {
     gasAnalyzerCheck: 'Gas Analyzer Check',
     utilities: 'Utilities',
     equipmentBase: 'Equipment Base',
+    changeLanguage: 'Change language',
+    polish: 'Polish',
+    english: 'English',
+    settings: 'Settings',
   },
 };

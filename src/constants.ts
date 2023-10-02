@@ -8,4 +8,5 @@ export const Screens = {
   gasAnalyzerCheck: 'gasAnalyzerCheck',
   utilities: 'utilities',
   equipmentBase: 'equipmentBase',
+  settings: 'settings',
 };

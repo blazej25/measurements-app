@@ -10,5 +10,9 @@ export const pl = {
     gasAnalyzerCheck: 'Sprawdzenie analizatora gazu',
     utilities: 'Pomocnicze',
     equipmentBase: 'Baza sprzętu',
+    changeLanguage: 'Zmień język',
+    polish: 'Polski',
+    english: 'Angielski',
+    settings: 'Ustawienia',
   },
 };

@@ -1,11 +1,16 @@
 import React from 'react';
 import {Button, Text, View} from 'react-native';
+import { NavigationButton } from '../components/buttons';
+import { Screens } from '../constants';
 
 export const MeasurementsScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Próba</Text>
-      <Button title="Powrót" onPress={() => navigation.navigate('Home')} />
+      <NavigationButton
+        navigation={navigation}
+        destinationScreen={Screens.home}
+      />
     </View>
   );
 };
