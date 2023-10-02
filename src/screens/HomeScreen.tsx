@@ -31,6 +31,9 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
   );
 };
 
+const CommonDataInput = () => {
+}
+
 const MeasurementTypeSelector = ({navigation}: {navigation: any}) => {
   return (
     <View
@@ -39,7 +42,7 @@ const MeasurementTypeSelector = ({navigation}: {navigation: any}) => {
         flexDirection: 'row',
         alignItems: 'flex-end',
         justifyContent: 'flex-end',
-        marginBottom: 5,
+        marginBottom: 15,
       }}>
       <NavigationButton
         navigation={navigation}

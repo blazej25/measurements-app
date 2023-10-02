@@ -24,11 +24,12 @@ export const SettingsScreen = ({navigation, route}: any) => {
     <View
       style={{
         flex: 1,
-        alignItems: 'center',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
         justifyContent: 'flex-start',
         marginBottom: 5,
       }}>
-      <Text style={styles.defaultHeader}> {t('translation:changeLanguage')}</Text>
+      <Text style={{...styles.defaultHeader, alignSelf: 'flex-start'}}> {t('translation:changeLanguage')}</Text>
       {languages.map((currentLang, i) => {
         const isLanguageSelected = currentLang.code === currentLanguageCode;
         return (
