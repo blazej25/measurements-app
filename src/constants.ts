@@ -10,3 +10,14 @@ export const Screens = {
   equipmentBase: 'equipmentBase',
   settings: 'settings',
 };
+
+export const CommonDataSchema = {
+  date: 'date',
+  arrivalTime: 'arrivalTime',
+  measurementRequestor: 'measurementRequestor',
+  emissionSource: 'emissionSource',
+  pipeCrossSectionType: 'pipeCrossSectionType',
+  staffResponsibleForMeasurement: 'staffResponsibleForMeasurement',
+  temperature: 'temperature',
+  pressure: 'pressure',
+};

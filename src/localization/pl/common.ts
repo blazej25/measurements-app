@@ -1,5 +1,5 @@
 export const pl = {
-  translation: {
+  userInterface: {
     welcome: 'Witaj',
     aspiration: 'Aspiracja',
     flows: 'Przepływy',
@@ -14,5 +14,15 @@ export const pl = {
     polish: 'Polski',
     english: 'Angielski',
     settings: 'Ustawienia',
+  },
+  commonDataForm: {
+    date: 'Data',
+    arrivalTime: 'Godzina przyjazdu',
+    measurementRequestor: 'Zleceniodawca',
+    emissionSource: 'Źródło emisji',
+    pipeCrossSectionType: 'Rodzaj przewodu',
+    staffResponsibleForMeasurement: 'Personel biorący udział w pomiarach',
+    temperature: 'Temperatura otoczenia',
+    pressure: 'Ciśnienie atmosferyczne',
   },
 };

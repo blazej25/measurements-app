@@ -30,52 +30,52 @@ function App(): JSX.Element {
         <Stack.Screen
           name={Screens.home}
           component={HomeScreen}
-          options={{title: t(`translation:${Screens.home}`)}}
+          options={{title: t(`userInterface:${Screens.home}`)}}
         />
         <Stack.Screen
           name={Screens.measurements}
           component={MeasurementsScreen}
-          options={{title: t(`translation:${Screens.measurements}`)}}
+          options={{title: t(`userInterface:${Screens.measurements}`)}}
         />
         <Stack.Screen
           name={Screens.flows}
           component={FlowsScreen}
-          options={{title: t(`translation:${Screens.flows}`)}}
+          options={{title: t(`userInterface:${Screens.flows}`)}}
         />
         <Stack.Screen
           name={Screens.aspiration}
           component={AspirationScreen}
-          options={{title: t(`translation:${Screens.aspiration}`)}}
+          options={{title: t(`userInterface:${Screens.aspiration}`)}}
         />
         <Stack.Screen
           name={Screens.dust}
           component={DustScreen}
-          options={{title: t(`translation:${Screens.dust}`)}}
+          options={{title: t(`userInterface:${Screens.dust}`)}}
         />
         <Stack.Screen
           name={Screens.H2O}
           component={H2O_14790_Screen}
-          options={{title: t(`translation:${Screens.H2O}`)}}
+          options={{title: t(`userInterface:${Screens.H2O}`)}}
         />
         <Stack.Screen
           name={Screens.gasAnalyzerCheck}
           component={GasAnalyzerScreen}
-          options={{title: t(`translation:${Screens.gasAnalyzerCheck}`)}}
+          options={{title: t(`userInterface:${Screens.gasAnalyzerCheck}`)}}
         />
         <Stack.Screen
           name={Screens.utilities}
           component={UtilitiesScreen}
-          options={{title: t(`translation:${Screens.utilities}`)}}
+          options={{title: t(`userInterface:${Screens.utilities}`)}}
         />
         <Stack.Screen
           name={Screens.equipmentBase}
           component={EquipmentBaseScreen}
-          options={{title: t(`translation:${Screens.equipmentBase}`)}}
+          options={{title: t(`userInterface:${Screens.equipmentBase}`)}}
         />
         <Stack.Screen
           name={Screens.settings}
           component={SettingsScreen}
-          options={{title: t(`translation:${Screens.settings}`)}}
+          options={{title: t(`userInterface:${Screens.settings}`)}}
         />
       </Stack.Navigator>
     </NavigationContainer>

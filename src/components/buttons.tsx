@@ -22,7 +22,7 @@ export const NavigationButton = ({
       onPress={() => navigation.navigate(destinationScreen)}
       style={styles.roundedButton1}>
       <Text style={styles.buttonText1}>
-        {t(`translation:${destinationScreen}`)}
+        {t(`userInterface:${destinationScreen}`)}
       </Text>
     </TouchableOpacity>
   );
