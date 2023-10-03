@@ -13,6 +13,7 @@ import {
   styles,
 } from '../styles/common-styles';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { MenuBar } from '../components/MenuBar';
 
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
@@ -31,7 +32,7 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
       </View>
       <WelcomeHeader />
       <CommonDataInput />
-      <MeasurementTypeSelector navigation={navigation} />
+      <MenuBar navigation={navigation} />
     </>
   );
 };
@@ -195,33 +196,3 @@ const InputRow = ({
   );
 };
 
-const MeasurementTypeSelector = ({navigation}: {navigation: any}) => {
-  return (
-    <>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          marginBottom: 15,
-          gap: defaultGap,
-        }}>
-        <NavigationButton
-          navigation={navigation}
-          destinationScreen={Screens.flows}
-        />
-        <NavigationButton
-          navigation={navigation}
-          destinationScreen={Screens.aspiration}
-        />
-        <NavigationButton
-          navigation={navigation}
-          destinationScreen={Screens.H2O}
-        />
-        <NavigationButton
-          navigation={navigation}
-          destinationScreen={Screens.dust}
-        />
-      </View>
-    </>
-  );
-};
