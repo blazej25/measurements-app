@@ -10,13 +10,13 @@ export const SettingsScreen = ({navigation, route}: any) => {
 
   const languages = [
     // Language List
-    {code: 'en', label: t('translation:english')},
-    {code: 'pl', label: t('translation:polish')},
+    {code: 'en', label: t('userInterface:english')},
+    {code: 'pl', label: t('userInterface:polish')},
   ];
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      headerTitle: t('translation:settings'),
+      headerTitle: t('userInterface:settings'),
     });
     return () => {};
   }, [navigation, language]);
@@ -29,7 +29,7 @@ export const SettingsScreen = ({navigation, route}: any) => {
         justifyContent: 'flex-start',
         marginBottom: 5,
       }}>
-      <Text style={{...styles.defaultHeader, alignSelf: 'flex-start'}}> {t('translation:changeLanguage')}</Text>
+      <Text style={{...styles.defaultHeader, alignSelf: 'flex-start'}}> {t('userInterface:changeLanguage')}</Text>
       {languages.map((currentLang, i) => {
         const isLanguageSelected = currentLang.code === currentLanguageCode;
         return (

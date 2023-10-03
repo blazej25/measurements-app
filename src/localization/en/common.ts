@@ -1,5 +1,5 @@
 export const en = {
-  translation: {
+  userInterface: {
     welcome: 'Welcome',
     aspiration: 'Aspiration',
     flows: 'Flows',
@@ -14,5 +14,15 @@ export const en = {
     polish: 'Polish',
     english: 'English',
     settings: 'Settings',
+  },
+  commonDataForm: {
+    date: 'Date',
+    arrivalTime: 'Time of arrival',
+    measurementRequestor: 'Principal',
+    emissionSource: 'Emmission source',
+    pipeCrossSectionType: 'Pipe cross section type',
+    staffResponsibleForMeasurement: 'Staff carrying out the measurements',
+    temperature: 'Ambient temperature',
+    pressure: 'Atmospheric pressure',
   },
 };
