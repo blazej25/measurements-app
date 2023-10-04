@@ -13,7 +13,7 @@ import {
   styles,
 } from '../styles/common-styles';
 import RNDateTimePicker, {
-  DateTimePickerAndroid,
+  DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import {MenuBar} from '../components/MenuBar';
 
@@ -25,6 +25,7 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
           alignItems: 'flex-end',
           justifyContent: 'flex-start',
           marginTop: 5,
+          marginRight: 5,
         }}>
         <NavigationButton
           navigation={navigation}
@@ -75,13 +76,8 @@ const CommonDataInput = () => {
       <DateTimeSelectorGroup
         date={date}
         setDate={setDate}
-        label="Data"
-        placeholder="Date3"
-      />
-      <InputRow
-        placeholder="17:00"
-        onChangeText={setArrivalTime}
-        label={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
+        dateLabel={t(`commonDataForm:${CommonDataSchema.date}`) + ':'}
+        timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
       />
       <InputRow
         placeholder="Jan Kowalski"
@@ -110,50 +106,73 @@ const CommonDataInput = () => {
 };
 
 const DateTimeSelectorGroup = ({
-  label,
-  placeholder,
+  dateLabel,
+  timeLabel,
   date,
   setDate,
 }: {
-  label: string;
-  placeholder: string;
+  dateLabel: string;
+  timeLabel: string;
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
 }) => {
+  const [datePickerActive, setDatePickerActive] = useState(false);
+  const [timePickerActive, setTimePickerActive] = useState(false);
   return (
-    <TouchableOpacity
-      style={{
-        borderRadius: largeBorderRadius,
-        flexDirection: 'row',
-        backgroundColor: colors.buttonBlue,
-        alignSelf: 'stretch',
-        marginHorizontal: defaultGap,
-        justifyContent: 'space-between',
-      }}>
-      <Text
-        style={{
-          ...styles.buttonText1,
-          alignSelf: 'center',
-          margin: defaultGap,
-          marginLeft: defaultPadding,
-        }}>
-        {label}
-      </Text>
-      <TouchableOpacity
-        style={{
-          borderRadius: defaultBorderRadius,
-          flexDirection: 'row',
-          margin: defaultGap,
-          paddingHorizontal: defaultPadding,
-          backgroundColor: colors.secondaryBlue,
-        }}
-        onPress={() => {
-          DateTimePickerAndroid.open({value: date});
-          console.log(date);
-        }}>
-        <Text>{date.toString()}</Text>
-      </TouchableOpacity>
-    </TouchableOpacity>
+    <>
+      <DataRow label={dateLabel}>
+        <TouchableOpacity
+          onPress={() => {
+            setDatePickerActive(true);
+          }}>
+          <Text
+            style={{height: 40, textAlignVertical: 'center', color: 'black'}}>
+            {`${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`}
+          </Text>
+          {datePickerActive && (
+            <RNDateTimePicker
+              mode="date"
+              value={date}
+              onChange={(
+                event: DateTimePickerEvent,
+                selectedDate?: Date | undefined,
+              ) => {
+                if (event.type === 'set' && selectedDate !== undefined) {
+                  setDate(selectedDate);
+                }
+                setDatePickerActive(false);
+              }}
+            />
+          )}
+        </TouchableOpacity>
+      </DataRow>
+      <DataRow label={timeLabel}>
+        <TouchableOpacity
+          onPress={() => {
+            setTimePickerActive(true);
+          }}>
+          <Text
+            style={{height: 40, textAlignVertical: 'center', color: 'black'}}>
+            {`${date.getHours()}:${date.getMinutes()}`}
+          </Text>
+          {timePickerActive && (
+            <RNDateTimePicker
+              mode="time"
+              value={date}
+              onChange={(
+                event: DateTimePickerEvent,
+                selectedDate?: Date | undefined,
+              ) => {
+                if (event.type === 'set' && selectedDate !== undefined) {
+                  setDate(selectedDate);
+                }
+                setTimePickerActive(false);
+              }}
+            />
+          )}
+        </TouchableOpacity>
+      </DataRow>
+    </>
   );
 };
 
@@ -167,6 +186,25 @@ const InputRow = ({
   onChangeText: (text: string) => void;
 }) => {
   return (
+    <DataRow label={label}>
+      <TextInput
+        placeholderTextColor={'gray'}
+        placeholder={placeholder}
+        onChangeText={onChangeText}
+        style={{height: 40}}
+      />
+    </DataRow>
+  );
+};
+
+const DataRow = ({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) => {
+  return (
     <TouchableOpacity
       style={{
         borderRadius: largeBorderRadius,
@@ -193,11 +231,7 @@ const InputRow = ({
           paddingHorizontal: defaultPadding,
           backgroundColor: colors.secondaryBlue,
         }}>
-        <TextInput
-          placeholderTextColor={'gray'}
-          placeholder={placeholder}
-          onChangeText={onChangeText}
-        />
+        {children}
       </TouchableOpacity>
     </TouchableOpacity>
   );
