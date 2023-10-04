@@ -12,9 +12,10 @@ import {
   largeBorderRadius,
   styles,
 } from '../styles/common-styles';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { MenuBar } from '../components/MenuBar';
-
+import RNDateTimePicker, {
+  DateTimePickerAndroid,
+} from '@react-native-community/datetimepicker';
+import {MenuBar} from '../components/MenuBar';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
   return (
@@ -71,7 +72,12 @@ const CommonDataInput = () => {
         justifyContent: 'flex-start',
         gap: defaultGap,
       }}>
-      <DateSelector date={date} setDate={setDate} label="Data" placeholder="Date3"/>
+      <DateTimeSelectorGroup
+        date={date}
+        setDate={setDate}
+        label="Data"
+        placeholder="Date3"
+      />
       <InputRow
         placeholder="17:00"
         onChangeText={setArrivalTime}
@@ -103,7 +109,7 @@ const CommonDataInput = () => {
   );
 };
 
-const DateSelector = ({
+const DateTimeSelectorGroup = ({
   label,
   placeholder,
   date,
@@ -141,9 +147,10 @@ const DateSelector = ({
           paddingHorizontal: defaultPadding,
           backgroundColor: colors.secondaryBlue,
         }}
-        onPress={() =>
-        DateTimePickerAndroid.open({value: date})
-        }>
+        onPress={() => {
+          DateTimePickerAndroid.open({value: date});
+          console.log(date);
+        }}>
         <Text>{date.toString()}</Text>
       </TouchableOpacity>
     </TouchableOpacity>
@@ -195,4 +202,3 @@ const InputRow = ({
     </TouchableOpacity>
   );
 };
-
