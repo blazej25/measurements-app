@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {Button, Text, TouchableOpacity, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
@@ -11,9 +11,48 @@ import {
   SelectorBar,
   TextInputBar,
 } from '../components/input-bars';
-import {PipeCrossSectionType} from '../model';
+import {
+  CommonMeasurementData,
+  CommonMeasurementDataSetters,
+  Person,
+  PipeCrossSectionType,
+} from '../model';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
+  const [date, setDate] = useState(new Date());
+  const [measurementRequestor, setMeasurementRequestor] = useState('');
+  const [emissionSource, setEmissionSource] = useState('');
+  const [pipeCrossSectionType, setPipeCrossSectionType] = useState(
+    PipeCrossSectionType.ROUND,
+  );
+  const emptyPersonArray: Person[] = [];
+  const [staffResponsibleForMeasurement, setStaffResponsibleForMeasurement]: [
+    Person[],
+    React.Dispatch<React.SetStateAction<Person[]>>,
+  ] = useState(emptyPersonArray);
+  const [temperature, setTemperature] = useState(0);
+  const [pressure, setPressure] = useState(0);
+
+  const data: CommonMeasurementData = {
+    date: date,
+    measurementRequestor: measurementRequestor,
+    emissionSource: emissionSource,
+    pipeCrossSectionType: pipeCrossSectionType,
+    staffResponsibleForMeasurement: staffResponsibleForMeasurement,
+    temperature: temperature,
+    pressure: pressure,
+  };
+
+  const setters: CommonMeasurementDataSetters = {
+    setDate: setDate,
+    setMeasurementRequestor: setMeasurementRequestor,
+    setEmissionSource: setEmissionSource,
+    setPipeCrossSectionType: setPipeCrossSectionType,
+    setStaffResponsibleForMeasurement: setStaffResponsibleForMeasurement,
+    setPressure: setPressure,
+    setTemperature: setTemperature,
+  };
+
   return (
     <>
       <View
@@ -29,7 +68,11 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
         />
       </View>
       <WelcomeHeader />
-      <CommonDataInput />
+      <CommonDataInput data={data} setters={setters} />
+      <TouchableOpacity
+        onPress={() => console.log(JSON.stringify(data, null, '\t'))}>
+        <Text>TEST</Text>
+      </TouchableOpacity>
     </>
   );
 };
@@ -50,15 +93,13 @@ const WelcomeHeader = () => {
   );
 };
 
-const CommonDataInput = () => {
-  const [date, setDate] = useState(new Date());
-  const [measurementRequestor, setMeasurementRequestor] = useState('');
-  const [emissionSource, setEmissionSource] = useState('');
-  const [pipeCrossSectionType, setPipeCrossSectionType] = useState(null);
-  const [staffResponsibleForMeasurement, setStaffResponsibleForMeasurement] =
-    useState([]);
-  const [temperature, setTemperature] = useState(0);
-  const [pressure, setPressure] = useState(0);
+const CommonDataInput = ({
+  data,
+  setters,
+}: {
+  data: CommonMeasurementData;
+  setters: CommonMeasurementDataSetters;
+}) => {
   const {t} = useTranslation();
   return (
     <View
@@ -68,21 +109,21 @@ const CommonDataInput = () => {
         gap: defaultGap,
       }}>
       <DateTimeSelectorGroup
-        date={date}
-        setDate={setDate}
+        date={data.date}
+        setDate={setters.setDate}
         dateLabel={t(`commonDataForm:${CommonDataSchema.date}`) + ':'}
         timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
       />
       <TextInputBar
         placeholder="Jan Kowalski"
-        onChangeText={setMeasurementRequestor}
+        onChangeText={setters.setMeasurementRequestor}
         label={
           t(`commonDataForm:${CommonDataSchema.measurementRequestor}`) + ':'
         }
       />
       <TextInputBar
         placeholder="some source"
-        onChangeText={setEmissionSource}
+        onChangeText={setters.setEmissionSource}
         label={t(`commonDataForm:${CommonDataSchema.emissionSource}`) + ':'}
       />
       <SelectorBar
@@ -93,20 +134,20 @@ const CommonDataInput = () => {
           item.toString(),
         )}
         onSelect={(selectedItem: string, _index: number) => {
-          setPipeCrossSectionType(PipeCrossSectionType[selectedItem]);
+          setters.setPipeCrossSectionType(PipeCrossSectionType[selectedItem]);
         }}
         selectionToText={selection => t(`pipeCrossSectionTypes:${selection}`)}
       />
       <NumberInputBar
         placeholder="20"
         valueUnit="℃"
-        onChangeText={text => setTemperature(parseFloat(text))}
+        onChangeText={text => setters.setTemperature(parseFloat(text))}
         label={t(`commonDataForm:${CommonDataSchema.temperature}`) + ':'}
       />
       <NumberInputBar
         placeholder="1100"
         valueUnit="hPa"
-        onChangeText={text => setPressure(parseFloat(text))}
+        onChangeText={text => setters.setPressure(parseFloat(text))}
         label={t(`commonDataForm:${CommonDataSchema.pressure}`) + ':'}
       />
     </View>

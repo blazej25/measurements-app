@@ -40,7 +40,9 @@ export const SelectorBar = ({
     backgroundColor: colors.buttonBlue,
     // The height of the dropdown needs to include space for all selection items
     // plus the gaps between them
-    height: selectorItemStyle.height * selections.length + defaultGap * (selections.length + 1),
+    height:
+      selectorItemStyle.height * selections.length +
+      defaultGap * (selections.length + 1),
   };
   return (
     <DataBar label={label}>
@@ -170,7 +172,7 @@ export const DateTimeSelectorGroup = ({
   dateLabel: string;
   timeLabel: string;
   date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  setDate: (date: Date) => void;
 }) => {
   const [datePickerActive, setDatePickerActive] = useState(false);
   const [timePickerActive, setTimePickerActive] = useState(false);
