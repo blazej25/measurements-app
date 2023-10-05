@@ -14,10 +14,10 @@ import {HomeScreen} from './src/screens/HomeScreen';
 import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
 import {SettingsScreen} from './src/screens/SettingsScreen';
 import {useTranslation} from 'react-i18next';
-import { Screens } from './src/constants';
+import {Screens} from './src/constants';
+import { MenuBar } from './src/components/MenuBar';
 
 const Stack = createNativeStackNavigator();
-
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -25,60 +25,63 @@ function App(): JSX.Element {
   const {t} = useTranslation();
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name={Screens.home}
-          component={HomeScreen}
-          options={{title: t(`userInterface:${Screens.home}`)}}
-        />
-        <Stack.Screen
-          name={Screens.measurements}
-          component={MeasurementsScreen}
-          options={{title: t(`userInterface:${Screens.measurements}`)}}
-        />
-        <Stack.Screen
-          name={Screens.flows}
-          component={FlowsScreen}
-          options={{title: t(`userInterface:${Screens.flows}`)}}
-        />
-        <Stack.Screen
-          name={Screens.aspiration}
-          component={AspirationScreen}
-          options={{title: t(`userInterface:${Screens.aspiration}`)}}
-        />
-        <Stack.Screen
-          name={Screens.dust}
-          component={DustScreen}
-          options={{title: t(`userInterface:${Screens.dust}`)}}
-        />
-        <Stack.Screen
-          name={Screens.H2O}
-          component={H2O_14790_Screen}
-          options={{title: t(`userInterface:${Screens.H2O}`)}}
-        />
-        <Stack.Screen
-          name={Screens.gasAnalyzerCheck}
-          component={GasAnalyzerScreen}
-          options={{title: t(`userInterface:${Screens.gasAnalyzerCheck}`)}}
-        />
-        <Stack.Screen
-          name={Screens.utilities}
-          component={UtilitiesScreen}
-          options={{title: t(`userInterface:${Screens.utilities}`)}}
-        />
-        <Stack.Screen
-          name={Screens.equipmentBase}
-          component={EquipmentBaseScreen}
-          options={{title: t(`userInterface:${Screens.equipmentBase}`)}}
-        />
-        <Stack.Screen
-          name={Screens.settings}
-          component={SettingsScreen}
-          options={{title: t(`userInterface:${Screens.settings}`)}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name={Screens.home}
+            component={HomeScreen}
+            options={{title: t(`userInterface:${Screens.home}`)}}
+          />
+          <Stack.Screen
+            name={Screens.measurements}
+            component={MeasurementsScreen}
+            options={{title: t(`userInterface:${Screens.measurements}`)}}
+          />
+          <Stack.Screen
+            name={Screens.flows}
+            component={FlowsScreen}
+            options={{title: t(`userInterface:${Screens.flows}`)}}
+          />
+          <Stack.Screen
+            name={Screens.aspiration}
+            component={AspirationScreen}
+            options={{title: t(`userInterface:${Screens.aspiration}`)}}
+          />
+          <Stack.Screen
+            name={Screens.dust}
+            component={DustScreen}
+            options={{title: t(`userInterface:${Screens.dust}`)}}
+          />
+          <Stack.Screen
+            name={Screens.H2O}
+            component={H2O_14790_Screen}
+            options={{title: t(`userInterface:${Screens.H2O}`)}}
+          />
+          <Stack.Screen
+            name={Screens.gasAnalyzerCheck}
+            component={GasAnalyzerScreen}
+            options={{title: t(`userInterface:${Screens.gasAnalyzerCheck}`)}}
+          />
+          <Stack.Screen
+            name={Screens.utilities}
+            component={UtilitiesScreen}
+            options={{title: t(`userInterface:${Screens.utilities}`)}}
+          />
+          <Stack.Screen
+            name={Screens.equipmentBase}
+            component={EquipmentBaseScreen}
+            options={{title: t(`userInterface:${Screens.equipmentBase}`)}}
+          />
+          <Stack.Screen
+            name={Screens.settings}
+            component={SettingsScreen}
+            options={{title: t(`userInterface:${Screens.settings}`)}}
+          />
+        </Stack.Navigator>
+      <MenuBar/>
+      </NavigationContainer>
+    </>
   );
 }
 

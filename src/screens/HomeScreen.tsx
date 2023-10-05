@@ -34,7 +34,6 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
       </View>
       <WelcomeHeader />
       <CommonDataInput />
-      <MenuBar navigation={navigation} />
     </>
   );
 };
@@ -191,7 +190,6 @@ const InputRow = ({
         placeholderTextColor={'gray'}
         placeholder={placeholder}
         onChangeText={onChangeText}
-        style={{height: 40}}
       />
     </DataRow>
   );
@@ -206,11 +204,11 @@ const DataRow = ({
 }) => {
   return (
     <TouchableOpacity
+      activeOpacity={1.0}
       style={{
         borderRadius: largeBorderRadius,
         flexDirection: 'row',
         backgroundColor: colors.buttonBlue,
-        alignSelf: 'stretch',
         marginHorizontal: defaultGap,
         justifyContent: 'space-between',
       }}>
@@ -230,6 +228,7 @@ const DataRow = ({
           margin: defaultGap,
           paddingHorizontal: defaultPadding,
           backgroundColor: colors.secondaryBlue,
+          height: 40,
         }}>
         {children}
       </TouchableOpacity>

@@ -1,27 +1,24 @@
-import React, {useState} from 'react';
-import {Button, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
 
-import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
-import {CommonDataSchema, Screens} from '../constants';
-import {
-  colors,
-  defaultBorderRadius,
-  defaultGap,
-  defaultPadding,
-  largeBorderRadius,
-  styles,
-} from '../styles/common-styles';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import {Screens} from '../constants';
+import {colors, defaultGap, defaultPadding} from '../styles/common-styles';
+import {useNavigation} from '@react-navigation/native';
 
-export const MenuBar = ({navigation}: {navigation: any}) => {
+export const MenuBar = () => {
+  // We use the useNavigation hook as the menu bar is accessible at the top
+  // level and it isn't possible to pass the navigation prop to this component
+  // via the stack navigator.
+  const navigation = useNavigation();
   return (
-    <>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'center',
-          marginBottom: 15,
+          backgroundColor: colors.secondaryBlue,
+          padding: defaultPadding,
+          alignSelf: 'stretch',
           gap: defaultGap,
         }}>
         <NavigationButton
@@ -41,6 +38,5 @@ export const MenuBar = ({navigation}: {navigation: any}) => {
           destinationScreen={Screens.dust}
         />
       </View>
-    </>
   );
 };

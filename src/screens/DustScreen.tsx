@@ -49,15 +49,6 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
         label={'Woda'}
       />
       </View>
-      <MenuBar navigation={navigation} />
-      <Button title="Press me to test" onPress={() => {
-        console.log(numberOfMeasurements);
-        console.log(end);
-        console.log(time);
-        console.log(volume);
-        console.log(filter);
-        console.log(water);
-      }}></Button>
     </>
   );
 };
