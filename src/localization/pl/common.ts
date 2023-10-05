@@ -22,6 +22,7 @@ export const pl = {
     emissionSource: 'Źródło emisji',
     pipeCrossSectionType: 'Rodzaj przewodu',
     staffResponsibleForMeasurement: 'Personel wykonujący pomiary',
+    nameAndSurname: 'Imię i nazwisko',
     temperature: 'Temperatura otoczenia',
     pressure: 'Ciśnienie atmosferyczne',
   },

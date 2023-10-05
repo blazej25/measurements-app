@@ -16,6 +16,8 @@ import {
   styles,
 } from '../styles/common-styles';
 import {getDateString, getTimeString} from '../util/date-util';
+import { useTranslation } from 'react-i18next';
+import { CommonDataSchema } from '../constants';
 
 export const SelectorBar = ({
   label,
@@ -89,6 +91,7 @@ export const StaffListInputBar = ({
   const [addingStaffMember, setAddingStaffMember] = useState(false);
   const [newStaffMemberName, setNewStaffMemberName] = useState('');
   const [isCollapsed, setCollapsed] = useState(false);
+  const {t} = useTranslation();
   return (
     <>
       <TouchableOpacity
@@ -147,7 +150,9 @@ export const StaffListInputBar = ({
         </View>
       </TouchableOpacity>
       {addingStaffMember && (
-        <DataBar label={'Imię i nazwisko'}>
+        <DataBar label={
+          t(`commonDataForm:${CommonDataSchema.nameAndSurname}`)
+          }>
           <TextInput
             placeholderTextColor={'gray'}
             placeholder={'Jan Kowalski'}
