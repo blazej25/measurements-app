@@ -1,5 +1,9 @@
-import React from 'react';
+import RNDateTimePicker, {
+  DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
+import React, {useState} from 'react';
 import {Text, TextInput, TouchableOpacity} from 'react-native';
+import SelectDropdown from 'react-native-select-dropdown';
 
 import {
   colors,
@@ -9,7 +13,41 @@ import {
   largeBorderRadius,
   styles,
 } from '../styles/common-styles';
+import {getDateString, getTimeString} from '../util/date-util';
 
+export const SelectorBar = ({
+  label,
+  selections,
+  onSelect,
+}: {
+  label: string;
+  selections: string[];
+  onSelect: (selectedItem: string, index: number) => void;
+}) => {
+  return (
+    <DataBar label={label}>
+      <SelectDropdown
+        buttonStyle={{
+          borderRadius: defaultBorderRadius,
+          backgroundColor: colors.secondaryBlue,
+          height: 40,
+        }}
+        buttonTextStyle={{fontSize: 14}}
+        data={selections}
+        onSelect={(selectedItem, index) => {
+          console.log(selectedItem, index);
+          onSelect(selectedItem, index);
+        }}
+        buttonTextAfterSelection={(selectedItem, _index) => {
+          return selectedItem;
+        }}
+        rowTextForSelection={(item, _index) => {
+          return item;
+        }}
+      />
+    </DataBar>
+  );
+};
 
 export const NumberInputBar = ({
   label,
@@ -30,14 +68,12 @@ export const NumberInputBar = ({
         placeholder={placeholder}
         onChangeText={onChangeText}
         textAlign={'right'}
+        style={styles.dataSelectorText}
       />
-      <Text style={{textAlignVertical: 'center', color: 'black'}}>
-      {valueUnit}
-      </Text>
+      <Text style={styles.dataSelectorText}>{valueUnit}</Text>
     </DataBar>
   );
 };
-
 
 export const TextInputBar = ({
   label,
@@ -54,6 +90,7 @@ export const TextInputBar = ({
         placeholderTextColor={'gray'}
         placeholder={placeholder}
         onChangeText={onChangeText}
+        style={styles.dataSelectorText}
       />
     </DataBar>
   );
@@ -97,5 +134,71 @@ export const DataBar = ({
         {children}
       </TouchableOpacity>
     </TouchableOpacity>
+  );
+};
+
+export const DateTimeSelectorGroup = ({
+  dateLabel,
+  timeLabel,
+  date,
+  setDate,
+}: {
+  dateLabel: string;
+  timeLabel: string;
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+}) => {
+  const [datePickerActive, setDatePickerActive] = useState(false);
+  const [timePickerActive, setTimePickerActive] = useState(false);
+
+  return (
+    <>
+      <DataBar label={dateLabel}>
+        <TouchableOpacity
+          onPress={() => {
+            setDatePickerActive(true);
+          }}>
+          <Text style={styles.dataSelectorText}>{getDateString(date)}</Text>
+          {datePickerActive && (
+            <RNDateTimePicker
+              mode="date"
+              value={date}
+              onChange={(
+                event: DateTimePickerEvent,
+                selectedDate?: Date | undefined,
+              ) => {
+                if (event.type === 'set' && selectedDate !== undefined) {
+                  setDate(selectedDate);
+                }
+                setDatePickerActive(false);
+              }}
+            />
+          )}
+        </TouchableOpacity>
+      </DataBar>
+      <DataBar label={timeLabel}>
+        <TouchableOpacity
+          onPress={() => {
+            setTimePickerActive(true);
+          }}>
+          <Text style={styles.dataSelectorText}>{getTimeString(date)}</Text>
+          {timePickerActive && (
+            <RNDateTimePicker
+              mode="time"
+              value={date}
+              onChange={(
+                event: DateTimePickerEvent,
+                selectedDate?: Date | undefined,
+              ) => {
+                if (event.type === 'set' && selectedDate !== undefined) {
+                  setDate(selectedDate);
+                }
+                setTimePickerActive(false);
+              }}
+            />
+          )}
+        </TouchableOpacity>
+      </DataBar>
+    </>
   );
 };

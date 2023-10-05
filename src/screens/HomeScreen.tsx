@@ -1,17 +1,17 @@
 import React, {useState} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
+import {defaultGap} from '../styles/common-styles';
 import {
-  defaultGap,
-} from '../styles/common-styles';
-import RNDateTimePicker, {
-  DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
-import { DataBar, NumberInputBar, TextInputBar } from '../components/input-bars';
-import { getDateString, getTimeString } from '../util/date-util';
+  DateTimeSelectorGroup,
+  NumberInputBar,
+  SelectorBar,
+  TextInputBar,
+} from '../components/input-bars';
+import {PipeCrossSectionType} from '../model';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
   return (
@@ -85,6 +85,17 @@ const CommonDataInput = () => {
         onChangeText={setEmissionSource}
         label={t(`commonDataForm:${CommonDataSchema.emissionSource}`) + ':'}
       />
+      <SelectorBar
+        label={
+          t(`commonDataForm:${CommonDataSchema.pipeCrossSectionType}`) + ':'
+        }
+        selections={Object.keys(PipeCrossSectionType).map(item =>
+          item.toString(),
+        )}
+        onSelect={(selectedItem: string, _index: number) => {
+          setPipeCrossSectionType(PipeCrossSectionType[selectedItem]);
+        }}
+      />
       <NumberInputBar
         placeholder="20"
         valueUnit="℃"
@@ -100,75 +111,3 @@ const CommonDataInput = () => {
     </View>
   );
 };
-
-const DateTimeSelectorGroup = ({
-  dateLabel,
-  timeLabel,
-  date,
-  setDate,
-}: {
-  dateLabel: string;
-  timeLabel: string;
-  date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-}) => {
-  const [datePickerActive, setDatePickerActive] = useState(false);
-  const [timePickerActive, setTimePickerActive] = useState(false);
-  return (
-    <>
-      <DataBar label={dateLabel}>
-        <TouchableOpacity
-          onPress={() => {
-            setDatePickerActive(true);
-          }}>
-          <Text
-            style={{height: 40, textAlignVertical: 'center', color: 'black'}}>
-            {getDateString(date)}
-          </Text>
-          {datePickerActive && (
-            <RNDateTimePicker
-              mode="date"
-              value={date}
-              onChange={(
-                event: DateTimePickerEvent,
-                selectedDate?: Date | undefined,
-              ) => {
-                if (event.type === 'set' && selectedDate !== undefined) {
-                  setDate(selectedDate);
-                }
-                setDatePickerActive(false);
-              }}
-            />
-          )}
-        </TouchableOpacity>
-      </DataBar>
-      <DataBar label={timeLabel}>
-        <TouchableOpacity
-          onPress={() => {
-            setTimePickerActive(true);
-          }}>
-          <Text
-            style={{height: 40, textAlignVertical: 'center', color: 'black'}}>
-            {getTimeString(date)}
-          </Text>
-          {timePickerActive && (
-            <RNDateTimePicker
-              mode="time"
-              value={date}
-              onChange={(
-                event: DateTimePickerEvent,
-                selectedDate?: Date | undefined,
-              ) => {
-                if (event.type === 'set' && selectedDate !== undefined) {
-                  setDate(selectedDate);
-                }
-                setTimePickerActive(false);
-              }}
-            />
-          )}
-        </TouchableOpacity>
-      </DataBar>
-    </>
-  );
-};
-

@@ -18,4 +18,10 @@ export const styles = StyleSheet.create({
   },
   defaultHeader: {fontSize: 22, fontWeight: 'bold'},
   buttonText1: {color: 'white', textTransform: 'uppercase', fontWeight: 'bold'},
+  dataSelectorText: {
+    height: 40,
+    textAlignVertical: 'center',
+    color: 'black',
+    fontSize: 14,
+  },
 });
