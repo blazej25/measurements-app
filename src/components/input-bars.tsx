@@ -33,6 +33,7 @@ export const SelectorBar = ({
   const selectorItemStyle = {
     borderRadius: defaultBorderRadius,
     backgroundColor: colors.secondaryBlue,
+    marginBottom: defaultGap,
     height: 40,
     maxWidth: 130,
   };
