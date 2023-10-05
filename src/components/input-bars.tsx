@@ -3,7 +3,9 @@ import RNDateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import React, {useState} from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import SelectDropdown from 'react-native-select-dropdown';
+import {Person} from '../model';
 
 import {
   colors,
@@ -75,6 +77,184 @@ export const SelectorBar = ({
   );
 };
 
+export const StaffListInputBar = ({
+  label,
+  staffList,
+  setStaffList,
+}: {
+  label: string;
+  staffList: Person[];
+  setStaffList: (staffList: Person[]) => void;
+}) => {
+  const [addingStaffMember, setAddingStaffMember] = useState(false);
+  const [newStaffMemberName, setNewStaffMemberName] = useState('');
+  const [isCollapsed, setCollapsed] = useState(false);
+  return (
+    <>
+      <TouchableOpacity
+        activeOpacity={1.0}
+        style={{
+          borderRadius: largeBorderRadius,
+          flexDirection: 'row',
+          backgroundColor: colors.buttonBlue,
+          marginHorizontal: defaultGap,
+          justifyContent: 'space-between',
+        }}>
+        <Text
+          style={{
+            ...styles.buttonText1,
+            alignSelf: 'center',
+            margin: defaultGap,
+            marginLeft: defaultPadding,
+          }}>
+          {label}
+        </Text>
+        <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          style={{
+            borderRadius: defaultBorderRadius,
+            flexDirection: 'row',
+            margin: defaultGap,
+            paddingHorizontal: defaultPadding,
+            backgroundColor: colors.secondaryBlue,
+            height: 40,
+          }}
+          onPress={() => setCollapsed(!isCollapsed)}>
+          <Icon
+            name={isCollapsed ? 'arrow-collapse-down' : 'arrow-collapse-up'}
+            style={{marginTop: 10}}
+            size={20}
+            color={colors.buttonBlue}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            borderRadius: defaultBorderRadius,
+            flexDirection: 'row',
+            margin: defaultGap,
+            paddingHorizontal: defaultPadding,
+            backgroundColor: colors.secondaryBlue,
+            height: 40,
+          }}
+          onPress={() => setAddingStaffMember(true)}>
+          <Icon
+            name="plus"
+            style={{marginTop: 10}}
+            size={20}
+            color={colors.buttonBlue}
+          />
+        </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+      {addingStaffMember && (
+        <DataBar label={'Imię i nazwisko'}>
+          <TextInput
+            placeholderTextColor={'gray'}
+            placeholder={'Jan Kowalski'}
+            onChangeText={setNewStaffMemberName}
+            style={styles.dataSelectorText}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              setAddingStaffMember(false);
+              const split = newStaffMemberName.split(' ');
+              const name = split[0].trim();
+              const surname = split[1].trim();
+              setStaffList([...staffList, {name: name, surname: surname}]);
+              setNewStaffMemberName('');
+            }}>
+            <Icon
+              name="check"
+              style={{marginTop: 10}}
+              size={20}
+              color="green"
+            />
+          </TouchableOpacity>
+        </DataBar>
+      )}
+      {!isCollapsed &&
+        staffList.map((staffMember: Person) => (
+          <StaffMemberLog
+            staffMember={staffMember}
+            staffMembers={staffList}
+            setStaffMembers={setStaffList}
+            key={staffList.indexOf(staffMember)}
+          />
+        ))}
+    </>
+  );
+};
+
+const StaffMemberLog = ({
+  staffMember,
+  staffMembers,
+  setStaffMembers,
+}: {
+  staffMember: Person;
+  staffMembers: Person[];
+  setStaffMembers: (staffMembers: Person[]) => void;
+}) => {
+  return (
+    <TouchableOpacity
+      activeOpacity={1.0}
+      style={{
+        borderRadius: largeBorderRadius,
+        flexDirection: 'row',
+        backgroundColor: colors.secondaryBlue,
+        marginHorizontal: defaultGap,
+        justifyContent: 'flex-end',
+        alignSelf: 'flex-end',
+        paddingHorizontal: defaultPadding,
+        gap: defaultGap,
+      }}>
+      <TouchableOpacity
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          backgroundColor: colors.secondaryBlue,
+          height: 30,
+        }}>
+        <Text
+          style={{
+            textAlignVertical: 'center',
+            color: 'black',
+            fontSize: 14,
+          }}>
+          {staffMember.name}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          backgroundColor: colors.secondaryBlue,
+          height: 30,
+        }}>
+        <Text
+          style={{
+            textAlignVertical: 'center',
+            color: 'black',
+            fontSize: 14,
+          }}>
+          {staffMember.surname}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          setStaffMembers(
+            staffMembers.filter(member => member !== staffMember),
+          );
+        }}>
+        <Icon
+          name="delete"
+          style={{marginTop: 7, alignSelf: 'center'}}
+          size={15}
+          color={colors.buttonBlue}
+        />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+};
 export const NumberInputBar = ({
   label,
   placeholder,

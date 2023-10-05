@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, Text, TouchableOpacity, View} from 'react-native';
+import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
@@ -9,6 +9,7 @@ import {
   DateTimeSelectorGroup,
   NumberInputBar,
   SelectorBar,
+  StaffListInputBar,
   TextInputBar,
 } from '../components/input-bars';
 import {
@@ -55,25 +56,27 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
 
   return (
     <>
-      <View
-        style={{
-          alignItems: 'flex-end',
-          justifyContent: 'flex-start',
-          marginTop: 5,
-          marginRight: 5,
-        }}>
-        <NavigationButton
-          navigation={navigation}
-          destinationScreen={Screens.settings}
-        />
-      </View>
+      <SettingsPanel navigation={navigation} />
       <WelcomeHeader />
       <CommonDataInput data={data} setters={setters} />
-      <TouchableOpacity
-        onPress={() => console.log(JSON.stringify(data, null, '\t'))}>
-        <Text>TEST</Text>
-      </TouchableOpacity>
     </>
+  );
+};
+
+const SettingsPanel = ({navigation}: {navigation: any}) => {
+  return (
+    <View
+      style={{
+        alignItems: 'flex-end',
+        justifyContent: 'flex-start',
+        marginTop: 5,
+        marginRight: 5,
+      }}>
+      <NavigationButton
+        navigation={navigation}
+        destinationScreen={Screens.settings}
+      />
+    </View>
   );
 };
 
@@ -102,9 +105,9 @@ const CommonDataInput = ({
 }) => {
   const {t} = useTranslation();
   return (
-    <View
-      style={{
-        flex: 1,
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
         justifyContent: 'flex-start',
         gap: defaultGap,
       }}>
@@ -138,6 +141,13 @@ const CommonDataInput = ({
         }}
         selectionToText={selection => t(`pipeCrossSectionTypes:${selection}`)}
       />
+      <StaffListInputBar
+        label={
+          t(`commonDataForm:${CommonDataSchema.staffResponsibleForMeasurement}`) + ':'
+          }
+        staffList={data.staffResponsibleForMeasurement}
+        setStaffList={setters.setStaffResponsibleForMeasurement}
+      />
       <NumberInputBar
         placeholder="20"
         valueUnit="℃"
@@ -150,6 +160,6 @@ const CommonDataInput = ({
         onChangeText={text => setters.setPressure(parseFloat(text))}
         label={t(`commonDataForm:${CommonDataSchema.pressure}`) + ':'}
       />
-    </View>
+    </ScrollView>
   );
 };
