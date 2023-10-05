@@ -2,7 +2,7 @@ import RNDateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import React, {useState} from 'react';
-import {Text, TextInput, TouchableOpacity} from 'react-native';
+import {Text, TextInput, TouchableOpacity, View} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 
 import {
@@ -19,32 +19,56 @@ export const SelectorBar = ({
   label,
   selections,
   onSelect,
+  selectionToText,
 }: {
   label: string;
   selections: string[];
   onSelect: (selectedItem: string, index: number) => void;
+  selectionToText?: (selectedItem: string) => string;
 }) => {
+  const selectorItemStyle = {
+    borderRadius: defaultBorderRadius,
+    backgroundColor: colors.secondaryBlue,
+    height: 40,
+    maxWidth: 130,
+  };
+
+  const dropdownStyle = {
+    borderRadius: largeBorderRadius,
+    padding: defaultGap,
+    paddingBottom: 0,
+    backgroundColor: colors.buttonBlue,
+    // The height of the dropdown needs to include space for all selection items
+    // plus the gaps between them
+    height: selectorItemStyle.height * selections.length + defaultGap * (selections.length + 1),
+  };
   return (
     <DataBar label={label}>
-      <SelectDropdown
-        buttonStyle={{
-          borderRadius: defaultBorderRadius,
-          backgroundColor: colors.secondaryBlue,
-          height: 40,
-        }}
-        buttonTextStyle={{fontSize: 14}}
-        data={selections}
-        onSelect={(selectedItem, index) => {
-          console.log(selectedItem, index);
-          onSelect(selectedItem, index);
-        }}
-        buttonTextAfterSelection={(selectedItem, _index) => {
-          return selectedItem;
-        }}
-        rowTextForSelection={(item, _index) => {
-          return item;
-        }}
-      />
+      <View>
+        <SelectDropdown
+          buttonStyle={selectorItemStyle}
+          rowStyle={selectorItemStyle}
+          dropdownStyle={dropdownStyle}
+          defaultValue={selections[0]}
+          buttonTextStyle={{fontSize: 14}}
+          data={selections}
+          onSelect={(selectedItem, index) => {
+            onSelect(selectedItem, index);
+          }}
+          buttonTextAfterSelection={(selectedItem, _index) => {
+            if (selectionToText) {
+              return selectionToText(selectedItem);
+            }
+            return selectedItem;
+          }}
+          rowTextForSelection={(item, _index) => {
+            if (selectionToText) {
+              return selectionToText(item);
+            }
+            return item;
+          }}
+        />
+      </View>
     </DataBar>
   );
 };

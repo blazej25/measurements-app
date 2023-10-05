@@ -95,6 +95,7 @@ const CommonDataInput = () => {
         onSelect={(selectedItem: string, _index: number) => {
           setPipeCrossSectionType(PipeCrossSectionType[selectedItem]);
         }}
+        selectionToText={selection => t(`pipeCrossSectionTypes:${selection}`)}
       />
       <NumberInputBar
         placeholder="20"

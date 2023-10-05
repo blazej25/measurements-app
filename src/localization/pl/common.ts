@@ -25,4 +25,8 @@ export const pl = {
     temperature: 'Temperatura otoczenia',
     pressure: 'Ciśnienie atmosferyczne',
   },
+  pipeCrossSectionTypes: {
+    ROUND: 'Okrągły',
+    RECTANGULAR: 'Prostokątny',
+  },
 };

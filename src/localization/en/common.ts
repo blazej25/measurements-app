@@ -25,4 +25,8 @@ export const en = {
     temperature: 'Ambient temperature',
     pressure: 'Atmospheric pressure',
   },
+  pipeCrossSectionTypes: {
+    ROUND: 'Round',
+    RECTANGULAR: 'Rectangular',
+  },
 };

@@ -1,6 +1,6 @@
 export enum PipeCrossSectionType {
   ROUND = 'ROUND',
-  SQUARE = 'SQUARE',
+  RECTANGULAR = 'RECTANGULAR',
 }
 
 export type Person = {
