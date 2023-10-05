@@ -1,21 +1,17 @@
 import React, {useState} from 'react';
-import {Button, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
 import {
-  colors,
-  defaultBorderRadius,
   defaultGap,
-  defaultPadding,
-  largeBorderRadius,
-  styles,
 } from '../styles/common-styles';
 import RNDateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import {MenuBar} from '../components/MenuBar';
+import { DataBar, NumberInputBar, TextInputBar } from '../components/input-bars';
+import { getDateString, getTimeString } from '../util/date-util';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
   return (
@@ -77,25 +73,25 @@ const CommonDataInput = () => {
         dateLabel={t(`commonDataForm:${CommonDataSchema.date}`) + ':'}
         timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
       />
-      <TextInputRow
+      <TextInputBar
         placeholder="Jan Kowalski"
         onChangeText={setMeasurementRequestor}
         label={
           t(`commonDataForm:${CommonDataSchema.measurementRequestor}`) + ':'
         }
       />
-      <TextInputRow
+      <TextInputBar
         placeholder="some source"
         onChangeText={setEmissionSource}
         label={t(`commonDataForm:${CommonDataSchema.emissionSource}`) + ':'}
       />
-      <NumberInputRow
+      <NumberInputBar
         placeholder="20"
         valueUnit="℃"
         onChangeText={text => setTemperature(parseFloat(text))}
         label={t(`commonDataForm:${CommonDataSchema.temperature}`) + ':'}
       />
-      <NumberInputRow
+      <NumberInputBar
         placeholder="1100"
         valueUnit="hPa"
         onChangeText={text => setPressure(parseFloat(text))}
@@ -120,14 +116,14 @@ const DateTimeSelectorGroup = ({
   const [timePickerActive, setTimePickerActive] = useState(false);
   return (
     <>
-      <DataRow label={dateLabel}>
+      <DataBar label={dateLabel}>
         <TouchableOpacity
           onPress={() => {
             setDatePickerActive(true);
           }}>
           <Text
             style={{height: 40, textAlignVertical: 'center', color: 'black'}}>
-            {`${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`}
+            {getDateString(date)}
           </Text>
           {datePickerActive && (
             <RNDateTimePicker
@@ -145,15 +141,15 @@ const DateTimeSelectorGroup = ({
             />
           )}
         </TouchableOpacity>
-      </DataRow>
-      <DataRow label={timeLabel}>
+      </DataBar>
+      <DataBar label={timeLabel}>
         <TouchableOpacity
           onPress={() => {
             setTimePickerActive(true);
           }}>
           <Text
             style={{height: 40, textAlignVertical: 'center', color: 'black'}}>
-            {`${date.getHours()}:${date.getMinutes()}`}
+            {getTimeString(date)}
           </Text>
           {timePickerActive && (
             <RNDateTimePicker
@@ -171,96 +167,8 @@ const DateTimeSelectorGroup = ({
             />
           )}
         </TouchableOpacity>
-      </DataRow>
+      </DataBar>
     </>
   );
 };
 
-const NumberInputRow = ({
-  label,
-  placeholder,
-  valueUnit,
-  onChangeText,
-}: {
-  label: string;
-  placeholder: string;
-  valueUnit: string;
-  onChangeText: (text: string) => void;
-}) => {
-  return (
-    <DataRow label={label}>
-      <TextInput
-        keyboardType={'numeric'}
-        placeholderTextColor={'gray'}
-        placeholder={placeholder}
-        onChangeText={onChangeText}
-        textAlign={'right'}
-      />
-      <Text style={{textAlignVertical: 'center', color: 'black'}}>
-      {valueUnit}
-      </Text>
-    </DataRow>
-  );
-};
-
-
-const TextInputRow = ({
-  label,
-  placeholder,
-  onChangeText,
-}: {
-  label: string;
-  placeholder: string;
-  onChangeText: (text: string) => void;
-}) => {
-  return (
-    <DataRow label={label}>
-      <TextInput
-        placeholderTextColor={'gray'}
-        placeholder={placeholder}
-        onChangeText={onChangeText}
-      />
-    </DataRow>
-  );
-};
-
-const DataRow = ({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => {
-  return (
-    <TouchableOpacity
-      activeOpacity={1.0}
-      style={{
-        borderRadius: largeBorderRadius,
-        flexDirection: 'row',
-        backgroundColor: colors.buttonBlue,
-        marginHorizontal: defaultGap,
-        justifyContent: 'space-between',
-      }}>
-      <Text
-        style={{
-          ...styles.buttonText1,
-          alignSelf: 'center',
-          margin: defaultGap,
-          marginLeft: defaultPadding,
-        }}>
-        {label}
-      </Text>
-      <TouchableOpacity
-        style={{
-          borderRadius: defaultBorderRadius,
-          flexDirection: 'row',
-          margin: defaultGap,
-          paddingHorizontal: defaultPadding,
-          backgroundColor: colors.secondaryBlue,
-          height: 40,
-        }}>
-        {children}
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
-};
