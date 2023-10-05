@@ -56,7 +56,6 @@ const WelcomeHeader = () => {
 
 const CommonDataInput = () => {
   const [date, setDate] = useState(new Date());
-  const [arrivalTime, setArrivalTime] = useState('');
   const [measurementRequestor, setMeasurementRequestor] = useState('');
   const [emissionSource, setEmissionSource] = useState('');
   const [pipeCrossSectionType, setPipeCrossSectionType] = useState(null);
@@ -78,25 +77,27 @@ const CommonDataInput = () => {
         dateLabel={t(`commonDataForm:${CommonDataSchema.date}`) + ':'}
         timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
       />
-      <InputRow
+      <TextInputRow
         placeholder="Jan Kowalski"
         onChangeText={setMeasurementRequestor}
         label={
           t(`commonDataForm:${CommonDataSchema.measurementRequestor}`) + ':'
         }
       />
-      <InputRow
+      <TextInputRow
         placeholder="some source"
         onChangeText={setEmissionSource}
         label={t(`commonDataForm:${CommonDataSchema.emissionSource}`) + ':'}
       />
-      <InputRow
-        placeholder="20 ℃ "
+      <NumberInputRow
+        placeholder="20"
+        valueUnit="℃"
         onChangeText={text => setTemperature(parseFloat(text))}
         label={t(`commonDataForm:${CommonDataSchema.temperature}`) + ':'}
       />
-      <InputRow
-        placeholder="1100 hPa"
+      <NumberInputRow
+        placeholder="1100"
+        valueUnit="hPa"
         onChangeText={text => setPressure(parseFloat(text))}
         label={t(`commonDataForm:${CommonDataSchema.pressure}`) + ':'}
       />
@@ -175,7 +176,35 @@ const DateTimeSelectorGroup = ({
   );
 };
 
-const InputRow = ({
+const NumberInputRow = ({
+  label,
+  placeholder,
+  valueUnit,
+  onChangeText,
+}: {
+  label: string;
+  placeholder: string;
+  valueUnit: string;
+  onChangeText: (text: string) => void;
+}) => {
+  return (
+    <DataRow label={label}>
+      <TextInput
+        keyboardType={'numeric'}
+        placeholderTextColor={'gray'}
+        placeholder={placeholder}
+        onChangeText={onChangeText}
+        textAlign={'right'}
+      />
+      <Text style={{textAlignVertical: 'center', color: 'black'}}>
+      {valueUnit}
+      </Text>
+    </DataRow>
+  );
+};
+
+
+const TextInputRow = ({
   label,
   placeholder,
   onChangeText,
