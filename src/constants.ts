@@ -18,6 +18,7 @@ export const CommonDataSchema = {
   emissionSource: 'emissionSource',
   pipeCrossSectionType: 'pipeCrossSectionType',
   staffResponsibleForMeasurement: 'staffResponsibleForMeasurement',
+  nameAndSurname: 'nameAndSurname',
   temperature: 'temperature',
   pressure: 'pressure',
 };

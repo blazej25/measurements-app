@@ -1,39 +1,82 @@
 import React, {useState} from 'react';
-import {Button, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
+import {defaultGap} from '../styles/common-styles';
 import {
-  colors,
-  defaultBorderRadius,
-  defaultGap,
-  defaultPadding,
-  largeBorderRadius,
-  styles,
-} from '../styles/common-styles';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { MenuBar } from '../components/MenuBar';
-
+  DateTimeSelectorGroup,
+  NumberInputBar,
+  SelectorBar,
+  StaffListInputBar,
+  TextInputBar,
+} from '../components/input-bars';
+import {
+  CommonMeasurementData,
+  CommonMeasurementDataSetters,
+  Person,
+  PipeCrossSectionType,
+} from '../model';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
+  const [date, setDate] = useState(new Date());
+  const [measurementRequestor, setMeasurementRequestor] = useState('');
+  const [emissionSource, setEmissionSource] = useState('');
+  const [pipeCrossSectionType, setPipeCrossSectionType] = useState(
+    PipeCrossSectionType.ROUND,
+  );
+  const emptyPersonArray: Person[] = [];
+  const [staffResponsibleForMeasurement, setStaffResponsibleForMeasurement]: [
+    Person[],
+    React.Dispatch<React.SetStateAction<Person[]>>,
+  ] = useState(emptyPersonArray);
+  const [temperature, setTemperature] = useState(0);
+  const [pressure, setPressure] = useState(0);
+
+  const data: CommonMeasurementData = {
+    date: date,
+    measurementRequestor: measurementRequestor,
+    emissionSource: emissionSource,
+    pipeCrossSectionType: pipeCrossSectionType,
+    staffResponsibleForMeasurement: staffResponsibleForMeasurement,
+    temperature: temperature,
+    pressure: pressure,
+  };
+
+  const setters: CommonMeasurementDataSetters = {
+    setDate: setDate,
+    setMeasurementRequestor: setMeasurementRequestor,
+    setEmissionSource: setEmissionSource,
+    setPipeCrossSectionType: setPipeCrossSectionType,
+    setStaffResponsibleForMeasurement: setStaffResponsibleForMeasurement,
+    setPressure: setPressure,
+    setTemperature: setTemperature,
+  };
+
   return (
     <>
-      <View
-        style={{
-          alignItems: 'flex-end',
-          justifyContent: 'flex-start',
-          marginTop: 5,
-        }}>
-        <NavigationButton
-          navigation={navigation}
-          destinationScreen={Screens.settings}
-        />
-      </View>
+      <SettingsPanel navigation={navigation} />
       <WelcomeHeader />
-      <CommonDataInput />
-      <MenuBar navigation={navigation} />
+      <CommonDataInput data={data} setters={setters} />
     </>
+  );
+};
+
+const SettingsPanel = ({navigation}: {navigation: any}) => {
+  return (
+    <View
+      style={{
+        alignItems: 'flex-end',
+        justifyContent: 'flex-start',
+        marginTop: 5,
+        marginRight: 5,
+      }}>
+      <NavigationButton
+        navigation={navigation}
+        destinationScreen={Screens.settings}
+      />
+    </View>
   );
 };
 
@@ -53,146 +96,70 @@ const WelcomeHeader = () => {
   );
 };
 
-const CommonDataInput = () => {
-  const [date, setDate] = useState(new Date());
-  const [arrivalTime, setArrivalTime] = useState('');
-  const [measurementRequestor, setMeasurementRequestor] = useState('');
-  const [emissionSource, setEmissionSource] = useState('');
-  const [pipeCrossSectionType, setPipeCrossSectionType] = useState(null);
-  const [staffResponsibleForMeasurement, setStaffResponsibleForMeasurement] =
-    useState([]);
-  const [temperature, setTemperature] = useState(0);
-  const [pressure, setPressure] = useState(0);
+const CommonDataInput = ({
+  data,
+  setters,
+}: {
+  data: CommonMeasurementData;
+  setters: CommonMeasurementDataSetters;
+}) => {
   const {t} = useTranslation();
   return (
-    <View
-      style={{
-        flex: 1,
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
         justifyContent: 'flex-start',
         gap: defaultGap,
       }}>
-      <DateSelector date={date} setDate={setDate} label="Data" placeholder="Date3"/>
-      <InputRow
-        placeholder="17:00"
-        onChangeText={setArrivalTime}
-        label={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
+      <DateTimeSelectorGroup
+        date={data.date}
+        setDate={setters.setDate}
+        dateLabel={t(`commonDataForm:${CommonDataSchema.date}`) + ':'}
+        timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
       />
-      <InputRow
+      <TextInputBar
         placeholder="Jan Kowalski"
-        onChangeText={setMeasurementRequestor}
+        onChangeText={setters.setMeasurementRequestor}
         label={
           t(`commonDataForm:${CommonDataSchema.measurementRequestor}`) + ':'
         }
       />
-      <InputRow
+      <TextInputBar
         placeholder="some source"
-        onChangeText={setEmissionSource}
+        onChangeText={setters.setEmissionSource}
         label={t(`commonDataForm:${CommonDataSchema.emissionSource}`) + ':'}
       />
-      <InputRow
-        placeholder="20 ℃ "
-        onChangeText={text => setTemperature(parseFloat(text))}
+      <SelectorBar
+        label={
+          t(`commonDataForm:${CommonDataSchema.pipeCrossSectionType}`) + ':'
+        }
+        selections={Object.keys(PipeCrossSectionType).map(item =>
+          item.toString(),
+        )}
+        onSelect={(selectedItem: string, _index: number) => {
+          setters.setPipeCrossSectionType(PipeCrossSectionType[selectedItem]);
+        }}
+        selectionToText={selection => t(`pipeCrossSectionTypes:${selection}`)}
+      />
+      <StaffListInputBar
+        label={
+          t(`commonDataForm:${CommonDataSchema.staffResponsibleForMeasurement}`) + ':'
+          }
+        staffList={data.staffResponsibleForMeasurement}
+        setStaffList={setters.setStaffResponsibleForMeasurement}
+      />
+      <NumberInputBar
+        placeholder="20"
+        valueUnit="℃"
+        onChangeText={text => setters.setTemperature(parseFloat(text))}
         label={t(`commonDataForm:${CommonDataSchema.temperature}`) + ':'}
       />
-      <InputRow
-        placeholder="1100 hPa"
-        onChangeText={text => setPressure(parseFloat(text))}
+      <NumberInputBar
+        placeholder="1100"
+        valueUnit="hPa"
+        onChangeText={text => setters.setPressure(parseFloat(text))}
         label={t(`commonDataForm:${CommonDataSchema.pressure}`) + ':'}
       />
-    </View>
+    </ScrollView>
   );
 };
-
-const DateSelector = ({
-  label,
-  placeholder,
-  date,
-  setDate,
-}: {
-  label: string;
-  placeholder: string;
-  date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-}) => {
-  return (
-    <TouchableOpacity
-      style={{
-        borderRadius: largeBorderRadius,
-        flexDirection: 'row',
-        backgroundColor: colors.buttonBlue,
-        alignSelf: 'stretch',
-        marginHorizontal: defaultGap,
-        justifyContent: 'space-between',
-      }}>
-      <Text
-        style={{
-          ...styles.buttonText1,
-          alignSelf: 'center',
-          margin: defaultGap,
-          marginLeft: defaultPadding,
-        }}>
-        {label}
-      </Text>
-      <TouchableOpacity
-        style={{
-          borderRadius: defaultBorderRadius,
-          flexDirection: 'row',
-          margin: defaultGap,
-          paddingHorizontal: defaultPadding,
-          backgroundColor: colors.secondaryBlue,
-        }}
-        onPress={() =>
-        DateTimePickerAndroid.open({value: date})
-        }>
-        <Text>{date.toString()}</Text>
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
-};
-
-const InputRow = ({
-  label,
-  placeholder,
-  onChangeText,
-}: {
-  label: string;
-  placeholder: string;
-  onChangeText: (text: string) => void;
-}) => {
-  return (
-    <TouchableOpacity
-      style={{
-        borderRadius: largeBorderRadius,
-        flexDirection: 'row',
-        backgroundColor: colors.buttonBlue,
-        alignSelf: 'stretch',
-        marginHorizontal: defaultGap,
-        justifyContent: 'space-between',
-      }}>
-      <Text
-        style={{
-          ...styles.buttonText1,
-          alignSelf: 'center',
-          margin: defaultGap,
-          marginLeft: defaultPadding,
-        }}>
-        {label}
-      </Text>
-      <TouchableOpacity
-        style={{
-          borderRadius: defaultBorderRadius,
-          flexDirection: 'row',
-          margin: defaultGap,
-          paddingHorizontal: defaultPadding,
-          backgroundColor: colors.secondaryBlue,
-        }}>
-        <TextInput
-          placeholderTextColor={'gray'}
-          placeholder={placeholder}
-          onChangeText={onChangeText}
-        />
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
-};
-

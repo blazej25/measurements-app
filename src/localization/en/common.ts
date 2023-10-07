@@ -21,8 +21,13 @@ export const en = {
     measurementRequestor: 'Principal',
     emissionSource: 'Emmission source',
     pipeCrossSectionType: 'Pipe cross section type',
-    staffResponsibleForMeasurement: 'Staff carrying out the measurements',
+    staffResponsibleForMeasurement: 'Staff carrying out measurements',
+    nameAndSurname: 'Name and surname',
     temperature: 'Ambient temperature',
     pressure: 'Atmospheric pressure',
+  },
+  pipeCrossSectionTypes: {
+    ROUND: 'Round',
+    RECTANGULAR: 'Rectangular',
   },
 };
