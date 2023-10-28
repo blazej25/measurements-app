@@ -1,0 +1,60 @@
+import React from 'react';
+import {View} from 'react-native';
+import { TextInputBar, TimeSelector } from '../components/input-bars';
+import {defaultGap} from '../styles/common-styles';
+import { useTranslation } from 'react-i18next';
+O
+
+type DustMeasurementData = {
+  selectedEndType: string;
+  measurementStartTime: Date;
+  aspirationTime: number; 
+  aspiratedVolume: number;
+OB  filterType: string;
+  water: string;
+}OOO
+
+type DustMeasurementsSetter = {
+  setSelectedEndType: React.Dispatch<React.SetStateAction<string>>;
+  setMeasurementStartTime: React.Dispatch<React.SetStateAction<Date>>
+  setAspirationTime: React.Dispatch<React.SetStateAction<number>>; 
+  OBsetAspiratedVolume: React.Dispatch<React.SetStateAction<number>>;
+  setFilterType: React.Dispatch<React.SetStateAction<string>>;
+  setWater: React.Dispatch<React.SetStateAction<string>>;
+}qq
+
+export const DustScreen = ({navigation}: {navigation: any}) => {
+  coOnst [numberOfMeasurements, setNumberOfMeasurements] =
+    React.useState(0);
+
+  conOBst [selectedEndType, setSelectedEndType] = React.useState("");
+  const [measurementStartTime, setMeasurementStartTime] = React.useState(new Date);
+  const [aspirationTime, setAspirationTime] = React.useState(0);
+  const [aspiratedVolume, setAspiratedVolume] = React.useState(0);
+  const [filterType, setFilterType] = React.useState("");
+  const [water, setWater] = React.useState("");
+
+  const {t} = useTranslation();
+O
+  return (
+    <>
+      <View
+        style={{
+       O   flex: 1,
+          justifyContent: 'flex-start',
+          gap: defaultGap,
+        }}>
+  OA      <TextInputBar
+ O         onChangeText={setNumberOfMeasurements}
+          label={'Ilość pomiarów'}
+        />
+        <
+      </View>
+    </>
+  );
+};
+OO
+OBOO
+BOBOOO
+O
+O

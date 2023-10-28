@@ -16,8 +16,8 @@ import {
   styles,
 } from '../styles/common-styles';
 import {getDateString, getTimeString} from '../util/date-util';
-import { useTranslation } from 'react-i18next';
-import { CommonDataSchema } from '../constants';
+import {useTranslation} from 'react-i18next';
+import {CommonDataSchema} from '../constants';
 
 export const SelectorBar = ({
   label,
@@ -114,46 +114,44 @@ export const StaffListInputBar = ({
           {label}
         </Text>
         <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity
-          style={{
-            borderRadius: defaultBorderRadius,
-            flexDirection: 'row',
-            margin: defaultGap,
-            paddingHorizontal: defaultPadding,
-            backgroundColor: colors.secondaryBlue,
-            height: 40,
-          }}
-          onPress={() => setCollapsed(!isCollapsed)}>
-          <Icon
-            name={isCollapsed ? 'arrow-collapse-down' : 'arrow-collapse-up'}
-            style={{marginTop: 10}}
-            size={20}
-            color={colors.buttonBlue}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            borderRadius: defaultBorderRadius,
-            flexDirection: 'row',
-            margin: defaultGap,
-            paddingHorizontal: defaultPadding,
-            backgroundColor: colors.secondaryBlue,
-            height: 40,
-          }}
-          onPress={() => setAddingStaffMember(true)}>
-          <Icon
-            name="plus"
-            style={{marginTop: 10}}
-            size={20}
-            color={colors.buttonBlue}
-          />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              borderRadius: defaultBorderRadius,
+              flexDirection: 'row',
+              margin: defaultGap,
+              paddingHorizontal: defaultPadding,
+              backgroundColor: colors.secondaryBlue,
+              height: 40,
+            }}
+            onPress={() => setCollapsed(!isCollapsed)}>
+            <Icon
+              name={isCollapsed ? 'arrow-collapse-down' : 'arrow-collapse-up'}
+              style={{marginTop: 10}}
+              size={20}
+              color={colors.buttonBlue}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              borderRadius: defaultBorderRadius,
+              flexDirection: 'row',
+              margin: defaultGap,
+              paddingHorizontal: defaultPadding,
+              backgroundColor: colors.secondaryBlue,
+              height: 40,
+            }}
+            onPress={() => setAddingStaffMember(true)}>
+            <Icon
+              name="plus"
+              style={{marginTop: 10}}
+              size={20}
+              color={colors.buttonBlue}
+            />
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
       {addingStaffMember && (
-        <DataBar label={
-          t(`commonDataForm:${CommonDataSchema.nameAndSurname}`)
-          }>
+        <DataBar label={t(`commonDataForm:${CommonDataSchema.nameAndSurname}`)}>
           <TextInput
             placeholderTextColor={'gray'}
             placeholder={'Jan Kowalski'}
@@ -269,7 +267,7 @@ export const NumberInputBar = ({
 }: {
   label: string;
   placeholder: string;
-  valueUnit: string;
+  valueUnit?: string;
   onChangeText: (text: string) => void;
 }) => {
   return (
@@ -282,7 +280,7 @@ export const NumberInputBar = ({
         textAlign={'right'}
         style={styles.dataSelectorText}
       />
-      <Text style={styles.dataSelectorText}>{valueUnit}</Text>
+      {valueUnit && <Text style={styles.dataSelectorText}>{valueUnit}</Text>}
     </DataBar>
   );
 };
@@ -346,6 +344,81 @@ export const DataBar = ({
         {children}
       </TouchableOpacity>
     </TouchableOpacity>
+  );
+};
+/*
+TODO: finish the duration selector.
+export const DurationSelector = ({
+  timeLabel,
+  minutes,
+  setMinutes,
+}: {
+  timeLabel: string;
+  minutes: number;
+  setMinutes: (minutes: number) => void;
+}) => {
+  const [timePickerActive, setTimePickerActive] = useState(false);
+  return (
+    <DataBar label={timeLabel}>
+      <TouchableOpacity
+        onPress={() => {
+          setTimePickerActive(true);
+        }}>
+        <Text style={styles.dataSelectorText}>{getTimeString(date)}</Text>
+        {timePickerActive && (
+          <RNDateTimePicker
+            mode="time"
+            value={date}
+            onChange={(
+              event: DateTimePickerEvent,
+              selectedDate?: Date | undefined,
+            ) => {
+              if (event.type === 'set' && selectedDate !== undefined) {
+                setDate(selectedDate);
+              }
+              setTimePickerActive(false);
+            }}
+          />
+        )}
+      </TouchableOpacity>
+    </DataBar>
+  );
+*/
+
+export const TimeSelector = ({
+  timeLabel,
+  date,
+  setDate,
+}: {
+  timeLabel: string;
+  date: Date;
+  setDate: (date: Date) => void;
+}) => {
+  const [timePickerActive, setTimePickerActive] = useState(false);
+  return (
+    <DataBar label={timeLabel}>
+      <TouchableOpacity
+        onPress={() => {
+          setTimePickerActive(true);
+        }}>
+        <Text style={styles.dataSelectorText}>{getTimeString(date)}</Text>
+        {timePickerActive && (
+          <RNDateTimePicker
+            mode="time"
+            value={date}
+            onChange={(
+              event: DateTimePickerEvent,
+              selectedDate?: Date | undefined,
+            ) => {
+              if (event.type === 'set' && selectedDate !== undefined) {
+                setDate(selectedDate);
+              }
+              setTimePickerActive(false);
+            }}
+          />
+        )}
+      </TouchableOpacity>
+    </DataBar>
   );
 };
 

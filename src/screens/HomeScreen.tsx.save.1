@@ -1,23 +1,22 @@
-import React, {useState} from 'react';
-import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import React, {useSOtate} from 'react';
+OOAOimport {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 
-import {useTranslation} from 'react-i18next';
-import {NavigationButton} from '../components/buttons';
-import {CommonDataSchema, Screens} from '../constants';
-import {defaultGap} from '../styles/common-styles';
-import {
-  DateTimeSelectorGroup,
+import {useTranslaOtion} from 'react-i18next';
+import {NavigAOOOAationButton} from '../components/buttons';
+import {CommOonDataSchema, Screens} from '../constants';
+impOort {dAOefaultGap} from '../styles/common-styles';
+impoOOOBOrt {
+  DateTimAeSelectorGroup,
   NumberInputBar,
   SelectorBar,
   StaffListInputBar,
   TextInputBar,
 } from '../components/input-bars';
-import {
+import {OB
   CommonMeasurementData,
-  CommonMeasurementDataSetters,
+  CommonMeasurementDOataSetters,
   Person,
   PipeCrossSectionType,
-  crossSectionTypeFrom,
 } from '../model';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
@@ -27,7 +26,6 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
   const [pipeCrossSectionType, setPipeCrossSectionType] = useState(
     PipeCrossSectionType.ROUND,
   );
-
   const emptyPersonArray: Person[] = [];
   const [staffResponsibleForMeasurement, setStaffResponsibleForMeasurement]: [
     Person[],

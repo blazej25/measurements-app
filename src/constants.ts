@@ -22,3 +22,13 @@ export const CommonDataSchema = {
   temperature: 'temperature',
   pressure: 'pressure',
 };
+
+export const DustMeasurementDataSchema = {
+  numberOfMeasurements: 'numberOfMeasurements',
+  selectedEndType: 'selectedEndType',
+  measurementStartTime: 'measurementStartTime',
+  aspirationTime: 'aspirationTime',
+  aspiratedVolume: 'aspiratedVolume',
+  filterType: 'filterType',
+  water: 'water',
+};

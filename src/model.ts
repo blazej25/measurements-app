@@ -5,6 +5,14 @@ export enum PipeCrossSectionType {
   RECTANGULAR = 'RECTANGULAR',
 }
 
+export function crossSectionTypeFrom(str: string) : PipeCrossSectionType {
+  if (str === 'RECTANGULAR') {
+    return PipeCrossSectionType.RECTANGULAR;
+  }
+    return PipeCrossSectionType.RECTANGULAR;
+
+}
+
 export type Person = {
   name: string;
   surname: string;

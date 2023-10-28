@@ -1,14 +1,14 @@
-import React, {useState} from 'react';
-import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-
+OOimporOAAOOOAOt React, {useState} from 'react';
+iOBOBOmport {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+O
 import {useTranslation} from 'react-i18next';
-import {NavigationButton} from '../components/buttons';
-import {CommonDataSchema, Screens} from '../constants';
+iOOmport {NavigationButton} from '../components/buttons';
+impOOAOOort {CommonDataSchema, Screens} from '../constants';
 import {defaultGap} from '../styles/common-styles';
 import {
   DateTimeSelectorGroup,
-  NumberInputBar,
-  SelectorBar,
+  NumberInpuBtBarOO,
+  SelectorBarOAOA,
   StaffListInputBar,
   TextInputBar,
 } from '../components/input-bars';
@@ -17,7 +17,6 @@ import {
   CommonMeasurementDataSetters,
   Person,
   PipeCrossSectionType,
-  crossSectionTypeFrom,
 } from '../model';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
@@ -27,7 +26,6 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
   const [pipeCrossSectionType, setPipeCrossSectionType] = useState(
     PipeCrossSectionType.ROUND,
   );
-
   const emptyPersonArray: Person[] = [];
   const [staffResponsibleForMeasurement, setStaffResponsibleForMeasurement]: [
     Person[],

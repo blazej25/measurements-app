@@ -30,4 +30,13 @@ export const pl = {
     ROUND: 'Okrągły',
     RECTANGULAR: 'Prostokątny',
   },
+  dustMeasurementData: {
+    numberOfMeasurements: 'Ilość Pomiarów',
+    selectedEndType: 'Dobrana końcówka',
+    measurementStartTime: 'Godzina rozpoczęcia',
+    aspirationTime: 'Czas aspiracji',
+    aspiratedVolume: 'Objętość zaaspirowana',
+    filterType: 'Filtr',
+    water: 'Woda'
+  }
 };
