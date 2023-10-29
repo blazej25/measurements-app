@@ -31,6 +31,7 @@ export const en = {
     RECTANGULAR: 'Rectangular',
   },
   dustMeasurementData: {
+    measurementNumber: 'Measurement no.',
     numberOfMeasurements: 'Number of Measurements',
     selectedEndType: 'Selected End Type',
     measurementStartTime: 'Start Time',

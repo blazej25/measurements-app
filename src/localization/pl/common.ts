@@ -31,7 +31,8 @@ export const pl = {
     RECTANGULAR: 'Prostokątny',
   },
   dustMeasurementData: {
-    numberOfMeasurements: 'Ilość Pomiarów',
+    measurementNumber: 'Numer pomiaru',
+    numberOfMeasurements: 'Ilość pomiarów',
     selectedEndType: 'Dobrana końcówka',
     measurementStartTime: 'Godzina rozpoczęcia',
     aspirationTime: 'Czas aspiracji',

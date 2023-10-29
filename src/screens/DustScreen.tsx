@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {
   NumberInputBar,
+  SelectorBar,
   TextInputBar,
   TimeSelector,
 } from '../components/input-bars';
@@ -36,17 +37,13 @@ type DustMeasurementsSetters = {
 export const DustScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
 
-  const [numberOfMeasurements, setNumberOfMeasurements] = React.useState(0);
-  const [selectedEndType, setSelectedEndType] = React.useState('');
-  const [measurementStartTime, setMeasurementStartTime] = React.useState(
-    new Date(),
-  );
-  const [aspirationTime, setAspirationTime] = React.useState(0);
-  const [aspiratedVolume, setAspiratedVolume] = React.useState(0);
-  const [filterType, setFilterType] = React.useState('');
-  const [water, setWater] = React.useState('');
-
-  const savedMeasurements: DustMeasurementData[] = [];
+  const [numberOfMeasurements, setNumberOfMeasurements] = useState(0);
+  const [selectedEndType, setSelectedEndType] = useState('');
+  const [measurementStartTime, setMeasurementStartTime] = useState(new Date());
+  const [aspirationTime, setAspirationTime] = useState(0);
+  const [aspiratedVolume, setAspiratedVolume] = useState(0);
+  const [filterType, setFilterType] = useState('');
+  const [water, setWater] = useState('');
 
   const data: DustMeasurementData = {
     selectedEndType: selectedEndType,
@@ -66,6 +63,10 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     setWater: setWater,
   };
 
+  const savedMeasurements: DustMeasurementData[] = [];
+
+  const [measurementIndex, setMeasurementIndex] = useState(-1);
+
   return (
     <>
       <View
@@ -81,22 +82,57 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
             `dustMeasurementData:${DustMeasurementDataSchema.numberOfMeasurements}`,
           )}
         />
-        <DustSingleMeasurementComponent data={data} setters={setters} savedMeasurements={savedMeasurements} />
+        <DustSingleMeasurementComponent
+          data={data}
+          setters={setters}
+          savedMeasurements={savedMeasurements}
+          measurementIndex={measurementIndex}
+        />
+        <SelectorBar
+          label={
+            t(
+              `dustMeasurementData:${DustMeasurementDataSchema.measurementNumber}`,
+            ) + ':'
+          }
+          selections={savedMeasurements
+            .map(element => savedMeasurements.indexOf(element) + 1)
+            .map(index => index.toString())}
+          onSelect={(selectedItem: string, _index: number) => {
+            setMeasurementIndex(_index);
+            restoreStateToSavedData(savedMeasurements[_index], setters);
+          }}
+          selectionToText={selection => selection}
+        />
       </View>
     </>
   );
 };
 
+function restoreStateToSavedData(
+  savedData: DustMeasurementData,
+  setters: DustMeasurementsSetters,
+) {
+  setters.setSelectedEndType(savedData.selectedEndType);
+  setters.setMeasurementStartTime(savedData.measurementStartTime);
+  setters.setAspirationTime(savedData.aspirationTime);
+  setters.setAspiratedVolume(savedData.aspiratedVolume);
+  setters.setFilterType(savedData.filterType);
+  setters.setWater(savedData.water);
+}
+
 const DustSingleMeasurementComponent = ({
   data,
   setters,
   savedMeasurements,
+  measurementIndex,
 }: {
   data: DustMeasurementData;
   setters: DustMeasurementsSetters;
   savedMeasurements: DustMeasurementData[];
+  measurementIndex: number;
 }) => {
   const {t} = useTranslation();
+
   return (
     <View
       style={{
@@ -144,11 +180,15 @@ const DustSingleMeasurementComponent = ({
         onPress={
           // Here we use the spread operator to have a copy of the data
           () => {
-            savedMeasurements.push({...data})
+            if (measurementIndex == -1) {
+              savedMeasurements.push({...data});
+            } else {
+              savedMeasurements[measurementIndex] = {...data};
+            }
           }
         }>
         <Icon
-          name="plus"
+          name={measurementIndex == -1 ? 'plus' : 'content-save-edit'}
           style={{marginTop: 10}}
           size={20}
           color={colors.buttonBlue}
