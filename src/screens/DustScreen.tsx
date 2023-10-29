@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {
   NumberInputBar,
@@ -63,9 +63,19 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     setWater: setWater,
   };
 
-  const savedMeasurements: DustMeasurementData[] = [];
+  const [savedMeasurements, setSavedMeasurements]: [
+    DustMeasurementData[],
+    Dispatch<SetStateAction<DustMeasurementData[]>>,
+  ] = useState([] as DustMeasurementData[]);
 
   const [measurementIndex, setMeasurementIndex] = useState(-1);
+  const selections = useMemo(
+    () =>
+      savedMeasurements
+        .map(measurement => savedMeasurements.indexOf(measurement))
+        .map(index => index.toString()),
+    [savedMeasurements],
+  );
 
   return (
     <>
@@ -86,7 +96,9 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
           data={data}
           setters={setters}
           savedMeasurements={savedMeasurements}
+          setSavedMeasurements={setSavedMeasurements}
           measurementIndex={measurementIndex}
+          setMeasurementIndex={setMeasurementIndex}
         />
         <SelectorBar
           label={
@@ -94,9 +106,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
               `dustMeasurementData:${DustMeasurementDataSchema.measurementNumber}`,
             ) + ':'
           }
-          selections={savedMeasurements
-            .map(element => savedMeasurements.indexOf(element) + 1)
-            .map(index => index.toString())}
+          selections={selections}
           onSelect={(selectedItem: string, _index: number) => {
             setMeasurementIndex(_index);
             restoreStateToSavedData(savedMeasurements[_index], setters);
@@ -120,16 +130,31 @@ function restoreStateToSavedData(
   setters.setWater(savedData.water);
 }
 
+function clearState(setters: DustMeasurementsSetters) {
+  setters.setSelectedEndType('');
+  setters.setMeasurementStartTime(new Date());
+  setters.setAspirationTime(0);
+  setters.setAspiratedVolume(0);
+  setters.setFilterType('');
+  setters.setWater('');
+}
+
 const DustSingleMeasurementComponent = ({
   data,
   setters,
   savedMeasurements,
+  setSavedMeasurements,
   measurementIndex,
+  setMeasurementIndex,
 }: {
   data: DustMeasurementData;
   setters: DustMeasurementsSetters;
   savedMeasurements: DustMeasurementData[];
+  setSavedMeasurements: React.Dispatch<
+    React.SetStateAction<DustMeasurementData[]>
+  >;
   measurementIndex: number;
+  setMeasurementIndex: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   const {t} = useTranslation();
 
@@ -182,9 +207,13 @@ const DustSingleMeasurementComponent = ({
           () => {
             if (measurementIndex == -1) {
               savedMeasurements.push({...data});
+              setSavedMeasurements(savedMeasurements);
+              console.log(savedMeasurements);
             } else {
               savedMeasurements[measurementIndex] = {...data};
+              setMeasurementIndex(-1);
             }
+            clearState(setters);
           }
         }>
         <Icon
