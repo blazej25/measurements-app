@@ -10,8 +10,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   const [date, setDate] = useState(new Date());
-  const [initialMass, setInitialMass]: [number[], Dispatch<SetStateAction<number[]>>] = useState([] as number[]);
-  const [afterMass, setAfterMass]: [number[], Dispatch<SetStateAction<number[]>>] = useState([] as number[]);
+  const [initialMass, setInitialMass]: [number[], Dispatch<SetStateAction<number[]>>] = useState([0, 0, 0]);
+  const [afterMass, setAfterMass]: [number[], Dispatch<SetStateAction<number[]>>] = useState([0, 0, 0]);
   const [n, setN] = useState(1);
   const afterMassDisplayValue = useMemo(() => afterMass[n], [afterMass, n]);
   const initialMassShowingValue = useMemo(() => initialMass[n], [initialMass, n]);
