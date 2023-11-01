@@ -260,11 +260,13 @@ const StaffMemberLog = ({
   );
 };
 export const NumberInputBar = ({
+  value,
   label,
   placeholder,
   valueUnit,
   onChangeText,
 }: {
+  value?: number;
   label: string;
   placeholder: string;
   valueUnit?: string;
@@ -276,6 +278,7 @@ export const NumberInputBar = ({
         keyboardType={'numeric'}
         placeholderTextColor={'gray'}
         placeholder={placeholder}
+        value={value ? value.toString(): ''}
         onChangeText={onChangeText}
         textAlign={'right'}
         style={styles.dataSelectorText}

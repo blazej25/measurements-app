@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
 import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
@@ -10,16 +10,15 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   const [date, setDate] = useState(new Date());
-  const [initialMass1, setInitialMass1] = useState(0);
-  const [afterMass1, setAfterMass1] = useState(0);
-  const [initialMass2, setInitialMass2] = useState(0);
-  const [afterMass2, setAfterMass2] = useState(0);
-  const [initialMass3, setInitialMass3] = useState(0);
-  const [afterMass3, setAfterMass3] = useState(0);
+  const [initialMass, setInitialMass]: [number[], Dispatch<SetStateAction<number[]>>] = useState([] as number[]);
+  const [afterMass, setAfterMass]: [number[], Dispatch<SetStateAction<number[]>>] = useState([] as number[]);
+  const [n, setN] = useState(1);
+  const afterMassDisplayValue = useMemo(() => afterMass[n], [afterMass, n]);
+  const initialMassShowingValue = useMemo(() => initialMass[n], [initialMass, n]);
+
   const [leakTightnessTest, setLeakTightnessTest] = useState(0);
   const [aspiratorFlow, setAspiratorFlow] = useState(0);
   const [aspiratedGases, setAspiratedGases] = useState(0);
-  const [n, setN] = useState(1);
 
   const [dataIndex, setDataIndex] = useState(0);
 
@@ -54,16 +53,31 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           onChangeText={(text) => setAspiratedGases(parseFloat(text))}
           label={'Ilość zaaspirowanych gazów:'}
         />
+        <SelectorBar
+          label={
+            'Numer płuczki: '
+          }
+          selections={['1', '2', '3']}
+          onSelect={(selectedItem: string, _index: number) => {
+            setN(parseFloat(selectedItem))
+          }}
+        />
         <NumberInputBar
           placeholder="20"
           valueUnit="℃"
-          onChangeText={(text) => setInitialMass1(parseFloat(text))}
+          onChangeText={(text) => {
+            setInitialMass(initialMass.map((mass, index) => (index == n) ? parseFloat(text): mass))
+          }}
+          value={initialMassShowingValue}
           label={'Masa początkowa płuczki:'}
         />
         <NumberInputBar
           placeholder="20"
           valueUnit="g"
-          onChangeText={(text) => setAfterMass1(parseFloat(text))}
+          value={afterMassDisplayValue}
+          onChangeText={(text) => {
+            setAfterMass(afterMass.map((mass, index) => (index == n) ? parseFloat(text): mass))
+          }}
           label={'Masa płuczki po pomiarze:'}
         />
       <TouchableOpacity
@@ -78,7 +92,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
         onPress={
           // Log all data that you want to see
           () => {
-            console.log(afterMass1, initialMass1, date, leakTightnessTest, aspiratedGases, aspiratorFlow);
+            console.log(afterMass, initialMass, date, leakTightnessTest, aspiratedGases, aspiratorFlow);
           }
         }>
         <Icon
