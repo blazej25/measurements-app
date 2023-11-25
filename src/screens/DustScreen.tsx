@@ -17,7 +17,7 @@ import {DustMeasurementDataSchema} from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type DustMeasurementData = {
-  selectedEndType: string;
+  selectedEndDiameter: number;
   measurementStartTime: Date;
   aspirationTime: number;
   aspiratedVolume: number;
@@ -26,7 +26,7 @@ type DustMeasurementData = {
 };
 
 type DustMeasurementsSetters = {
-  setSelectedEndType: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedEndDiameter: React.Dispatch<React.SetStateAction<number>>;
   setMeasurementStartTime: React.Dispatch<React.SetStateAction<Date>>;
   setAspirationTime: React.Dispatch<React.SetStateAction<number>>;
   setAspiratedVolume: React.Dispatch<React.SetStateAction<number>>;
@@ -38,7 +38,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
 
   const [numberOfMeasurements, setNumberOfMeasurements] = useState(0);
-  const [selectedEndType, setSelectedEndType] = useState('');
+  const [selectedEndDiameter, setSelectedEndDiameter] = useState(0);
   const [measurementStartTime, setMeasurementStartTime] = useState(new Date());
   const [aspirationTime, setAspirationTime] = useState(0);
   const [aspiratedVolume, setAspiratedVolume] = useState(0);
@@ -46,7 +46,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   const [water, setWater] = useState('');
 
   const data: DustMeasurementData = {
-    selectedEndType: selectedEndType,
+    selectedEndDiameter: selectedEndDiameter,
     measurementStartTime: measurementStartTime,
     aspirationTime: aspirationTime,
     aspiratedVolume: aspiratedVolume,
@@ -55,7 +55,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   };
 
   const setters: DustMeasurementsSetters = {
-    setSelectedEndType: setSelectedEndType,
+    setSelectedEndDiameter: setSelectedEndDiameter,
     setMeasurementStartTime: setMeasurementStartTime,
     setAspirationTime: setAspirationTime,
     setAspiratedVolume: setAspiratedVolume,
@@ -122,7 +122,7 @@ function restoreStateToSavedData(
   savedData: DustMeasurementData,
   setters: DustMeasurementsSetters,
 ) {
-  setters.setSelectedEndType(savedData.selectedEndType);
+  setters.setSelectedEndDiameter(savedData.selectedEndDiameter);
   setters.setMeasurementStartTime(savedData.measurementStartTime);
   setters.setAspirationTime(savedData.aspirationTime);
   setters.setAspiratedVolume(savedData.aspiratedVolume);
@@ -131,7 +131,7 @@ function restoreStateToSavedData(
 }
 
 function clearState(setters: DustMeasurementsSetters) {
-  setters.setSelectedEndType('');
+  setters.setSelectedEndDiameter(0);
   setters.setMeasurementStartTime(new Date());
   setters.setAspirationTime(0);
   setters.setAspiratedVolume(0);
@@ -169,7 +169,7 @@ const DustSingleMeasurementComponent = ({
         label={t(
           `dustMeasurementData:${DustMeasurementDataSchema.selectedEndType}`,
         )}
-        onChangeText={text => setters.setSelectedEndType(text)}
+        onChangeText={text => setters.setSelectedEndDiameter(parseInt(text))}
       />
       <TimeSelector
         timeLabel={t(
@@ -207,7 +207,6 @@ const DustSingleMeasurementComponent = ({
           () => {
             if (measurementIndex == -1) {
               savedMeasurements.push({...data});
-              setSavedMeasurements(savedMeasurements);
               console.log(savedMeasurements);
             } else {
               savedMeasurements[measurementIndex] = {...data};

@@ -45,36 +45,51 @@ export const SelectorBar = ({
     backgroundColor: colors.buttonBlue,
     // The height of the dropdown needs to include space for all selection items
     // plus the gaps between them
-    height:
+    height: Math.min(
       selectorItemStyle.height * selections.length +
-      defaultGap * (selections.length + 1),
+        defaultGap * (selections.length + 1),
+      600,
+    ),
   };
   return (
     <DataBar label={label}>
-      <View>
-        <SelectDropdown
-          buttonStyle={selectorItemStyle}
-          rowStyle={selectorItemStyle}
-          dropdownStyle={dropdownStyle}
-          defaultValue={selections[0]}
-          buttonTextStyle={{fontSize: 14}}
-          data={selections}
-          onSelect={(selectedItem, index) => {
-            onSelect(selectedItem, index);
-          }}
-          buttonTextAfterSelection={(selectedItem, _index) => {
-            if (selectionToText) {
-              return selectionToText(selectedItem);
+      <View style={{borderRadius: defaultBorderRadius}}>
+        {selections.length != 0 ? (
+          <SelectDropdown
+            buttonStyle={selectorItemStyle}
+            rowStyle={selectorItemStyle}
+            dropdownStyle={dropdownStyle}
+            defaultValue={selections[0]}
+            buttonTextStyle={{fontSize: 14}}
+            data={selections}
+            onSelect={(selectedItem, index) => {
+              onSelect(selectedItem, index);
+            }}
+            buttonTextAfterSelection={(selectedItem, _index) => {
+              if (selectionToText) {
+                return selectionToText(selectedItem);
+              }
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, _index) => {
+              if (selectionToText) {
+                return selectionToText(item);
+              }
+              return item;
+            }}
+          />
+        ) : (
+          <SelectDropdown
+            buttonStyle={selectorItemStyle}
+            rowStyle={selectorItemStyle}
+            dropdownStyle={dropdownStyle}
+            buttonTextStyle={{fontSize: 14}}
+            data={["Test"]}
+            onSelect={() =>
+              console.log('Dropdown selected when no selections available')
             }
-            return selectedItem;
-          }}
-          rowTextForSelection={(item, _index) => {
-            if (selectionToText) {
-              return selectionToText(item);
-            }
-            return item;
-          }}
-        />
+          />
+        )}
       </View>
     </DataBar>
   );
@@ -278,7 +293,7 @@ export const NumberInputBar = ({
         keyboardType={'numeric'}
         placeholderTextColor={'gray'}
         placeholder={placeholder}
-        value={value ? value.toString(): ''}
+        value={value ? value.toString() : ''}
         onChangeText={onChangeText}
         textAlign={'right'}
         style={styles.dataSelectorText}
