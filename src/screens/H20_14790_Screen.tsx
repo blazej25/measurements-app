@@ -181,7 +181,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
         />
         <NumberInputBar
           placeholder="20"
-          valueUnit="℃"
+          valueUnit="g"
           onChangeText={text => {
             setInitialMass(
               initialMass.map((mass, index) =>
