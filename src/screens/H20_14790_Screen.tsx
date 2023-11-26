@@ -1,5 +1,13 @@
 import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
-import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Button,
+  ScrollView,
+  StyleProp,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
 import {t} from 'i18next';
@@ -15,6 +23,8 @@ import {
   defaultBorderRadius,
   defaultGap,
   defaultPadding,
+  largeBorderRadius,
+  styles,
 } from '../styles/common-styles';
 import {
   CommonMeasurementDataSetters,
@@ -40,6 +50,17 @@ interface Measurement {
   aspiratorFlow: number;
   aspiratedGases: number;
 }
+
+const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
+  return (
+    <Icon
+      name={materialIconName}
+      style={{marginTop: 10}}
+      size={20}
+      color={colors.buttonBlue}
+    />
+  );
+};
 
 export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   // In this screen we are collecting a list of measurements.
@@ -110,6 +131,15 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     [initialMass, scrubberIndex],
   );
 
+  const measurementNavigationButtonStyle: StyleProp<ViewStyle> = {
+    borderRadius: defaultBorderRadius,
+    flexDirection: 'row',
+    margin: defaultGap,
+    paddingHorizontal: defaultPadding,
+    backgroundColor: 'white',
+    height: 40,
+  };
+
   return (
     <View>
       <ScrollView
@@ -119,7 +149,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           gap: defaultGap,
         }}>
         <DataBar label={'Numer Pomiaru'}>
-          <Text>{dataIndex + 1}</Text>
+          <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
         <TimeSelector
           timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
@@ -152,7 +182,10 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           label={'Numer płuczki: '}
           selections={['1', '2', '3']}
           onSelect={(selectedItem: string, _index: number) => {
-            setScrubberIndex(parseFloat(selectedItem));
+            // We subtract 1 because the UI displays the numbers of the scrubbers
+            // starting from 1, but the array of scrubbers uses usual 0-based
+            // indexing.
+            setScrubberIndex(parseInt(selectedItem) - 1);
           }}
         />
         <NumberInputBar
@@ -183,114 +216,86 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
         />
         <View
           style={{
+            borderRadius: largeBorderRadius,
             flexDirection: 'row',
-            justifyContent: 'center',
+            justifyContent: 'space-evenly',
             backgroundColor: colors.secondaryBlue,
             padding: defaultPadding,
-            alignSelf: 'stretch',
+            alignSelf: 'center',
             gap: defaultGap,
           }}>
           <TouchableOpacity
-            style={{
-              borderRadius: defaultBorderRadius,
-              flexDirection: 'row',
-              margin: defaultGap,
-              paddingHorizontal: defaultPadding,
-              backgroundColor: colors.secondaryBlue,
-              height: 40,
-            }}
+            style={measurementNavigationButtonStyle}
             onPress={() => {
               if (dataIndex > 0) {
                 loadMeasurement(measurements[dataIndex - 1]);
                 setDataIndex(dataIndex - 1);
               }
             }}>
-            <Icon
-              name="arrow-left-circle"
-              style={{marginTop: 10}}
-              size={20}
-              color={colors.buttonBlue}
-            />
+            <ButtonIcon materialIconName="arrow-left-circle" />
           </TouchableOpacity>
-          {dataIndex < measurements.length && (
-            <TouchableOpacity
-              style={{
-                borderRadius: defaultBorderRadius,
-                flexDirection: 'row',
-                margin: defaultGap,
-                paddingHorizontal: defaultPadding,
-                backgroundColor: colors.secondaryBlue,
-                height: 40,
-              }}
-              onPress={
-                // Here save the current state as the new saved measurement.
-                () => {
-                  measurements.map(measurement => {
-                    if (measurement.id == dataIndex) {
-                      return storeCurrentValuesAsMeasurement();
-                    } else {
-                      return measurement;
-                    }
+          {
+            // If we are currently adding a new measurement, then here the '+' button
+            // will be rendered, and clicking on it will save the new measurement.
+            // If the user navigates into one of the previous measurements, then
+            // instead of the '+' button, the save button will be rendered, and clicking
+            // on that save button will apply the changes made to the input to that
+            // previously captured measurement.
+            dataIndex == measurements.length ? (
+              <TouchableOpacity
+                style={measurementNavigationButtonStyle}
+                onPress={
+                  // Here save the current state as the new saved measurement.
+                  () => {
+                    setMeasurements(
+                      measurements.concat(storeCurrentValuesAsMeasurement()),
+                    );
+                    setDataIndex(dataIndex + 1);
+                    eraseCurrentValues();
+                    // Restore the 'numer płuczki' to 1.
+                    setScrubberIndex(0);
+                  }
+                }>
+                <ButtonIcon materialIconName="plus" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={measurementNavigationButtonStyle}
+                onPress={() => {
+                  // Update the currently selected measurement with the new values.
+                  const newMeasurements = measurements.map(measurement => {
+                    return measurement.id == dataIndex
+                      ? storeCurrentValuesAsMeasurement()
+                      : measurement;
                   });
-                }
-              }>
-              <Icon
-                name="content-save"
-                style={{marginTop: 10}}
-                size={20}
-                color={colors.buttonBlue}
-              />
-            </TouchableOpacity>
-          )}
+                  setMeasurements(newMeasurements);
+                }}>
+                <ButtonIcon materialIconName="content-save" />
+              </TouchableOpacity>
+            )
+          }
           <TouchableOpacity
-            style={{
-              borderRadius: defaultBorderRadius,
-              flexDirection: 'row',
-              margin: defaultGap,
-              paddingHorizontal: defaultPadding,
-              backgroundColor: colors.secondaryBlue,
-              height: 40,
-            }}
-            onPress={
-              // Here save the current state as the new saved measurement.
-              () => {
-                setMeasurements(
-                  measurements.concat(storeCurrentValuesAsMeasurement()),
-                );
-                setDataIndex(dataIndex + 1);
-                eraseCurrentValues();
-                setScrubberIndex(0);
-              }
-            }>
-            <Icon
-              name="plus"
-              style={{marginTop: 10}}
-              size={20}
-              color={colors.buttonBlue}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              borderRadius: defaultBorderRadius,
-              flexDirection: 'row',
-              margin: defaultGap,
-              paddingHorizontal: defaultPadding,
-              backgroundColor: colors.secondaryBlue,
-              height: 40,
-            }}
-            // Here we need to set the current measurement counte +1 modulo number of measurements (or cap it)
+            style={measurementNavigationButtonStyle}
             onPress={() => {
+              // Here if the dataIndex is within the measurements array, it means
+              // that we are viewing an already-saved measurement and so we want
+              // to load that measurement. Otherwise, if dataIndex
+              // is equal to measurements.length, it means that we are adding a
+              // new measurement and so no measurement exists that can be loaded.
               if (dataIndex < measurements.length - 1) {
                 loadMeasurement(measurements[dataIndex + 1]);
+              }
+
+              if (dataIndex < measurements.length) {
                 setDataIndex(dataIndex + 1);
               }
+              // We erase the current values only if the user transitions from viewing the
+              // last saved measurement to adding the new one.
+              if (dataIndex + 1 == measurements.length) {
+                eraseCurrentValues();
+              }
             }}>
-            <Icon
-              name="arrow-right-circle"
-              style={{marginTop: 10}}
-              size={20}
-              color={colors.buttonBlue}
-            />
+            <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
         </View>
       </ScrollView>
