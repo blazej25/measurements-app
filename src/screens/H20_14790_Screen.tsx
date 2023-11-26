@@ -149,7 +149,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
         />
         <NumberInputBar
           placeholder="20"
-          valueUnit="℃"
+          valueUnit="l"
           // Value parameter controlls what is displayed in the component
           value={leakTightnessTest}
           onChangeText={text => setLeakTightnessTest(parseFloat(text))}
@@ -157,14 +157,14 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
         />
         <NumberInputBar
           placeholder="20"
-          valueUnit="℃"
+          valueUnit="m3/h"
           value={aspiratorFlow}
           onChangeText={text => setAspiratorFlow(parseFloat(text))}
           label={'Przepływ przez aspirator:'}
         />
         <NumberInputBar
           placeholder="20"
-          valueUnit="℃"
+          valueUnit="m3"
           value={aspiratedGases}
           onChangeText={text => setAspiratedGases(parseFloat(text))}
           label={'Ilość zaaspirowanych gazów:'}
