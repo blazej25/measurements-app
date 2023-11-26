@@ -42,11 +42,6 @@ export const MenuBar = () => {
         navigation={navigation}
         destinationScreen={Screens.dust}
       />
-      <TouchableOpacity
-        onPress={() => navigation.navigate("Tutorial Screen" as never)}
-        style={styles.roundedButton1}>
-        <Text style={styles.buttonText1}>{'Tutorial'}</Text>
-      </TouchableOpacity>
     </View>
   );
 };

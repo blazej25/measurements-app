@@ -1,6 +1,5 @@
 import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
 import {
-  Button,
   ScrollView,
   StyleProp,
   Text,
@@ -8,12 +7,10 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import {NavigationButton} from '../components/buttons';
-import {CommonDataSchema, Screens} from '../constants';
+import {CommonDataSchema} from '../constants';
 import {t} from 'i18next';
 import {
   DataBar,
-  DateTimeSelectorGroup,
   NumberInputBar,
   SelectorBar,
   TimeSelector,
@@ -26,13 +23,7 @@ import {
   largeBorderRadius,
   styles,
 } from '../styles/common-styles';
-import {
-  CommonMeasurementDataSetters,
-  PipeCrossSectionType,
-  crossSectionTypeFrom,
-} from '../model';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {MeasurementsScreen} from './MeasurementScreen';
 
 // interfaces are like structs in c
 // syntax:
