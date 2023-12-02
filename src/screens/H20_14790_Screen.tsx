@@ -25,13 +25,6 @@ import {
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// interfaces are like structs in c
-// syntax:
-// interface MyInterfaceName{
-//   field: FieldType
-// }
-//
-
 interface Measurement {
   id: number;
   date: Date;
@@ -60,66 +53,54 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     setMeasurements: any,
   ] = useState([]);
 
-  // State of the measurement that is currently showing on the screen.
-  const [date, setDate] = useState(new Date());
-  const [initialMass, setInitialMass]: [
-    number[],
-    Dispatch<SetStateAction<number[]>>,
-  ] = useState([0, 0, 0]);
-  const [afterMass, setAfterMass]: [
-    number[],
-    Dispatch<SetStateAction<number[]>>,
-  ] = useState([0, 0, 0]);
-  const [leakTightnessTest, setLeakTightnessTest] = useState(0);
-  const [aspiratorFlow, setAspiratorFlow] = useState(0);
-  const [aspiratedGases, setAspiratedGases] = useState(0);
+  const initialState: Measurement = {
+    id: 0,
+    date: new Date(),
+    afterMass: [0, 0, 0],
+    initialMass: [0, 0, 0],
+    leakTightnessTest: 0,
+    aspiratorFlow: 0,
+    aspiratedGases: 0,
+  };
 
-  const [scrubberIndex, setScrubberIndex] = useState(0);
   const [dataIndex, setDataIndex] = useState(0);
+  const [scrubberIndex, setScrubberIndex] = useState(0);
+  const [currentMeasurement, setCurrentMeasurement] =
+    useState(initialState);
 
   const loadMeasurement = (measurement: Measurement) => {
-    setDate(measurement.date);
-    setInitialMass(measurement.initialMass);
-    setAfterMass(measurement.afterMass);
-    setLeakTightnessTest(measurement.leakTightnessTest);
-    setAspiratorFlow(measurement.aspiratorFlow);
-    setAspiratedGases(measurement.aspiratedGases);
+    setCurrentMeasurement(measurement);
   };
 
   const storeCurrentValuesAsMeasurement = () => {
     const newMeasurement: Measurement = {
-      id: dataIndex,
-      date: date,
-      afterMass: afterMass,
-      initialMass: initialMass,
-      leakTightnessTest: leakTightnessTest,
-      aspiratorFlow: aspiratorFlow,
-      aspiratedGases: aspiratedGases,
+      id: currentMeasurement.id,
+      date: currentMeasurement.date,
+      afterMass: currentMeasurement.afterMass,
+      initialMass: currentMeasurement.initialMass,
+      leakTightnessTest: currentMeasurement.leakTightnessTest,
+      aspiratorFlow: currentMeasurement.aspiratorFlow,
+      aspiratedGases: currentMeasurement.aspiratedGases,
     };
     return newMeasurement;
   };
 
   // Function for erasing the current input values
   const eraseCurrentValues = () => {
-    setDate(new Date());
-    setInitialMass([0, 0, 0]);
-    setAfterMass([0, 0, 0]);
-    setLeakTightnessTest(0);
-    setAspiratorFlow(0);
-    setAspiratedGases(0);
+    setCurrentMeasurement(initialState);
   };
 
   // Derived state used for displaying the curren scrubber masses.
   const afterMassDisplayValue = useMemo(
-    () => afterMass[scrubberIndex],
-    [afterMass, scrubberIndex],
+    () => currentMeasurement.afterMass[scrubberIndex],
+    [currentMeasurement, scrubberIndex],
   );
   // useMemo makes a derived state out of some other state. In the case below the derived state
   // is the currently showing mass value depending on the number of the 'płuczka' that is currently showing.
   // syntax of use memo: useMemo(() => <expression-for-the-derived-state>, [state arguments from which the target state is derived]);
   const initialMassShowingValue = useMemo(
-    () => initialMass[scrubberIndex],
-    [initialMass, scrubberIndex],
+    () => currentMeasurement.initialMass[scrubberIndex],
+    [currentMeasurement, scrubberIndex],
   );
 
   const measurementNavigationButtonStyle: StyleProp<ViewStyle> = {
@@ -144,29 +125,41 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
         </DataBar>
         <TimeSelector
           timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
-          date={date}
-          setDate={setDate}
+          date={currentMeasurement.date}
+          setDate={date => {
+            currentMeasurement.date = date;
+            setCurrentMeasurement(currentMeasurement);
+          }}
         />
         <NumberInputBar
           placeholder="20"
           valueUnit="l"
           // Value parameter controlls what is displayed in the component
-          value={leakTightnessTest}
-          onChangeText={text => setLeakTightnessTest(parseFloat(text))}
+          value={currentMeasurement.leakTightnessTest}
+          onChangeText={text => {
+            currentMeasurement.leakTightnessTest = parseFloat(text);
+            setCurrentMeasurement(currentMeasurement);
+          }}
           label={'Próba szczelności:'}
         />
         <NumberInputBar
           placeholder="20"
           valueUnit="m3/h"
-          value={aspiratorFlow}
-          onChangeText={text => setAspiratorFlow(parseFloat(text))}
+          value={currentMeasurement.aspiratorFlow}
+          onChangeText={(text) => { 
+            currentMeasurement.aspiratorFlow = parseFloat(text)
+            setCurrentMeasurement(currentMeasurement);
+          }}
           label={'Przepływ przez aspirator:'}
         />
         <NumberInputBar
           placeholder="20"
           valueUnit="m3"
-          value={aspiratedGases}
-          onChangeText={text => setAspiratedGases(parseFloat(text))}
+          value={currentMeasurement.aspiratedGases}
+          onChangeText={text => {
+            currentMeasurement.aspiratedGases = parseFloat(text)
+            setCurrentMeasurement(currentMeasurement)
+         }}
           label={'Ilość zaaspirowanych gazów:'}
         />
         <SelectorBar
@@ -183,11 +176,11 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           placeholder="20"
           valueUnit="g"
           onChangeText={text => {
-            setInitialMass(
-              initialMass.map((mass, index) =>
+            currentMeasurement.initialMass =
+              currentMeasurement.initialMass.map((mass, index) =>
                 index == scrubberIndex ? parseFloat(text) : mass,
               ),
-            );
+            setCurrentMeasurement(currentMeasurement);
           }}
           value={initialMassShowingValue}
           label={'Masa początkowa płuczki:'}
@@ -197,15 +190,16 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           valueUnit="g"
           value={afterMassDisplayValue}
           onChangeText={text => {
-            setAfterMass(
-              afterMass.map((mass, index) =>
+            currentMeasurement.afterMass =
+              currentMeasurement.afterMass.map((mass, index) =>
                 index == scrubberIndex ? parseFloat(text) : mass,
               ),
-            );
+            setCurrentMeasurement(currentMeasurement);
           }}
           label={'Masa płuczki po pomiarze:'}
         />
         <View
+          // This is the main button component
           style={{
             borderRadius: largeBorderRadius,
             flexDirection: 'row',
