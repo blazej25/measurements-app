@@ -134,7 +134,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           justifyContent: 'flex-start',
           gap: defaultGap,
         }}>
-        <DataBar label={'Numer Pomiaru'}>
+        <DataBar label={'Numer Pomiaru:'}>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
         <NumberInputBar
@@ -147,7 +147,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               initialVolume: parseFloat(text),
             });
           }}
-          label={'Objętość początkowa roztworu'}
+          label={'Objętość początkowa roztworu:'}
         />
         <NumberInputBar
           placeholder="0"
@@ -190,7 +190,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               aspiratedVolume: parseFloat(text),
             });
           }}
-          label={'Objętość zaaspirowana'}
+          label={'Objętość zaaspirowana:'}
         />
         <NumberInputBar
           placeholder="0"
@@ -202,10 +202,10 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               testNumber: parseInt(text),
             });
           }}
-          label={'Nr identyfikacyjny próbki'}
+          label={'Nr identyfikacyjny próbki:'}
         />
         <SelectorBar
-          label={'Rodzaj próbki'}
+          label={'Rodzaj próbki:'}
           selections={TESTED_COMPOUNDS}
           onSelect={(selectedItem: string, _index: number) => {
             var modifiedMeasurement = measurements[dataIndex];

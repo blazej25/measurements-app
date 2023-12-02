@@ -120,7 +120,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           justifyContent: 'flex-start',
           gap: defaultGap,
         }}>
-        <DataBar label={'Numer Pomiaru'}>
+        <DataBar label={'Numer Pomiaru:'}>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
         <TimeSelector
