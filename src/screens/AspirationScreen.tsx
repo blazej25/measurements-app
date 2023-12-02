@@ -1,10 +1,12 @@
 import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
 import {
   ScrollView,
+  ScrollViewProps,
   StyleProp,
   Text,
   TouchableOpacity,
   View,
+  ViewProps,
   ViewStyle,
 } from 'react-native';
 import {CommonDataSchema} from '../constants';
@@ -25,16 +27,6 @@ import {
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const TESTED_COMPOUNDS: string[] = [
-  'HCL',
-  'HF',
-  'HG',
-  'S02',
-  'NH3',
-  'METALE',
-  'PB',
-];
-
 interface Measurement {
   id: number;
   compounds: {[compound: string]: MeasurementPerCompound};
@@ -51,16 +43,15 @@ interface MeasurementPerCompound {
   testNumber: number;
 }
 
-const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
-  return (
-    <Icon
-      name={materialIconName}
-      style={{marginTop: 10}}
-      size={20}
-      color={colors.buttonBlue}
-    />
-  );
-};
+const TESTED_COMPOUNDS: string[] = [
+  'HCL',
+  'HF',
+  'HG',
+  'S02',
+  'NH3',
+  'METALE',
+  'PB',
+];
 
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // In this screen we are collecting a list of measurements.
@@ -90,50 +81,80 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   const [currentCompoundData, setCurrentCompoundData] = useState(initialState);
   const [currentMeasurement, setCurrentMeasurement] =
     useState(emptyMeasurement);
-  const [measurements, setMeasurements]: [
-    measurements: Measurement[],
-    setMeasurements: any,
-  ] = useState([emptyMeasurement]);
+  const [measurements, setMeasurements] = useState([emptyMeasurement]);
 
-  const loadMeasurement = (measurement: MeasurementPerCompound) => {
-    setCurrentCompoundData(measurement);
+  const loadPreviousMeasurement = () => {
+    if (dataIndex > 0) {
+      setCurrentCompoundData(
+        measurements[dataIndex - 1].compounds[currentCompoundData.compoundName],
+      );
+      setDataIndex(dataIndex - 1);
+    }
   };
 
-  const snaphotCurrentInputValues = () => {
-    const newMeasurement: MeasurementPerCompound = {
-      compoundName: currentCompoundData.compoundName,
-      date: currentCompoundData.date,
-      leakTightnessTest: currentCompoundData.leakTightnessTest,
-      aspiratorFlow: currentCompoundData.aspiratorFlow,
-      aspiratedVolume: currentCompoundData.aspiratedVolume,
-      initialVolume: currentCompoundData.initialVolume,
-      testNumber: currentCompoundData.testNumber,
-    };
-    return newMeasurement;
-  };
-
-  // Function for erasing the current input values
-  const eraseCurrentValues = () => {
+  const addNewMeasurement = () => {
+    saveModifications();
+    setMeasurements([
+      ...measurements,
+      {...emptyMeasurement, id: measurements.length},
+    ]);
+    setDataIndex(dataIndex + 1);
+    // Erase the fields so that new input can be collected.
     setCurrentCompoundData(initialState);
   };
 
-  const measurementNavigationButtonStyle: StyleProp<ViewStyle> = {
-    borderRadius: defaultBorderRadius,
-    flexDirection: 'row',
-    margin: defaultGap,
-    paddingHorizontal: defaultPadding,
-    backgroundColor: 'white',
-    height: 40,
+  const saveModifications = () => {
+    // Update the currently selected measurement with the new values.
+    var modifiedMeasurement = measurements[dataIndex];
+    modifiedMeasurement.compounds[currentCompoundData.compoundName] = {
+      ...currentCompoundData,
+    };
+    setCurrentMeasurement(modifiedMeasurement);
+    const newMeasurements: Measurement[] = measurements.map(measurement => {
+      return measurement.id == dataIndex ? currentMeasurement : measurement;
+    });
+    setMeasurements(newMeasurements);
+  };
+
+  const loadNextMeasurement = () => {
+    if (isLatestMeasurement()) {
+      setCurrentCompoundData(initialState);
+    }
+    if (dataIndex < measurements.length - 1) {
+      setCurrentCompoundData(
+        measurements[dataIndex + 1].compounds[currentCompoundData.compoundName],
+      );
+      setDataIndex(dataIndex + 1);
+    }
+  };
+
+  const changeCurrentCompound = (compound: string) => {
+    // When a new tested compound is selected we want to save the data
+    // that was input for the current one, then load the selected one
+    // from the current measurement state.
+    var modifiedMeasurement = measurements[dataIndex];
+    modifiedMeasurement.compounds[currentCompoundData.compoundName] = {
+      ...currentCompoundData,
+    };
+    setCurrentCompoundData(modifiedMeasurement.compounds[compound]);
+    setCurrentMeasurement(modifiedMeasurement);
+  };
+
+  const isLatestMeasurement = () => {
+    return dataIndex == measurements.length - 1;
+  };
+
+  const updateCurrentCompound = (field: any) => {
+    setCurrentCompoundData({
+      ...currentCompoundData,
+      ...field,
+    });
   };
 
   return (
     <View>
       <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'flex-start',
-          gap: defaultGap,
-        }}>
+        contentContainerStyle={defaultScrollViewStyle as ScrollViewProps}>
         <DataBar label={'Numer Pomiaru:'}>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
@@ -142,10 +163,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="ml"
           value={currentCompoundData.initialVolume}
           onChangeText={text => {
-            setCurrentCompoundData({
-              ...currentCompoundData,
-              initialVolume: parseFloat(text),
-            });
+            updateCurrentCompound({initialVolume: parseFloat(text)});
           }}
           label={'Objętość początkowa roztworu:'}
         />
@@ -154,8 +172,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="l/h"
           value={currentCompoundData.aspiratorFlow}
           onChangeText={text => {
-            setCurrentCompoundData({
-              ...currentCompoundData,
+            updateCurrentCompound({
               aspiratorFlow: parseFloat(text),
             });
           }}
@@ -166,8 +183,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="l/h"
           value={currentCompoundData.leakTightnessTest}
           onChangeText={text => {
-            setCurrentCompoundData({
-              ...currentCompoundData,
+            updateCurrentCompound({
               leakTightnessTest: parseFloat(text),
             });
           }}
@@ -177,7 +193,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
           date={currentCompoundData.date}
           setDate={date => {
-            setCurrentCompoundData({...currentCompoundData, date: date});
+            updateCurrentCompound({date: date});
           }}
         />
         <NumberInputBar
@@ -185,8 +201,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="l"
           value={currentCompoundData.aspiratedVolume}
           onChangeText={text => {
-            setCurrentCompoundData({
-              ...currentCompoundData,
+            updateCurrentCompound({
               aspiratedVolume: parseFloat(text),
             });
           }}
@@ -197,8 +212,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit=""
           value={currentCompoundData.testNumber}
           onChangeText={text => {
-            setCurrentCompoundData({
-              ...currentCompoundData,
+            updateCurrentCompound({
               testNumber: parseInt(text),
             });
           }}
@@ -208,107 +222,71 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           label={'Rodzaj próbki:'}
           selections={TESTED_COMPOUNDS}
           onSelect={(selectedItem: string, _index: number) => {
-            var modifiedMeasurement = measurements[dataIndex];
-            modifiedMeasurement.compounds[currentCompoundData.compoundName] =
-              snaphotCurrentInputValues();
-            console.log(JSON.stringify(modifiedMeasurement.compounds, null, 2));
-            loadMeasurement(modifiedMeasurement.compounds[selectedItem]);
-            setCurrentMeasurement(modifiedMeasurement);
+            changeCurrentCompound(selectedItem);
           }}
         />
-        <View
-          style={{
-            borderRadius: largeBorderRadius,
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            backgroundColor: colors.secondaryBlue,
-            padding: defaultPadding,
-            alignSelf: 'center',
-            gap: defaultGap,
-          }}>
+        <View style={buttonContainerStyle as ViewProps}>
           <TouchableOpacity
-            style={measurementNavigationButtonStyle}
-            onPress={() => {
-              if (dataIndex > 0) {
-                loadMeasurement(
-                  measurements[dataIndex - 1].compounds[
-                    currentCompoundData.compoundName
-                  ],
-                );
-                setDataIndex(dataIndex - 1);
-              }
-            }}>
+            style={navigationButtonStyle}
+            onPress={loadPreviousMeasurement}>
             <ButtonIcon materialIconName="arrow-left-circle" />
           </TouchableOpacity>
-          {dataIndex == measurements.length - 1 ? (
+          {isLatestMeasurement() ? (
             <TouchableOpacity
-              style={measurementNavigationButtonStyle}
-              onPress={
-                // Here save the current state as the new saved measurement.
-                () => {
-                  var modifiedMeasurement = measurements[dataIndex];
-                  modifiedMeasurement.compounds[
-                    currentCompoundData.compoundName
-                  ] = snaphotCurrentInputValues();
-                  setCurrentMeasurement(modifiedMeasurement);
-                  const newMeasurements: Measurement[] = measurements.map(
-                    measurement => {
-                      return measurement.id == dataIndex
-                        ? currentMeasurement
-                        : measurement;
-                    },
-                  );
-                  setMeasurements([
-                    ...newMeasurements,
-                    {...emptyMeasurement, id: measurements.length},
-                  ]);
-                  setDataIndex(dataIndex + 1);
-                  eraseCurrentValues();
-                }
-              }>
+              style={navigationButtonStyle}
+              onPress={addNewMeasurement}>
               <ButtonIcon materialIconName="plus" />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={measurementNavigationButtonStyle}
-              onPress={() => {
-                // Update the currently selected measurement with the new values.
-                var modifiedMeasurement = measurements[dataIndex];
-                modifiedMeasurement.compounds[
-                  currentCompoundData.compoundName
-                ] = snaphotCurrentInputValues();
-                setCurrentMeasurement(modifiedMeasurement);
-                const newMeasurements: Measurement[] = measurements.map(
-                  measurement => {
-                    return measurement.id == dataIndex
-                      ? currentMeasurement
-                      : measurement;
-                  },
-                );
-                setMeasurements(newMeasurements);
-              }}>
+              style={navigationButtonStyle}
+              onPress={saveModifications}>
               <ButtonIcon materialIconName="content-save" />
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            style={measurementNavigationButtonStyle}
-            onPress={() => {
-              if (dataIndex == measurements.length - 1) {
-                eraseCurrentValues();
-              }
-              if (dataIndex < measurements.length - 1) {
-                loadMeasurement(
-                  measurements[dataIndex + 1].compounds[
-                    currentCompoundData.compoundName
-                  ],
-                );
-                setDataIndex(dataIndex + 1);
-              }
-            }}>
+            style={navigationButtonStyle}
+            onPress={loadNextMeasurement}>
             <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
   );
+};
+
+const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
+  return (
+    <Icon
+      name={materialIconName}
+      style={{marginTop: 10}}
+      size={20}
+      color={colors.buttonBlue}
+    />
+  );
+};
+
+const navigationButtonStyle: StyleProp<ViewStyle> = {
+  borderRadius: defaultBorderRadius,
+  flexDirection: 'row',
+  margin: defaultGap,
+  paddingHorizontal: defaultPadding,
+  backgroundColor: 'white',
+  height: 40,
+};
+
+const defaultScrollViewStyle = {
+  flexGrow: 1,
+  justifyContent: 'flex-start',
+  gap: defaultGap,
+};
+
+const buttonContainerStyle = {
+  borderRadius: largeBorderRadius,
+  flexDirection: 'row',
+  justifyContent: 'space-evenly',
+  backgroundColor: colors.secondaryBlue,
+  padding: defaultPadding,
+  alignSelf: 'center',
+  gap: defaultGap,
 };
