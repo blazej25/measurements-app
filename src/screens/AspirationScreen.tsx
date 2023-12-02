@@ -42,6 +42,7 @@ interface Measurement {
 
 // Add UI components to get this data
 interface MeasurementPerCompound {
+  compoundName: string;
   date: Date;
   leakTightnessTest: number;
   aspiratorFlow: number;
@@ -63,12 +64,8 @@ const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
 
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // In this screen we are collecting a list of measurements.
-  const [measurements, setMeasurements]: [
-    measurements: Measurement[],
-    setMeasurements: any,
-  ] = useState([]);
-
   const initialState: MeasurementPerCompound = {
+    compoundName: TESTED_COMPOUNDS[0],
     date: new Date(),
     leakTightnessTest: 0,
     aspiratorFlow: 0,
@@ -77,28 +74,47 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     testNumber: 0,
   };
 
-  const [dataIndex, setDataIndex] = useState(0);
-  const [currentMeasurement, setCurrentMeasurement] = useState(initialState);
-
-  const loadMeasurement = (measurement: MeasurementPerCompound) => {
-    setCurrentMeasurement(measurement);
+  const emptyMeasurement: Measurement = {
+    id: 0,
+    compounds: {},
   };
 
-  const storeCurrentValuesAsMeasurement = () => {
+  for (const compound of TESTED_COMPOUNDS) {
+    emptyMeasurement.compounds[compound] = {
+      ...initialState,
+      compoundName: compound,
+    };
+  }
+
+  const [dataIndex, setDataIndex] = useState(0);
+  const [currentCompoundData, setCurrentCompoundData] = useState(initialState);
+  const [currentMeasurement, setCurrentMeasurement] =
+    useState(emptyMeasurement);
+  const [measurements, setMeasurements]: [
+    measurements: Measurement[],
+    setMeasurements: any,
+  ] = useState([emptyMeasurement]);
+
+  const loadMeasurement = (measurement: MeasurementPerCompound) => {
+    setCurrentCompoundData(measurement);
+  };
+
+  const snaphotCurrentInputValues = () => {
     const newMeasurement: MeasurementPerCompound = {
-      date: currentMeasurement.date,
-      leakTightnessTest: currentMeasurement.leakTightnessTest,
-      aspiratorFlow: currentMeasurement.aspiratorFlow,
-      aspiratedVolume: currentMeasurement.aspiratedVolume,
-      initialVolume: currentMeasurement.initialVolume,
-      testNumber: currentMeasurement.testNumber,
+      compoundName: currentCompoundData.compoundName,
+      date: currentCompoundData.date,
+      leakTightnessTest: currentCompoundData.leakTightnessTest,
+      aspiratorFlow: currentCompoundData.aspiratorFlow,
+      aspiratedVolume: currentCompoundData.aspiratedVolume,
+      initialVolume: currentCompoundData.initialVolume,
+      testNumber: currentCompoundData.testNumber,
     };
     return newMeasurement;
   };
 
   // Function for erasing the current input values
   const eraseCurrentValues = () => {
-    setCurrentMeasurement(initialState);
+    setCurrentCompoundData(initialState);
   };
 
   const measurementNavigationButtonStyle: StyleProp<ViewStyle> = {
@@ -124,72 +140,83 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
         <NumberInputBar
           placeholder="0"
           valueUnit="ml"
-          value={currentMeasurement.aspiratorFlow}
+          value={currentCompoundData.initialVolume}
           onChangeText={text => {
-            currentMeasurement.initialVolume = parseFloat(text);
-            setCurrentMeasurement(currentMeasurement);
+            setCurrentCompoundData({
+              ...currentCompoundData,
+              initialVolume: parseFloat(text),
+            });
           }}
           label={'Objętość początkowa roztworu'}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="l/h"
-          value={currentMeasurement.aspiratorFlow}
+          value={currentCompoundData.aspiratorFlow}
           onChangeText={text => {
-            currentMeasurement.aspiratorFlow = parseFloat(text);
-            setCurrentMeasurement(currentMeasurement);
+            setCurrentCompoundData({
+              ...currentCompoundData,
+              aspiratorFlow: parseFloat(text),
+            });
           }}
           label={'Przepływ przez aspirator:'}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="l/h"
-          value={currentMeasurement.leakTightnessTest}
+          value={currentCompoundData.leakTightnessTest}
           onChangeText={text => {
-            currentMeasurement.leakTightnessTest = parseFloat(text);
-            setCurrentMeasurement(currentMeasurement);
+            setCurrentCompoundData({
+              ...currentCompoundData,
+              leakTightnessTest: parseFloat(text),
+            });
           }}
           label={'Próba szczelności - przepływ:'}
         />
         <TimeSelector
           timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
-          date={currentMeasurement.date}
+          date={currentCompoundData.date}
           setDate={date => {
-            currentMeasurement.date = date;
-            setCurrentMeasurement(currentMeasurement);
+            setCurrentCompoundData({...currentCompoundData, date: date});
           }}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="l"
-          value={currentMeasurement.aspiratedVolume}
+          value={currentCompoundData.aspiratedVolume}
           onChangeText={text => {
-            currentMeasurement.aspiratedVolume = parseFloat(text);
-            setCurrentMeasurement(currentMeasurement);
+            setCurrentCompoundData({
+              ...currentCompoundData,
+              aspiratedVolume: parseFloat(text),
+            });
           }}
           label={'Objętość zaaspirowana'}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit=""
-          value={currentMeasurement.aspiratedVolume}
+          value={currentCompoundData.testNumber}
           onChangeText={text => {
-            currentMeasurement.testNumber = parseInt(text);
-            setCurrentMeasurement(currentMeasurement);
+            setCurrentCompoundData({
+              ...currentCompoundData,
+              testNumber: parseInt(text),
+            });
           }}
           label={'Nr identyfikacyjny próbki'}
         />
         <SelectorBar
-          label={'Numer płuczki: '}
-          selections={['1', '2', '3']}
+          label={'Rodzaj próbki'}
+          selections={TESTED_COMPOUNDS}
           onSelect={(selectedItem: string, _index: number) => {
-            // We subtract 1 because the UI displays the numbers of the scrubbers
-            // starting from 1, but the array of scrubbers uses usual 0-based
-            // indexing.
+            var modifiedMeasurement = measurements[dataIndex];
+            modifiedMeasurement.compounds[currentCompoundData.compoundName] =
+              snaphotCurrentInputValues();
+            console.log(JSON.stringify(modifiedMeasurement.compounds, null, 2));
+            loadMeasurement(modifiedMeasurement.compounds[selectedItem]);
+            setCurrentMeasurement(modifiedMeasurement);
           }}
         />
         <View
-          // This is the main button component
           style={{
             borderRadius: largeBorderRadius,
             flexDirection: 'row',
@@ -203,71 +230,79 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
             style={measurementNavigationButtonStyle}
             onPress={() => {
               if (dataIndex > 0) {
-                loadMeasurement(measurements[dataIndex - 1]);
+                loadMeasurement(
+                  measurements[dataIndex - 1].compounds[
+                    currentCompoundData.compoundName
+                  ],
+                );
                 setDataIndex(dataIndex - 1);
               }
             }}>
             <ButtonIcon materialIconName="arrow-left-circle" />
           </TouchableOpacity>
-          {
-            // If we are currently adding a new measurement, then here the '+' button
-            // will be rendered, and clicking on it will save the new measurement.
-            // If the user navigates into one of the previous measurements, then
-            // instead of the '+' button, the save button will be rendered, and clicking
-            // on that save button will apply the changes made to the input to that
-            // previously captured measurement.
-            dataIndex == measurements.length ? (
-              <TouchableOpacity
-                style={measurementNavigationButtonStyle}
-                onPress={
-                  // Here save the current state as the new saved measurement.
-                  () => {
-                    setMeasurements(
-                      measurements.concat(storeCurrentValuesAsMeasurement()),
-                    );
-                    setDataIndex(dataIndex + 1);
-                    eraseCurrentValues();
-                    // Restore the 'numer płuczki' to 1.
-                    setScrubberIndex(0);
-                  }
-                }>
-                <ButtonIcon materialIconName="plus" />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={measurementNavigationButtonStyle}
-                onPress={() => {
-                  // Update the currently selected measurement with the new values.
-                  const newMeasurements = measurements.map(measurement => {
+          {dataIndex == measurements.length - 1 ? (
+            <TouchableOpacity
+              style={measurementNavigationButtonStyle}
+              onPress={
+                // Here save the current state as the new saved measurement.
+                () => {
+                  var modifiedMeasurement = measurements[dataIndex];
+                  modifiedMeasurement.compounds[
+                    currentCompoundData.compoundName
+                  ] = snaphotCurrentInputValues();
+                  setCurrentMeasurement(modifiedMeasurement);
+                  const newMeasurements: Measurement[] = measurements.map(
+                    measurement => {
+                      return measurement.id == dataIndex
+                        ? currentMeasurement
+                        : measurement;
+                    },
+                  );
+                  setMeasurements([
+                    ...newMeasurements,
+                    {...emptyMeasurement, id: measurements.length},
+                  ]);
+                  setDataIndex(dataIndex + 1);
+                  eraseCurrentValues();
+                }
+              }>
+              <ButtonIcon materialIconName="plus" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={measurementNavigationButtonStyle}
+              onPress={() => {
+                // Update the currently selected measurement with the new values.
+                var modifiedMeasurement = measurements[dataIndex];
+                modifiedMeasurement.compounds[
+                  currentCompoundData.compoundName
+                ] = snaphotCurrentInputValues();
+                setCurrentMeasurement(modifiedMeasurement);
+                const newMeasurements: Measurement[] = measurements.map(
+                  measurement => {
                     return measurement.id == dataIndex
-                      ? storeCurrentValuesAsMeasurement()
+                      ? currentMeasurement
                       : measurement;
-                  });
-                  setMeasurements(newMeasurements);
-                }}>
-                <ButtonIcon materialIconName="content-save" />
-              </TouchableOpacity>
-            )
-          }
+                  },
+                );
+                setMeasurements(newMeasurements);
+              }}>
+              <ButtonIcon materialIconName="content-save" />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={measurementNavigationButtonStyle}
             onPress={() => {
-              // Here if the dataIndex is within the measurements array, it means
-              // that we are viewing an already-saved measurement and so we want
-              // to load that measurement. Otherwise, if dataIndex
-              // is equal to measurements.length, it means that we are adding a
-              // new measurement and so no measurement exists that can be loaded.
-              if (dataIndex < measurements.length - 1) {
-                loadMeasurement(measurements[dataIndex + 1]);
-              }
-
-              if (dataIndex < measurements.length) {
-                setDataIndex(dataIndex + 1);
-              }
-              // We erase the current values only if the user transitions from viewing the
-              // last saved measurement to adding the new one.
-              if (dataIndex + 1 == measurements.length) {
+              if (dataIndex == measurements.length - 1) {
                 eraseCurrentValues();
+              }
+              if (dataIndex < measurements.length - 1) {
+                loadMeasurement(
+                  measurements[dataIndex + 1].compounds[
+                    currentCompoundData.compoundName
+                  ],
+                );
+                setDataIndex(dataIndex + 1);
               }
             }}>
             <ButtonIcon materialIconName="arrow-right-circle" />

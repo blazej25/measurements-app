@@ -127,38 +127,34 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
           date={currentMeasurement.date}
           setDate={date => {
-            currentMeasurement.date = date;
-            setCurrentMeasurement(currentMeasurement);
+            setCurrentMeasurement({...currentMeasurement, date: date});
           }}
         />
         <NumberInputBar
-          placeholder="20"
+          placeholder="0"
           valueUnit="l"
           // Value parameter controlls what is displayed in the component
           value={currentMeasurement.leakTightnessTest}
           onChangeText={text => {
-            currentMeasurement.leakTightnessTest = parseFloat(text);
-            setCurrentMeasurement(currentMeasurement);
+            setCurrentMeasurement({...currentMeasurement, leakTightnessTest: parseFloat(text)});
           }}
           label={'Próba szczelności:'}
         />
         <NumberInputBar
-          placeholder="20"
+          placeholder="0"
           valueUnit="m3/h"
           value={currentMeasurement.aspiratorFlow}
-          onChangeText={(text) => { 
-            currentMeasurement.aspiratorFlow = parseFloat(text)
-            setCurrentMeasurement(currentMeasurement);
+          onChangeText={(text) => {
+            setCurrentMeasurement({...currentMeasurement, aspiratorFlow: parseFloat(text)});
           }}
           label={'Przepływ przez aspirator:'}
         />
         <NumberInputBar
-          placeholder="20"
+          placeholder="0"
           valueUnit="m3"
           value={currentMeasurement.aspiratedGases}
           onChangeText={text => {
-            currentMeasurement.aspiratedGases = parseFloat(text)
-            setCurrentMeasurement(currentMeasurement)
+            setCurrentMeasurement({...currentMeasurement, aspiratedGases : parseFloat(text)})
          }}
           label={'Ilość zaaspirowanych gazów:'}
         />
@@ -173,28 +169,28 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           }}
         />
         <NumberInputBar
-          placeholder="20"
+          placeholder="0"
           valueUnit="g"
           onChangeText={text => {
-            currentMeasurement.initialMass =
+            const newInitialMass =
               currentMeasurement.initialMass.map((mass, index) =>
                 index == scrubberIndex ? parseFloat(text) : mass,
-              ),
-            setCurrentMeasurement(currentMeasurement);
+              );
+            setCurrentMeasurement({...currentMeasurement, initialMass: newInitialMass});
           }}
           value={initialMassShowingValue}
           label={'Masa początkowa płuczki:'}
         />
         <NumberInputBar
-          placeholder="20"
+          placeholder="0"
           valueUnit="g"
           value={afterMassDisplayValue}
           onChangeText={text => {
-            currentMeasurement.afterMass =
+            let newAfterMass =
               currentMeasurement.afterMass.map((mass, index) =>
                 index == scrubberIndex ? parseFloat(text) : mass,
-              ),
-            setCurrentMeasurement(currentMeasurement);
+              );
+            setCurrentMeasurement({...currentMeasurement, afterMass: newAfterMass});
           }}
           label={'Masa płuczki po pomiarze:'}
         />
