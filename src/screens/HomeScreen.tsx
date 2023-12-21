@@ -137,7 +137,7 @@ const CommonDataInput = ({
           t(
             `commonDataForm:${CommonDataSchema.staffResponsibleForMeasurement}`,
           ) + ':'
-        }
+       }
         staffList={data.staffResponsibleForMeasurement}
         setStaffList={staffList =>
           updateField({staffResponsibleForMeasurement: staffList})
