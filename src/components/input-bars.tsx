@@ -65,26 +65,22 @@ export const SelectorBar = ({
             onSelect={(selectedItem, index) => {
               onSelect(selectedItem, index);
             }}
-            buttonTextAfterSelection={(selectedItem, _index) => {
-              if (selectionToText) {
-                return selectionToText(selectedItem);
-              }
-              return selectedItem;
+            buttonTextAfterSelection={(item, _index) => {
+              return selectionToText ? selectionToText(item) : item;
             }}
             rowTextForSelection={(item, _index) => {
-              if (selectionToText) {
-                return selectionToText(item);
-              }
-              return item;
+              return selectionToText ? selectionToText(item) : item;
             }}
           />
         ) : (
+          // TODO: finish this off so that it handles the no selections empty box
+          // properly
           <SelectDropdown
             buttonStyle={selectorItemStyle}
             rowStyle={selectorItemStyle}
             dropdownStyle={dropdownStyle}
             buttonTextStyle={{fontSize: 14}}
-            data={["Test"]}
+            data={['Test']}
             onSelect={() =>
               console.log('Dropdown selected when no selections available')
             }
@@ -324,6 +320,12 @@ export const TextInputBar = ({
   );
 };
 
+/**
+ * DataBar is the basic container component out of which all of the other ui bar
+ * selectors / input boxer are built. It takes in the label which is the main title
+ * of the input bar and a 'children' property which is responsible for embedding
+ * the actual component inside of that horizontal bar.
+ */
 export const DataBar = ({
   label,
   children,
