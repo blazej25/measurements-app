@@ -35,7 +35,7 @@ export const pl = {
   dustScreen: {
     measurementNumber: 'Numer pomiaru',
     numberOfMeasurements: 'Ilość pomiarów',
-    selectedEndType: 'Dobrana końcówka',
+    selectedEndDiameter: 'Dobrana końcówka',
     measurementStartTime: 'Godzina rozpoczęcia',
     aspirationTime: 'Czas aspiracji',
     aspiratedVolume: 'Objętość zaaspirowana',

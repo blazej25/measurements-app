@@ -26,7 +26,7 @@ export const CommonDataSchema = {
 export const DustMeasurementDataSchema = {
   measurementNumber: 'measurementNumber',
   numberOfMeasurements: 'numberOfMeasurements',
-  selectedEndType: 'selectedEndType',
+  selectedEndDiameter: 'selectedEndDiameter',
   measurementStartTime: 'measurementStartTime',
   aspirationTime: 'aspirationTime',
   aspiratedVolume: 'aspiratedVolume',

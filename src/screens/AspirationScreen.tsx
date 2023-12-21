@@ -7,7 +7,6 @@ import {
   View,
 } from 'react-native';
 import {AspirationDataSchema} from '../constants';
-import {t} from 'i18next';
 import {
   DataBar,
   NumberInputBar,
@@ -23,7 +22,7 @@ import {
   styles,
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
 interface AspirationMeasurement {
   id: number;
@@ -162,13 +161,15 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     });
   };
 
-
   const {t} = useTranslation();
 
   return (
     <View>
       <ScrollView contentContainerStyle={local_styles.defaultScrollView}>
-        <DataBar label={t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'}>
+        <DataBar
+          label={
+            t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'
+          }>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
         <NumberInputBar
@@ -178,7 +179,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           onChangeText={text => {
             updateCurrentCompound({initialVolume: parseFloat(text)});
           }}
-          label={t(`aspirationScreen:${AspirationDataSchema.initialVolume}`) + ':'}
+          label={
+            t(`aspirationScreen:${AspirationDataSchema.initialVolume}`) + ':'
+          }
         />
         <NumberInputBar
           placeholder="0"
@@ -189,7 +192,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               aspiratorFlow: parseFloat(text),
             });
           }}
-          label={t(`aspirationScreen:${AspirationDataSchema.aspiratorFlow}`) + ':'}
+          label={
+            t(`aspirationScreen:${AspirationDataSchema.aspiratorFlow}`) + ':'
+          }
         />
         <NumberInputBar
           placeholder="0"
@@ -200,10 +205,15 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               leakTightnessTest: parseFloat(text),
             });
           }}
-          label={t(`aspirationScreen:${AspirationDataSchema.leakTightnessTest}`) + ':'}
+          label={
+            t(`aspirationScreen:${AspirationDataSchema.leakTightnessTest}`) +
+            ':'
+          }
         />
         <TimeSelector
-          timeLabel={t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'}
+          timeLabel={
+            t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'
+          }
           date={currentCompoundData.date}
           setDate={date => {
             updateCurrentCompound({date: date});
@@ -218,7 +228,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               aspiratedVolume: parseFloat(text),
             });
           }}
-          label={t(`aspirationScreen:${AspirationDataSchema.aspiratedVolume}`) + ':'}
+          label={
+            t(`aspirationScreen:${AspirationDataSchema.aspiratedVolume}`) + ':'
+          }
         />
         <NumberInputBar
           placeholder="0"
@@ -232,7 +244,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           label={t(`aspirationScreen:${AspirationDataSchema.sampleId}`) + ':'}
         />
         <SelectorBar
-          label={t(`aspirationScreen:${AspirationDataSchema.compoundType}`) + ':'}
+          label={
+            t(`aspirationScreen:${AspirationDataSchema.compoundType}`) + ':'
+          }
           selections={TESTED_COMPOUNDS}
           onSelect={(selectedItem: string, _index: number) => {
             changeCurrentCompound(selectedItem);

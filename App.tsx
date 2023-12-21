@@ -1,7 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {useColorScheme} from 'react-native';
 
 import {AspirationScreen} from './src/screens/AspirationScreen';
 import {DustScreen} from './src/screens/DustScreen';
@@ -17,13 +16,10 @@ import {useTranslation} from 'react-i18next';
 import {Screens} from './src/constants';
 import { MenuBar } from './src/components/MenuBar';
 import { TutorialMainScreen } from './src/tutorials/TutorialMainScreen';
-import { NavigationButton } from './src/components/buttons';
 
 const Stack = createNativeStackNavigator();
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
   const {t} = useTranslation();
 
   return (

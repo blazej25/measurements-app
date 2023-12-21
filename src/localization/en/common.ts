@@ -31,7 +31,7 @@ export const en = {
     ROUND: 'Round',
     RECTANGULAR: 'Rectangular',
   },
-  dustMeasurementData: {
+  dustScreen: {
     measurementNumber: 'Measurement no.',
     numberOfMeasurements: 'Number of Measurements',
     selectedEndType: 'Selected End Type',
