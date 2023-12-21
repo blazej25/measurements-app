@@ -5,12 +5,11 @@ export enum PipeCrossSectionType {
   RECTANGULAR = 'RECTANGULAR',
 }
 
-export function crossSectionTypeFrom(str: string) : PipeCrossSectionType {
+export function crossSectionTypeFrom(str: string): PipeCrossSectionType {
   if (str === 'RECTANGULAR') {
     return PipeCrossSectionType.RECTANGULAR;
   }
-    return PipeCrossSectionType.RECTANGULAR;
-
+  return PipeCrossSectionType.RECTANGULAR;
 }
 
 export type Person = {
@@ -26,18 +25,4 @@ export type CommonMeasurementData = {
   staffResponsibleForMeasurement: Person[];
   temperature: number;
   pressure: number;
-};
-
-export type CommonMeasurementDataSetters = {
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-  setMeasurementRequestor: React.Dispatch<React.SetStateAction<string>>;
-  setEmissionSource: React.Dispatch<React.SetStateAction<string>>;
-  setPipeCrossSectionType: React.Dispatch<
-    React.SetStateAction<PipeCrossSectionType>
-  >;
-  setStaffResponsibleForMeasurement: React.Dispatch<
-    React.SetStateAction<Person[]>
-  >;
-  setTemperature: React.Dispatch<React.SetStateAction<number>>;
-  setPressure: React.Dispatch<React.SetStateAction<number>>;
 };

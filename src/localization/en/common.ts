@@ -17,6 +17,7 @@ export const en = {
   },
   commonDataForm: {
     date: 'Date',
+    dummyName: 'John Doe',
     arrivalTime: 'Time of arrival',
     measurementRequestor: 'Principal',
     emissionSource: 'Emmission source',
@@ -38,6 +39,18 @@ export const en = {
     aspirationTime: 'Aspiration Time',
     aspiratedVolume: 'Aspirated Volume',
     filterType: 'Filter Type',
-    water: 'Water'
-  }
+    water: 'Water',
+  },
+  aspirationScreen: {
+    date: 'Date',
+    arrivalTime: 'Time of Arrival',
+    measurementNumber: 'Measurement no.',
+    compoundName: 'Compound Name',
+    leakTightnessTest: 'Leak-tightness Test - Flow',
+    aspiratorFlow: 'Aspirator flow',
+    aspiratedVolume: 'Aspirated Volume',
+    initialVolume: 'Initial Volume',
+    sampleId: 'Sample ID number',
+    compoundType: 'Sample Type',
+  },
 };

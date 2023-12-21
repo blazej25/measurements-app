@@ -1,15 +1,12 @@
-import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {
   ScrollView,
-  ScrollViewProps,
-  StyleProp,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ViewProps,
-  ViewStyle,
 } from 'react-native';
-import {CommonDataSchema} from '../constants';
+import {AspirationDataSchema} from '../constants';
 import {t} from 'i18next';
 import {
   DataBar,
@@ -26,13 +23,13 @@ import {
   styles,
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTranslation } from 'react-i18next';
 
-interface Measurement {
+interface AspirationMeasurement {
   id: number;
   compounds: {[compound: string]: MeasurementPerCompound};
 }
 
-// Add UI components to get this data
 interface MeasurementPerCompound {
   compoundName: string;
   date: Date;
@@ -40,7 +37,7 @@ interface MeasurementPerCompound {
   aspiratorFlow: number;
   aspiratedVolume: number;
   initialVolume: number;
-  testNumber: number;
+  sampleId: number;
 }
 
 const TESTED_COMPOUNDS: string[] = [
@@ -54,7 +51,6 @@ const TESTED_COMPOUNDS: string[] = [
 ];
 
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
-  // In this screen we are collecting a list of measurements.
   const initialState: MeasurementPerCompound = {
     compoundName: TESTED_COMPOUNDS[0],
     date: new Date(),
@@ -62,10 +58,10 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     aspiratorFlow: 0,
     aspiratedVolume: 0,
     initialVolume: 0,
-    testNumber: 0,
+    sampleId: 0,
   };
 
-  const emptyMeasurement: Measurement = {
+  const emptyMeasurement: AspirationMeasurement = {
     id: 0,
     compounds: {},
   };
@@ -77,18 +73,27 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     };
   }
 
+  // dataIndex is used to select the current measurement that is being modified.
   const [dataIndex, setDataIndex] = useState(0);
+
+  // currentCompundData is used for storing the state of the measurement of
+  // the current compound that is being entered / edited.
   const [currentCompoundData, setCurrentCompoundData] = useState(initialState);
+
+  // current measurement is the measurement for which we are currently modifying
+  // the respective compounds.
   const [currentMeasurement, setCurrentMeasurement] =
     useState(emptyMeasurement);
+
   const [measurements, setMeasurements] = useState([emptyMeasurement]);
 
   const loadPreviousMeasurement = () => {
     if (dataIndex > 0) {
+      const newIndex = dataIndex - 1;
       setCurrentCompoundData(
-        measurements[dataIndex - 1].compounds[currentCompoundData.compoundName],
+        measurements[newIndex].compounds[currentCompoundData.compoundName],
       );
-      setDataIndex(dataIndex - 1);
+      setDataIndex(newIndex);
     }
   };
 
@@ -110,9 +115,11 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       ...currentCompoundData,
     };
     setCurrentMeasurement(modifiedMeasurement);
-    const newMeasurements: Measurement[] = measurements.map(measurement => {
-      return measurement.id == dataIndex ? currentMeasurement : measurement;
-    });
+    const newMeasurements: AspirationMeasurement[] = measurements.map(
+      measurement => {
+        return measurement.id == dataIndex ? currentMeasurement : measurement;
+      },
+    );
     setMeasurements(newMeasurements);
   };
 
@@ -120,11 +127,12 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     if (isLatestMeasurement()) {
       setCurrentCompoundData(initialState);
     }
+    const newIndex = dataIndex + 1;
     if (dataIndex < measurements.length - 1) {
       setCurrentCompoundData(
-        measurements[dataIndex + 1].compounds[currentCompoundData.compoundName],
+        measurements[newIndex].compounds[currentCompoundData.compoundName],
       );
-      setDataIndex(dataIndex + 1);
+      setDataIndex(newIndex);
     }
   };
 
@@ -144,6 +152,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     return dataIndex == measurements.length - 1;
   };
 
+  // This helper can be used for updating the array by overwriting a single
+  // field inside of it. The field should be an object with a single field
+  // that we want to update, e.g. {date: new Date()}
   const updateCurrentCompound = (field: any) => {
     setCurrentCompoundData({
       ...currentCompoundData,
@@ -151,11 +162,13 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     });
   };
 
+
+  const {t} = useTranslation();
+
   return (
     <View>
-      <ScrollView
-        contentContainerStyle={defaultScrollViewStyle as ScrollViewProps}>
-        <DataBar label={'Numer Pomiaru:'}>
+      <ScrollView contentContainerStyle={local_styles.defaultScrollView}>
+        <DataBar label={t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'}>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
         <NumberInputBar
@@ -165,7 +178,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           onChangeText={text => {
             updateCurrentCompound({initialVolume: parseFloat(text)});
           }}
-          label={'Objętość początkowa roztworu:'}
+          label={t(`aspirationScreen:${AspirationDataSchema.initialVolume}`) + ':'}
         />
         <NumberInputBar
           placeholder="0"
@@ -176,7 +189,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               aspiratorFlow: parseFloat(text),
             });
           }}
-          label={'Przepływ przez aspirator:'}
+          label={t(`aspirationScreen:${AspirationDataSchema.aspiratorFlow}`) + ':'}
         />
         <NumberInputBar
           placeholder="0"
@@ -187,10 +200,10 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               leakTightnessTest: parseFloat(text),
             });
           }}
-          label={'Próba szczelności - przepływ:'}
+          label={t(`aspirationScreen:${AspirationDataSchema.leakTightnessTest}`) + ':'}
         />
         <TimeSelector
-          timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
+          timeLabel={t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'}
           date={currentCompoundData.date}
           setDate={date => {
             updateCurrentCompound({date: date});
@@ -205,47 +218,47 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               aspiratedVolume: parseFloat(text),
             });
           }}
-          label={'Objętość zaaspirowana:'}
+          label={t(`aspirationScreen:${AspirationDataSchema.aspiratedVolume}`) + ':'}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit=""
-          value={currentCompoundData.testNumber}
+          value={currentCompoundData.sampleId}
           onChangeText={text => {
             updateCurrentCompound({
               testNumber: parseInt(text),
             });
           }}
-          label={'Nr identyfikacyjny próbki:'}
+          label={t(`aspirationScreen:${AspirationDataSchema.sampleId}`) + ':'}
         />
         <SelectorBar
-          label={'Rodzaj próbki:'}
+          label={t(`aspirationScreen:${AspirationDataSchema.compoundType}`) + ':'}
           selections={TESTED_COMPOUNDS}
           onSelect={(selectedItem: string, _index: number) => {
             changeCurrentCompound(selectedItem);
           }}
         />
-        <View style={buttonContainerStyle as ViewProps}>
+        <View style={local_styles.buttonContainer}>
           <TouchableOpacity
-            style={navigationButtonStyle}
+            style={local_styles.navigationButton}
             onPress={loadPreviousMeasurement}>
             <ButtonIcon materialIconName="arrow-left-circle" />
           </TouchableOpacity>
           {isLatestMeasurement() ? (
             <TouchableOpacity
-              style={navigationButtonStyle}
+              style={local_styles.navigationButton}
               onPress={addNewMeasurement}>
               <ButtonIcon materialIconName="plus" />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={navigationButtonStyle}
+              style={local_styles.navigationButton}
               onPress={saveModifications}>
               <ButtonIcon materialIconName="content-save" />
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            style={navigationButtonStyle}
+            style={local_styles.navigationButton}
             onPress={loadNextMeasurement}>
             <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
@@ -266,27 +279,27 @@ const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
   );
 };
 
-const navigationButtonStyle: StyleProp<ViewStyle> = {
-  borderRadius: defaultBorderRadius,
-  flexDirection: 'row',
-  margin: defaultGap,
-  paddingHorizontal: defaultPadding,
-  backgroundColor: 'white',
-  height: 40,
-};
-
-const defaultScrollViewStyle = {
-  flexGrow: 1,
-  justifyContent: 'flex-start',
-  gap: defaultGap,
-};
-
-const buttonContainerStyle = {
-  borderRadius: largeBorderRadius,
-  flexDirection: 'row',
-  justifyContent: 'space-evenly',
-  backgroundColor: colors.secondaryBlue,
-  padding: defaultPadding,
-  alignSelf: 'center',
-  gap: defaultGap,
-};
+const local_styles = StyleSheet.create({
+  navigationButton: {
+    borderRadius: defaultBorderRadius,
+    flexDirection: 'row',
+    margin: defaultGap,
+    paddingHorizontal: defaultPadding,
+    backgroundColor: 'white',
+    height: 40,
+  },
+  defaultScrollView: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    gap: defaultGap,
+  },
+  buttonContainer: {
+    borderRadius: largeBorderRadius,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    backgroundColor: colors.secondaryBlue,
+    padding: defaultPadding,
+    alignSelf: 'center',
+    gap: defaultGap,
+  },
+});

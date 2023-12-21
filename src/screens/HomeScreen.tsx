@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
@@ -14,53 +14,29 @@ import {
 } from '../components/input-bars';
 import {
   CommonMeasurementData,
-  CommonMeasurementDataSetters,
   Person,
   PipeCrossSectionType,
   crossSectionTypeFrom,
 } from '../model';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
-  const [date, setDate] = useState(new Date());
-  const [measurementRequestor, setMeasurementRequestor] = useState('');
-  const [emissionSource, setEmissionSource] = useState('');
-  const [pipeCrossSectionType, setPipeCrossSectionType] = useState(
-    PipeCrossSectionType.ROUND,
-  );
-
-  const emptyPersonArray: Person[] = [];
-  const [staffResponsibleForMeasurement, setStaffResponsibleForMeasurement]: [
-    Person[],
-    React.Dispatch<React.SetStateAction<Person[]>>,
-  ] = useState(emptyPersonArray);
-  const [temperature, setTemperature] = useState(0);
-  const [pressure, setPressure] = useState(0);
-
-  const data: CommonMeasurementData = {
-    date: date,
-    measurementRequestor: measurementRequestor,
-    emissionSource: emissionSource,
-    pipeCrossSectionType: pipeCrossSectionType,
-    staffResponsibleForMeasurement: staffResponsibleForMeasurement,
-    temperature: temperature,
-    pressure: pressure,
+  const empty_data: CommonMeasurementData = {
+    date: new Date(),
+    measurementRequestor: '',
+    emissionSource: '',
+    pipeCrossSectionType: PipeCrossSectionType.ROUND,
+    staffResponsibleForMeasurement: [],
+    temperature: 0,
+    pressure: 0,
   };
 
-  const setters: CommonMeasurementDataSetters = {
-    setDate: setDate,
-    setMeasurementRequestor: setMeasurementRequestor,
-    setEmissionSource: setEmissionSource,
-    setPipeCrossSectionType: setPipeCrossSectionType,
-    setStaffResponsibleForMeasurement: setStaffResponsibleForMeasurement,
-    setPressure: setPressure,
-    setTemperature: setTemperature,
-  };
+  const [measurementData, setMeasurementData] = useState(empty_data);
 
   return (
     <>
       <SettingsPanel navigation={navigation} />
       <WelcomeHeader />
-      <CommonDataInput data={data} setters={setters} />
+      <CommonDataInput data={measurementData} setter={setMeasurementData} />
     </>
   );
 };
@@ -100,12 +76,19 @@ const WelcomeHeader = () => {
 
 const CommonDataInput = ({
   data,
-  setters,
+  setter,
 }: {
   data: CommonMeasurementData;
-  setters: CommonMeasurementDataSetters;
+  setter: React.Dispatch<React.SetStateAction<CommonMeasurementData>>;
 }) => {
   const {t} = useTranslation();
+
+  const updateField = (field: any) => {
+    setter({
+      ...data,
+      ...field,
+    });
+  };
   return (
     <ScrollView
       contentContainerStyle={{
@@ -115,20 +98,24 @@ const CommonDataInput = ({
       }}>
       <DateTimeSelectorGroup
         date={data.date}
-        setDate={setters.setDate}
+        setDate={date => updateField({date: date})}
         dateLabel={t(`commonDataForm:${CommonDataSchema.date}`) + ':'}
         timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
       />
       <TextInputBar
-        placeholder="Jan Kowalski"
-        onChangeText={setters.setMeasurementRequestor}
+        placeholder={t(`commonDataForm:dummyName`)}
+        onChangeText={requestor =>
+          updateField({measurementRequestor: requestor})
+        }
         label={
           t(`commonDataForm:${CommonDataSchema.measurementRequestor}`) + ':'
         }
       />
       <TextInputBar
-        placeholder="some source"
-        onChangeText={setters.setEmissionSource}
+        placeholder={
+          t(`commonDataForm:${CommonDataSchema.emissionSource}`) + ':'
+        }
+        onChangeText={source => updateField({emissionSource: source})}
         label={t(`commonDataForm:${CommonDataSchema.emissionSource}`) + ':'}
       />
       <SelectorBar
@@ -139,27 +126,35 @@ const CommonDataInput = ({
           item.toString(),
         )}
         onSelect={(selectedItem: string, _index: number) => {
-          setters.setPipeCrossSectionType(crossSectionTypeFrom(selectedItem));
+          updateField({
+            pipeCrossSectionType: crossSectionTypeFrom(selectedItem),
+          });
         }}
         selectionToText={selection => t(`pipeCrossSectionTypes:${selection}`)}
       />
       <StaffListInputBar
         label={
-          t(`commonDataForm:${CommonDataSchema.staffResponsibleForMeasurement}`) + ':'
-          }
+          t(
+            `commonDataForm:${CommonDataSchema.staffResponsibleForMeasurement}`,
+          ) + ':'
+        }
         staffList={data.staffResponsibleForMeasurement}
-        setStaffList={setters.setStaffResponsibleForMeasurement}
+        setStaffList={staffList =>
+          updateField({staffResponsibleForMeasurement: staffList})
+        }
       />
       <NumberInputBar
         placeholder="20"
         valueUnit="℃"
-        onChangeText={text => setters.setTemperature(parseFloat(text))}
+        value={data.temperature}
+        onChangeText={text => updateField({temperature: parseFloat(text)})}
         label={t(`commonDataForm:${CommonDataSchema.temperature}`) + ':'}
       />
       <NumberInputBar
         placeholder="1100"
         valueUnit="hPa"
-        onChangeText={text => setters.setPressure(parseFloat(text))}
+        value={data.pressure}
+        onChangeText={text => updateField({pressure: parseFloat(text)})}
         label={t(`commonDataForm:${CommonDataSchema.pressure}`) + ':'}
       />
     </ScrollView>

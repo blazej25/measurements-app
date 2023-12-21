@@ -33,3 +33,17 @@ export const DustMeasurementDataSchema = {
   filterType: 'filterType',
   water: 'water',
 };
+
+export const AspirationDataSchema = {
+  date: 'date',
+  arrivalTime: 'arrivalTime',
+  measurementNumber: 'measurementNumber',
+  compoundName: 'compoundName',
+  leakTightnessTest: 'leakTightnessTest',
+  aspiratorFlow: 'aspiratorFlow',
+  aspiratedVolume: 'aspiratedVolume',
+  initialVolume: 'initialVolume',
+  testNumber: 'testNumber',
+  sampleId: 'sampleId',
+  compoundType: 'compoundType',
+};

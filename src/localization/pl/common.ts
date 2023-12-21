@@ -16,6 +16,7 @@ export const pl = {
     settings: 'Ustawienia',
   },
   commonDataForm: {
+    dummyName: 'Jan Kowalski',
     date: 'Data',
     arrivalTime: 'Godzina przyjazdu',
     measurementRequestor: 'Zleceniodawca',
@@ -30,7 +31,8 @@ export const pl = {
     ROUND: 'Okrągły',
     RECTANGULAR: 'Prostokątny',
   },
-  dustMeasurementData: {
+  // Screen-specific translations
+  dustScreen: {
     measurementNumber: 'Numer pomiaru',
     numberOfMeasurements: 'Ilość pomiarów',
     selectedEndType: 'Dobrana końcówka',
@@ -38,6 +40,18 @@ export const pl = {
     aspirationTime: 'Czas aspiracji',
     aspiratedVolume: 'Objętość zaaspirowana',
     filterType: 'Filtr',
-    water: 'Woda'
-  }
+    water: 'Woda',
+  },
+  aspirationScreen: {
+    date: 'Data',
+    arrivalTime: 'Godzina przyjazdu',
+    measurementNumber: 'Numer Pomiaru',
+    compoundName: 'Rodzaj próbki',
+    leakTightnessTest: 'Próba szczelności - przepływ',
+    aspiratorFlow: 'Przepływ przez aspirator',
+    aspiratedVolume: 'Objętość zaaspirowana',
+    initialVolume: 'Objętość początkowa roztworu',
+    sampleId: 'Nr identyfikacyjny próbki',
+    compoundType: 'Rodzaj próbki',
+  },
 };
