@@ -366,6 +366,45 @@ export const DataBar = ({
     </TouchableOpacity>
   );
 };
+/*
+TODO: finish the duration selector.
+export const DurationSelector = ({
+  timeLabel,
+  minutes,
+  setMinutes,
+}: {
+  timeLabel: string;
+  minutes: number;
+  setMinutes: (minutes: number) => void;
+}) => {
+  const [timePickerActive, setTimePickerActive] = useState(false);
+  return (
+    <DataBar label={timeLabel}>
+      <TouchableOpacity
+        onPress={() => {
+          setTimePickerActive(true);
+        }}>
+        <Text style={styles.dataSelectorText}>{getTimeString(date)}</Text>
+        {timePickerActive && (
+          <RNDateTimePicker
+            mode="time"
+            value={date}
+            onChange={(
+              event: DateTimePickerEvent,
+              selectedDate?: Date | undefined,
+            ) => {
+              if (event.type === 'set' && selectedDate !== undefined) {
+                setDate(selectedDate);
+              }
+              setTimePickerActive(false);
+            }}
+          />
+        )}
+      </TouchableOpacity>
+    </DataBar>
+  );
+*/
+
 export const TimeSelector = ({
   timeLabel,
   date,

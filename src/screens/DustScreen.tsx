@@ -64,6 +64,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
       <View style={local_styles.mainContainer}>
         <NumberInputBar
           placeholder="0"
+          value={numberOfMeasurements}
           onChangeText={text => setNumberOfMeasurements(parseInt(text))}
           label={t(
             `dustScreen:${DustMeasurementDataSchema.numberOfMeasurements}`,
@@ -137,10 +138,11 @@ const DustSingleMeasurementComponent = ({
           `dustScreen:${DustMeasurementDataSchema.measurementStartTime}`,
         )}
         date={data.measurementStartTime}
-        setDate={date => updateField({date: date})}
+        setDate={date => updateField({measurementStartTime: date})}
       />
       <NumberInputBar
         placeholder="0"
+        value={data.aspiratedVolume}
         onChangeText={text => updateField({aspiratedVolume: parseInt(text)})}
         label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`)}
       />
@@ -184,6 +186,7 @@ const DustSingleMeasurementComponent = ({
 
 const local_styles = StyleSheet.create({
   mainContainer: {
+    margin: defaultGap,
     flex: 1,
     justifyContent: 'flex-start',
     gap: defaultGap,
