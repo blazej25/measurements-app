@@ -32,11 +32,11 @@ interface AspirationMeasurement {
 interface MeasurementPerCompound {
   compoundName: string;
   date: Date;
-  leakTightnessTest: number;
-  aspiratorFlow: number;
-  aspiratedVolume: number;
-  initialVolume: number;
-  sampleId: number;
+  leakTightnessTest: string;
+  aspiratorFlow: string;
+  aspiratedVolume: string;
+  initialVolume: string;
+  sampleId: string;
 }
 
 const TESTED_COMPOUNDS: string[] = [
@@ -53,11 +53,11 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   const initialState: MeasurementPerCompound = {
     compoundName: TESTED_COMPOUNDS[0],
     date: new Date(),
-    leakTightnessTest: 0,
-    aspiratorFlow: 0,
-    aspiratedVolume: 0,
-    initialVolume: 0,
-    sampleId: 0,
+    leakTightnessTest: '',
+    aspiratorFlow: '',
+    aspiratedVolume: '',
+    initialVolume: '',
+    sampleId: '',
   };
 
   const emptyMeasurement: AspirationMeasurement = {
