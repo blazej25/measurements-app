@@ -1,4 +1,5 @@
 package com.measurementsapp;
+import com.rnfs.RNFSPackage; // <------- add package
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -8,7 +9,7 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate;
 import android.os.Bundle;
 
 
-public class MainActivity extends ReactActivity {
+public class MainActivity extends ReactActivity implements ReactApplication{
 
   /**
    * Returns the name of the main component registered from JavaScript. This is
@@ -37,4 +38,12 @@ public class MainActivity extends ReactActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(null);
   }
+
+  @Override
+    protected List<ReactPackage> getPackages() {
+      return Arrays.<ReactPackage>asList(
+        new MainReactPackage(), // <---- add comma
+        new RNFSPackage() // <---------- add package
+      );
+    }
 }
