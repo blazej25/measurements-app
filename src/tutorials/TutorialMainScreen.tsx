@@ -58,7 +58,7 @@ export const SimpleSelector = ({item1, item2, item3} : {item1: string, item2: st
   return (
     <View>
         {
-        // Add a text box here showing the current selection 
+        // Add a text box here showing the current selection
         }
       <Text>{selection}</Text>
 
