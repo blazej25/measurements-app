@@ -9,7 +9,7 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate;
 import android.os.Bundle;
 
 
-public class MainActivity extends ReactActivity implements ReactApplication{
+public class MainActivity extends ReactActivity {
 
   /**
    * Returns the name of the main component registered from JavaScript. This is
@@ -39,11 +39,4 @@ public class MainActivity extends ReactActivity implements ReactApplication{
     super.onCreate(null);
   }
 
-  @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-        new MainReactPackage(), // <---- add comma
-        new RNFSPackage() // <---------- add package
-      );
-    }
 }

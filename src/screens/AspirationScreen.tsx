@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import RNFS from 'react-native-fs';
 import {
   ScrollView,
   StyleSheet,
@@ -32,11 +33,11 @@ interface AspirationMeasurement {
 interface MeasurementPerCompound {
   compoundName: string;
   date: Date;
-  leakTightnessTest: string;
-  aspiratorFlow: string;
-  aspiratedVolume: string;
-  initialVolume: string;
-  sampleId: string;
+  leakTightnessTest: number;
+  aspiratorFlow: number;
+  aspiratedVolume: number;
+  initialVolume: number;
+  sampleId: number;
 }
 
 const TESTED_COMPOUNDS: string[] = [
@@ -53,11 +54,11 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   const initialState: MeasurementPerCompound = {
     compoundName: TESTED_COMPOUNDS[0],
     date: new Date(),
-    leakTightnessTest: '',
-    aspiratorFlow: '',
-    aspiratedVolume: '',
-    initialVolume: '',
-    sampleId: '',
+    leakTightnessTest: 0,
+    aspiratorFlow: 0,
+    aspiratedVolume: 0,
+    initialVolume: 0,
+    sampleId: 0,
   };
 
   const emptyMeasurement: AspirationMeasurement = {
@@ -120,6 +121,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       },
     );
     setMeasurements(newMeasurements);
+    saveFile();
   };
 
   const loadNextMeasurement = () => {
@@ -159,6 +161,23 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       ...currentCompoundData,
       ...field,
     });
+  };
+
+
+  const saveFile = () => {
+    // create a path you want to write to
+    // :warning: on iOS, you cannot write into `RNFS.MainBundlePath`,
+    // but `RNFS.DocumentDirectoryPath` exists on both platforms and is writable
+    var path = RNFS.DocumentDirectoryPath + '/test.txt';
+
+    // write the file
+    RNFS.writeFile(path, 'Lorem ipsum dolor sit amet', 'utf8')
+      .then(success => {
+        console.log('File written to: ' + path);
+      })
+      .catch(err => {
+        console.log(err.message);
+      });
   };
 
   const {t} = useTranslation();
