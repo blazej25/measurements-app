@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import RNFS from 'react-native-fs';
 import {
   ScrollView,
   StyleSheet,
@@ -24,6 +23,8 @@ import {
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTranslation} from 'react-i18next';
+import FileSystemService from '../services/FileSystemService';
+import FilePickerManager from 'react-native-file-picker';
 
 interface AspirationMeasurement {
   id: number;
@@ -60,6 +61,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     initialVolume: 0,
     sampleId: 0,
   };
+
+  const fileSystemService = new FileSystemService();
 
   const emptyMeasurement: AspirationMeasurement = {
     id: 0,
@@ -121,7 +124,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       },
     );
     setMeasurements(newMeasurements);
-    saveFile();
+
+    fileSystemService.saveJSON(newMeasurements, 'aspiration-measurements.txt');
   };
 
   const loadNextMeasurement = () => {
@@ -161,23 +165,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       ...currentCompoundData,
       ...field,
     });
-  };
-
-
-  const saveFile = () => {
-    // create a path you want to write to
-    // :warning: on iOS, you cannot write into `RNFS.MainBundlePath`,
-    // but `RNFS.DocumentDirectoryPath` exists on both platforms and is writable
-    var path = RNFS.DocumentDirectoryPath + '/test.txt';
-
-    // write the file
-    RNFS.writeFile(path, 'Lorem ipsum dolor sit amet', 'utf8')
-      .then(success => {
-        console.log('File written to: ' + path);
-      })
-      .catch(err => {
-        console.log(err.message);
-      });
   };
 
   const {t} = useTranslation();
@@ -296,6 +283,26 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
             <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={local_styles.navigationButton}
+          onPress={() => {
+            FilePickerManager.showFilePicker(null, (response: any) => {
+              console.log('Response = ', response);
+
+              if (response.didCancel) {
+                console.log('User cancelled file picker');
+              } else if (response.error) {
+                console.log('FilePickerManager Error: ', response.error);
+              } else {
+                console.log({
+                  file: response,
+                });
+              }
+            });
+          }}>
+          <ButtonIcon materialIconName="content-save" />
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
