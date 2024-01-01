@@ -182,7 +182,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
 
   return (
-    <View>
+    <View style={styles.mainContainer}>
       <ScrollView contentContainerStyle={local_styles.defaultScrollView}>
         <DataBar
           label={

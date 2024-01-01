@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import {NumberInputBar, SelectorBar} from '../components/input-bars';
-import {defaultGap} from '../styles/common-styles';
+import {defaultGap, styles} from '../styles/common-styles';
 
 interface SingleFlowMeasurement {
   dynamicPressure: string[];
@@ -67,7 +67,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
   };
 
   return (
-    <View>
+    <View style={styles.mainContainer}>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -218,7 +218,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           placeholder=""
           value={currentMeasurement.dynamicPressure[0]}
           onChangeText={text => {
-            const value0 = parseFloat(text);
+            const value0 = text;
             const value1 = currentMeasurement.dynamicPressure[1];
             const value2 = currentMeasurement.dynamicPressure[2];
             const value3 = currentMeasurement.dynamicPressure[3];
@@ -233,7 +233,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           value={currentMeasurement.dynamicPressure[1]}
           onChangeText={text => {
             const value0 = currentMeasurement.dynamicPressure[0];
-            const value1 = parseFloat(text);
+            const value1 = text;
             const value2 = currentMeasurement.dynamicPressure[2];
             const value3 = currentMeasurement.dynamicPressure[3];
             const newValue = [value0, value1, value2, value3];
@@ -248,7 +248,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           onChangeText={text => {
             const value0 = currentMeasurement.dynamicPressure[0];
             const value1 = currentMeasurement.dynamicPressure[1];
-            const value2 = parseFloat(text);
+            const value2 = text;
             const value3 = currentMeasurement.dynamicPressure[3];
             const newValue = [value0, value1, value2, value3];
 
@@ -263,7 +263,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
             const value0 = currentMeasurement.dynamicPressure[0];
             const value1 = currentMeasurement.dynamicPressure[1];
             const value2 = currentMeasurement.dynamicPressure[2];
-            const value3 = parseFloat(text);
+            const value3 = text;
             const newValue = [value0, value1, value2, value3];
 
             updateSingleFlowMeasurement({dynamicPressure: newValue});
@@ -274,7 +274,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           placeholder=""
           value={currentMeasurement.temperature}
           onChangeText={text => {
-            updateSingleFlowMeasurement({temperature: parseFloat(text)});
+            updateSingleFlowMeasurement({temperature: text});
           }}
           label={'Temperatura'}
         />

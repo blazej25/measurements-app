@@ -11,6 +11,17 @@ export const defaultPadding = 10;
 export const defaultGap = 5;
 
 export const styles = StyleSheet.create({
+  mainContainer: {
+    margin: defaultGap,
+    flex: 1,
+    justifyContent: 'flex-start',
+    gap: defaultGap,
+  },
+  defaultView: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    gap: defaultGap,
+  },
   roundedButton1: {
     padding: defaultPadding,
     borderRadius: defaultBorderRadius,

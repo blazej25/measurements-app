@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   ScrollView,
   StyleProp,
@@ -28,11 +28,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 interface Measurement {
   id: number;
   date: Date;
-  afterMass: number[];
-  initialMass: number[];
-  leakTightnessTest: number;
-  aspiratorFlow: number;
-  aspiratedGases: number;
+  afterMass: string[];
+  initialMass: string[];
+  leakTightnessTest: string;
+  aspiratorFlow: string;
+  aspiratedGases: string;
 }
 
 const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
@@ -47,7 +47,6 @@ const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
 };
 
 export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
-  // In this screen we are collecting a list of measurements.
   const [measurements, setMeasurements]: [
     measurements: Measurement[],
     setMeasurements: any,
@@ -56,11 +55,11 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   const initialState: Measurement = {
     id: 0,
     date: new Date(),
-    afterMass: [0, 0, 0],
-    initialMass: [0, 0, 0],
-    leakTightnessTest: 0,
-    aspiratorFlow: 0,
-    aspiratedGases: 0,
+    afterMass: ['', '', ''],
+    initialMass: ['', '', ''],
+    leakTightnessTest: '',
+    aspiratorFlow: '',
+    aspiratedGases: '',
   };
 
   const [dataIndex, setDataIndex] = useState(0);
@@ -113,7 +112,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   };
 
   return (
-    <View>
+    <View style={styles.mainContainer}>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -136,7 +135,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           // Value parameter controlls what is displayed in the component
           value={currentMeasurement.leakTightnessTest}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, leakTightnessTest: parseFloat(text)});
+            setCurrentMeasurement({...currentMeasurement, leakTightnessTest: text});
           }}
           label={'Próba szczelności:'}
         />
@@ -145,7 +144,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           valueUnit="m3/h"
           value={currentMeasurement.aspiratorFlow}
           onChangeText={(text) => {
-            setCurrentMeasurement({...currentMeasurement, aspiratorFlow: parseFloat(text)});
+            setCurrentMeasurement({...currentMeasurement, aspiratorFlow: text});
           }}
           label={'Przepływ przez aspirator:'}
         />
@@ -154,7 +153,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           valueUnit="m3"
           value={currentMeasurement.aspiratedGases}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, aspiratedGases : parseFloat(text)})
+            setCurrentMeasurement({...currentMeasurement, aspiratedGases : text})
          }}
           label={'Ilość zaaspirowanych gazów:'}
         />
@@ -174,7 +173,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           onChangeText={text => {
             const newInitialMass =
               currentMeasurement.initialMass.map((mass, index) =>
-                index == scrubberIndex ? parseFloat(text) : mass,
+                index == scrubberIndex ? text : mass,
               );
             setCurrentMeasurement({...currentMeasurement, initialMass: newInitialMass});
           }}
@@ -188,7 +187,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           onChangeText={text => {
             let newAfterMass =
               currentMeasurement.afterMass.map((mass, index) =>
-                index == scrubberIndex ? parseFloat(text) : mass,
+                index == scrubberIndex ? text : mass,
               );
             setCurrentMeasurement({...currentMeasurement, afterMass: newAfterMass});
           }}

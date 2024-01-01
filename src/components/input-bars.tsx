@@ -37,7 +37,7 @@ export const SelectorBar = ({
     backgroundColor: colors.secondaryBlue,
     marginBottom: defaultGap,
     height: 40,
-    maxWidth: 120,
+    maxWidth: 110,
   };
 
   const dropdownStyle = {
@@ -319,7 +319,7 @@ export const TextInputBar = ({
   return (
     <DataBar label={label}>
       <TextInput
-        value={value}
+        value={placeholder}
         placeholderTextColor={'gray'}
         placeholder={placeholder}
         onChangeText={onChangeText}
