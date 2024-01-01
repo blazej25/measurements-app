@@ -33,10 +33,10 @@ interface AspirationMeasurement {
 interface MeasurementPerCompound {
   compoundName: string;
   date: Date;
-  leakTightnessTest: number;
-  aspiratorFlow: number;
-  aspiratedVolume: number;
-  initialVolume: number;
+  leakTightnessTest: string;
+  aspiratorFlow: string;
+  aspiratedVolume: string;
+  initialVolume: string;
   sampleId: number;
 }
 
@@ -54,10 +54,10 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   const initialState: MeasurementPerCompound = {
     compoundName: TESTED_COMPOUNDS[0],
     date: new Date(),
-    leakTightnessTest: 0,
-    aspiratorFlow: 0,
-    aspiratedVolume: 0,
-    initialVolume: 0,
+    leakTightnessTest: '',
+    aspiratorFlow: '',
+    aspiratedVolume: '',
+    initialVolume: '',
     sampleId: 0,
   };
 
@@ -163,7 +163,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     });
   };
 
-
   const saveFile = () => {
     // create a path you want to write to
     // :warning: on iOS, you cannot write into `RNFS.MainBundlePath`,
@@ -196,7 +195,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="ml"
           value={currentCompoundData.initialVolume}
           onChangeText={text => {
-            updateCurrentCompound({initialVolume: parseFloat(text)});
+            updateCurrentCompound({initialVolume: text});
           }}
           label={
             t(`aspirationScreen:${AspirationDataSchema.initialVolume}`) + ':'
@@ -207,9 +206,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="l/h"
           value={currentCompoundData.aspiratorFlow}
           onChangeText={text => {
-            updateCurrentCompound({
-              aspiratorFlow: parseFloat(text),
-            });
+            updateCurrentCompound({aspiratorFlow: text});
           }}
           label={
             t(`aspirationScreen:${AspirationDataSchema.aspiratorFlow}`) + ':'
@@ -221,7 +218,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           value={currentCompoundData.leakTightnessTest}
           onChangeText={text => {
             updateCurrentCompound({
-              leakTightnessTest: parseFloat(text),
+              leakTightnessTest: text,
             });
           }}
           label={
@@ -244,7 +241,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           value={currentCompoundData.aspiratedVolume}
           onChangeText={text => {
             updateCurrentCompound({
-              aspiratedVolume: parseFloat(text),
+              aspiratedVolume: text,
             });
           }}
           label={
@@ -254,7 +251,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
         <NumberInputBar
           placeholder="0"
           valueUnit=""
-          value={currentCompoundData.sampleId}
+          value={currentCompoundData.sampleId.toString()}
           onChangeText={text => {
             updateCurrentCompound({
               testNumber: parseInt(text),

@@ -17,19 +17,19 @@ import {DustMeasurementDataSchema} from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface DustMeasurementData {
-  selectedEndDiameter: number;
+  selectedEndDiameter: string;
   measurementStartTime: Date;
-  aspirationTime: number;
-  aspiratedVolume: number;
+  aspirationTime: string;
+  aspiratedVolume: string;
   filterType: string;
   water: string;
 }
 
 const initialData: DustMeasurementData = {
-  selectedEndDiameter: 0,
+  selectedEndDiameter: '',
   measurementStartTime: new Date(),
-  aspirationTime: 0,
-  aspiratedVolume: 0,
+  aspirationTime: '',
+  aspiratedVolume: '',
   filterType: '',
   water: '',
 };
@@ -53,20 +53,9 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     () =>
       savedMeasurements
         .map(measurement => savedMeasurements.indexOf(measurement) + 1)
-        .map(index => index.toString()).slice(0, numberOfMeasurements),
+        .map(index => index.toString())
+        .slice(0, numberOfMeasurements),
     [savedMeasurements, numberOfMeasurements],
-  );
-
-
-  const selections2: string[] = useMemo(
-    () => {
-       const selections: string[] = []
-       for (var i = 0; i < numberOfMeasurements; i++) {
-        selections.push((i + 1).toString())
-       }
-       return selections;
-    },
-    [numberOfMeasurements],
   );
 
   return (
@@ -74,8 +63,10 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
       <View style={local_styles.mainContainer}>
         <NumberInputBar
           placeholder="0"
-          value={numberOfMeasurements}
-          onChangeText={text => setNumberOfMeasurements(parseInt(text))}
+          value={numberOfMeasurements.toString()}
+          onChangeText={text =>
+            setNumberOfMeasurements(text ? parseInt(text) : 0)
+          }
           label={t(
             `dustScreen:${DustMeasurementDataSchema.numberOfMeasurements}`,
           )}
@@ -94,11 +85,18 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
             t(`dustScreen:${DustMeasurementDataSchema.measurementNumber}`) + ':'
           }
           selections={selections}
-          onSelect={(selectedItem: string, index: number) => {
+          onSelect={(_selectedItem: string, index: number) => {
             setMeasurementIndex(index);
             setData(savedMeasurements[index]);
           }}
-          selectionToText={selection => selection}
+          // If we are adding a new measurement, the selector should display its
+          // number at the top.
+          selectionToText={selection =>
+            measurementIndex == -1
+              ? savedMeasurements.length.toString()
+              : selection
+          }
+          rowTextForSelection={selection => selection}
         />
       </View>
     </>
@@ -141,10 +139,9 @@ const DustSingleMeasurementComponent = ({
         gap: defaultGap,
       }}>
       <TextInputBar
+        value={data.selectedEndDiameter}
         label={t(`dustScreen:${DustMeasurementDataSchema.selectedEndDiameter}`)}
-        onChangeText={text =>
-          updateField({selectedEndDiameter: parseInt(text)})
-        }
+        onChangeText={text => updateField({selectedEndDiameter: text})}
       />
       <TimeSelector
         timeLabel={t(
@@ -155,15 +152,24 @@ const DustSingleMeasurementComponent = ({
       />
       <NumberInputBar
         placeholder="0"
+        value={data.aspirationTime}
+        valueUnit="min"
+        onChangeText={text => updateField({aspirationTime: text})}
+        label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`)}
+      />
+      <NumberInputBar
+        placeholder="0"
         value={data.aspiratedVolume}
-        onChangeText={text => updateField({aspiratedVolume: parseInt(text)})}
+        onChangeText={text => updateField({aspiratedVolume: text})}
         label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`)}
       />
       <TextInputBar
+        value={data.filterType}
         label={t(`dustScreen:${DustMeasurementDataSchema.filterType}`)}
         onChangeText={text => updateField({filterType: text})}
       />
       <TextInputBar
+        value={data.water}
         label={t(`dustScreen:${DustMeasurementDataSchema.water}`)}
         onChangeText={text => updateField({water: text})}
       />
@@ -177,16 +183,15 @@ const DustSingleMeasurementComponent = ({
             // an id with each entry and then filtering the array and
             // using the setter to finally update the state.
             if (savedMeasurements.length == numberOfMeasurements) {
-              return
+              return;
             }
             if (measurementIndex == -1) {
-              const newSavedMesurements = [...savedMeasurements, {...data}]
-              setSavedMeasurements(newSavedMesurements)
-              console.log(savedMeasurements);
+              const newSavedMesurements = [...savedMeasurements, {...data}];
+              setSavedMeasurements(newSavedMesurements);
             } else {
               var newSavedMesurements = [...savedMeasurements];
               newSavedMesurements[measurementIndex] = {...data};
-              setSavedMeasurements(newSavedMesurements)
+              setSavedMeasurements(newSavedMesurements);
               setMeasurementIndex(-1);
             }
             setData(initialData);
