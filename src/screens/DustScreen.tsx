@@ -45,19 +45,29 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   ] = useState([] as DustMeasurementData[]);
 
   const [measurementIndex, setMeasurementIndex] = useState(-1);
-
-  // Here we need to have the derived state so tha he measurement number selector
-  // has the correct set of strings to display and select from.
-  const selections = useMemo(
-    () =>
-      savedMeasurements
-        .map(measurement => savedMeasurements.indexOf(measurement))
-        .map(index => index.toString()),
-    [savedMeasurements],
-  );
-
   const [numberOfMeasurements, setNumberOfMeasurements] = useState(0);
 
+  // Here we need to have the derived state so that the measurement number selector
+  // has the correct set of strings to display and select from.
+  const selections: string[] = useMemo(
+    () =>
+      savedMeasurements
+        .map(measurement => savedMeasurements.indexOf(measurement) + 1)
+        .map(index => index.toString()).slice(0, numberOfMeasurements),
+    [savedMeasurements, numberOfMeasurements],
+  );
+
+
+  const selections2: string[] = useMemo(
+    () => {
+       const selections: string[] = []
+       for (var i = 0; i < numberOfMeasurements; i++) {
+        selections.push((i + 1).toString())
+       }
+       return selections;
+    },
+    [numberOfMeasurements],
+  );
 
   return (
     <>
@@ -77,6 +87,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
           setSavedMeasurements={setSavedMeasurements}
           measurementIndex={measurementIndex}
           setMeasurementIndex={setMeasurementIndex}
+          numberOfMeasurements={numberOfMeasurements}
         />
         <SelectorBar
           label={
@@ -101,6 +112,7 @@ const DustSingleMeasurementComponent = ({
   setSavedMeasurements,
   measurementIndex,
   setMeasurementIndex,
+  numberOfMeasurements,
 }: {
   data: DustMeasurementData;
   setData: React.Dispatch<React.SetStateAction<DustMeasurementData>>;
@@ -110,6 +122,7 @@ const DustSingleMeasurementComponent = ({
   >;
   measurementIndex: number;
   setMeasurementIndex: React.Dispatch<React.SetStateAction<number>>;
+  numberOfMeasurements: number;
 }) => {
   const {t} = useTranslation();
 
@@ -163,11 +176,17 @@ const DustSingleMeasurementComponent = ({
             // I suspect that we would need to modify the array by maintaining
             // an id with each entry and then filtering the array and
             // using the setter to finally update the state.
+            if (savedMeasurements.length == numberOfMeasurements) {
+              return
+            }
             if (measurementIndex == -1) {
-              savedMeasurements.push({...data});
+              const newSavedMesurements = [...savedMeasurements, {...data}]
+              setSavedMeasurements(newSavedMesurements)
               console.log(savedMeasurements);
             } else {
-              savedMeasurements[measurementIndex] = {...data};
+              var newSavedMesurements = [...savedMeasurements];
+              newSavedMesurements[measurementIndex] = {...data};
+              setSavedMeasurements(newSavedMesurements)
               setMeasurementIndex(-1);
             }
             setData(initialData);

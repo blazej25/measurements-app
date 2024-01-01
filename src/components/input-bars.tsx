@@ -35,7 +35,7 @@ export const SelectorBar = ({
     backgroundColor: colors.secondaryBlue,
     marginBottom: defaultGap,
     height: 40,
-    maxWidth: 130,
+    maxWidth: 100,
   };
 
   const dropdownStyle = {
