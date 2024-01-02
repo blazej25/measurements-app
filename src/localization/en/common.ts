@@ -53,4 +53,18 @@ export const en = {
     sampleId: 'Sample ID number',
     compoundType: 'Sample Type',
   },
+  flowsScreen: {
+    pipeCrossSection: 'Pipe cross section',
+    numberOfSpigots: 'Number of spigots',
+    numberOfPoints: 'Number of points',
+    width: 'Width',
+    height: 'Height',
+    pipeDiameter: 'Diameter of the pipe',
+    dynamicPressure: 'Dynamic pressure',
+    staticPressure: 'Static pressure',
+    temperature: 'Temperature',
+    angle: 'Angle', 
+    axisNumber: 'Number of the axis',
+    pointOnAxis: 'Point on the axis',
+  }
 };

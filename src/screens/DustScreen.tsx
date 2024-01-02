@@ -58,17 +58,6 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   );
 
 
-  const selections2: string[] = useMemo(
-    () => {
-       const selections: string[] = []
-       for (var i = 0; i < numberOfMeasurements; i++) {
-        selections.push((i + 1).toString())
-       }
-       return selections;
-    },
-    [numberOfMeasurements],
-  );
-
   return (
     <>
       <View style={local_styles.mainContainer}>

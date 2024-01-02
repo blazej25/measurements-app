@@ -54,4 +54,18 @@ export const pl = {
     sampleId: 'Nr identyfikacyjny próbki',
     compoundType: 'Rodzaj próbki',
   },
+  flowsScreen: {
+    pipeCrossSection: 'Przekrój przewodu',
+    numberOfSpigots: 'Ilość osi pomiarowych',
+    numberOfPoints: 'Ilość punktów na ois',
+    width: 'Szerokość',
+    height: 'Wysokość',
+    pipeDiameter: 'Średnica przewodu',
+    dynamicPressure: 'Ciśnienie dynamiczne',
+    staticPressure: 'Ciśnienie statyczne',
+    temperature: 'Temperatura',
+    angle: 'Kąt', 
+    axisNumber: 'Numer osi pomiarowej',
+    pointOnAxis: 'Punkt na osi',
+  }
 };
