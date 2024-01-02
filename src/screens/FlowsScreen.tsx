@@ -1,7 +1,12 @@
-import React, {useMemo, useState} from 'react';
-import {ScrollView, View} from 'react-native';
-import {NumberInputBar, SelectorBar} from '../components/input-bars';
-import {defaultGap, styles} from '../styles/common-styles';
+import React, { useMemo, useState } from 'react';
+import { Button, ScrollView, Text, View } from 'react-native';
+import { NavigationButton } from '../components/buttons';
+import { Screens } from '../constants';
+import { TextInput } from 'react-native';
+import { NumberInputBar, SelectorBar } from '../components/input-bars';
+import { defaultGap } from '../styles/common-styles';
+import {useTranslation} from 'react-i18next';
+
 
 interface SingleFlowMeasurement {
   dynamicPressure: string[];
@@ -66,6 +71,8 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
     return filtered.length > 0;
   };
 
+  const {t} = useTranslation();
+
   return (
     <View style={styles.mainContainer}>
       <ScrollView
@@ -75,8 +82,10 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           gap: defaultGap,
         }}>
         <SelectorBar
-          label={'Rodzaj przewodu'}
-          selections={['Kołowy', 'Prostokątny']}
+          label={
+            t(`flowsScreen:pipeCrossSection`) + ':'
+          }
+          selections={[t('pipeCrossSectionTypes:ROUND'), t('pipeCrossSectionTypes:RECTANGULAR')]}
           onSelect={(selectedItem: string, _index: number) => {
             setMode(selectedItem !== 'Kołowy');
             console.log(JSON.stringify(measurements, null, 2));
@@ -94,7 +103,9 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
                 const new_value = [height, width];
                 setPipeDimensions(new_value);
               }}
-              label={'Wysokość'}
+              label={
+                t(`flowsScreen:height`) + ':'
+              }
             />
             <NumberInputBar
               placeholder=""
@@ -106,7 +117,9 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
                 const new_value = [height, width];
                 setPipeDimensions(new_value);
               }}
-              label={'Szerokość'}
+              label={
+                t(`flowsScreen:width`) + ':'
+              }
             />
           </>
         ) : (
@@ -115,23 +128,31 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
             valueUnit="m"
             value={pipeDiameter}
             onChangeText={text => setPipeDiameter(text)}
-            label={'Średnica przewodu'}
+            label={
+              t(`flowsScreen:pipeDiameter`) + ':'
+            }
           />
         )}
         <NumberInputBar
           placeholder=""
           value={numberOfSpigots.toString()}
           onChangeText={text => setNumberOfSpigots(parseFloat(text))}
-          label={'Liczba króćców na obiekcie'}
+          label={
+            t(`flowsScreen:numberOfSpigots`) + ':'
+          }
         />
         <NumberInputBar
           placeholder=""
           value={numberOfPoints.toString()}
           onChangeText={text => setNumberOfPoints(parseFloat(text))}
-          label={'Ilość punktów na osi'}
+          label={
+            t(`flowsScreen:numberOfPoints`) + ':'
+          }
         />
         <SelectorBar
-          label={'Numer króćca'}
+          label={
+            t(`flowsScreen:axisNumber`) + ':'
+          }
           selections={selectionsSpigots}
           onSelect={(_selectedItem: string, index: number) => {
             const newAxisNumber = index;
@@ -174,7 +195,9 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           }}
         />
         <SelectorBar
-          label={'Numer punktu pomiarowego'}
+          label={
+            t(`flowsScreen:pointOnAxis`) + ':'
+          }
           selections={selectionsPoints}
           onSelect={(_selectedItem: string, index: number) => {
             const newPointOnAxis = index;
@@ -226,7 +249,9 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
 
             updateSingleFlowMeasurement({dynamicPressure: newValue});
           }}
-          label={'Ciśnienie Dynamiczne 1'}
+          label={
+            t(`flowsScreen:dynamicPressure`) + ' 1:'
+          }
         />
         <NumberInputBar
           placeholder=""
@@ -240,7 +265,9 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
 
             updateSingleFlowMeasurement({dynamicPressure: newValue});
           }}
-          label={'Ciśnienie Dynamiczne 2'}
+          label={
+            t(`flowsScreen:dynamicPressure`) + ' 2:'
+          }
         />
         <NumberInputBar
           placeholder=""
@@ -254,7 +281,9 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
 
             updateSingleFlowMeasurement({dynamicPressure: newValue});
           }}
-          label={'Ciśnienie Dynamiczne 3'}
+          label={
+            t(`flowsScreen:dynamicPressure`) + ' 3:'
+          }
         />
         <NumberInputBar
           placeholder=""
@@ -268,23 +297,27 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
 
             updateSingleFlowMeasurement({dynamicPressure: newValue});
           }}
-          label={'Ciśnienie Dynamiczne 4'}
+          label={
+            t(`flowsScreen:dynamicPressure`) + ' 4:'
+          }
         />
         <NumberInputBar
           placeholder=""
           value={currentMeasurement.temperature}
-          onChangeText={text => {
-            updateSingleFlowMeasurement({temperature: text});
-          }}
-          label={'Temperatura'}
+          onChangeText={text => { updateSingleFlowMeasurement({ temperature: text}) }}
+          label={
+            t(`flowsScreen:temperature`) + ':'
+          }
         />
         <NumberInputBar
           placeholder=""
           value={currentMeasurement.angle}
-          onChangeText={text => {
-            updateSingleFlowMeasurement({angle: text});
+          onChangeText={text => { 
+            updateSingleFlowMeasurement({ angle: text });
           }}
-          label={'Kąt'}
+          label={
+            t(`flowsScreen:angle`) + ':'
+          }
         />
       </ScrollView>
     </View>
