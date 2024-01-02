@@ -4,7 +4,7 @@ import { NavigationButton } from '../components/buttons';
 import { Screens } from '../constants';
 import { TextInput } from 'react-native';
 import { NumberInputBar, SelectorBar } from '../components/input-bars';
-import { defaultGap } from '../styles/common-styles';
+import { defaultGap, styles } from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
 
 
