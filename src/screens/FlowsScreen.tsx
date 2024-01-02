@@ -7,36 +7,37 @@ import { NumberInputBar, SelectorBar } from '../components/input-bars';
 import { defaultGap } from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
 
+
 interface SingleFlowMeasurement {
-  dynamicPressure: number[];
-  staticPressure: number;
-  temperature: number;
-  angle: number;
+  dynamicPressure: string[];
+  staticPressure: string;
+  temperature: string;
+  angle: string;
   axisNumber: number;
   pointOnAxis: number;
 }
 
 const initialState: SingleFlowMeasurement = {
   dynamicPressure: [],
-  staticPressure: 0,
-  temperature: 0,
-  angle: 0,
+  staticPressure: "",
+  temperature: "",
+  angle: "",
   axisNumber: 0,
   pointOnAxis: 0,
-}
+};
 
-export const FlowsScreen = ({ navigation }: { navigation: any }) => {
-  const [numberOfSpigots, setNumberOfSpigots] = useState(1)
-  const [numberOfPoints, setNumberOfPoints] = useState(1)
-  const [pipeDimensions, setPipeDimensions] = useState([0, 0])
-  const [pipeDiameter, setPipeDiameter] = useState(0)
-  const [mode, setMode] = useState(false)
-  const [currentMeasurement, setCurrentMeasurement] = useState(initialState)
-
+export const FlowsScreen = ({navigation}: {navigation: any}) => {
+  // We represent numerical values as strings so that they can be entered using
+  // the number input bars.
+  const [numberOfSpigots, setNumberOfSpigots] = useState(1);
+  const [numberOfPoints, setNumberOfPoints] = useState(1);
+  const [pipeDimensions, setPipeDimensions] = useState(["", ""]);
+  const [pipeDiameter, setPipeDiameter] = useState("");
+  const [mode, setMode] = useState(false);
+  const [currentMeasurement, setCurrentMeasurement] = useState(initialState);
 
   // Stores all measurements for the axes and points on those axes.
-  const [measurements, setMeasurements] = useState([initialState])
-
+  const [measurements, setMeasurements] = useState([initialState]);
 
   const updateSingleFlowMeasurement = (field: any) => {
     setCurrentMeasurement({
@@ -45,49 +46,52 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
     });
   };
 
-  const selectionsSpigots: string[] = useMemo(
-    () => {
-      const selections: string[] = []
-      for (var i = 0; i < numberOfSpigots; i++) {
-        selections.push((i + 1).toString())
-      }
-      return selections;
-    },
-    [numberOfSpigots],
-  );
+  const selectionsSpigots: string[] = useMemo(() => {
+    const selections: string[] = [];
+    for (var i = 0; i < numberOfSpigots; i++) {
+      selections.push((i + 1).toString());
+    }
+    return selections;
+  }, [numberOfSpigots]);
 
-  const selectionsPoints: string[] = useMemo(
-    () => {
-      const selections: string[] = []
-      for (var i = 0; i < numberOfPoints; i++) {
-        selections.push((i + 1).toString())
-      }
-      return selections;
-    },
-    [numberOfPoints],
-  );
+  const selectionsPoints: string[] = useMemo(() => {
+    const selections: string[] = [];
+    for (var i = 0; i < numberOfPoints; i++) {
+      selections.push((i + 1).toString());
+    }
+    return selections;
+  }, [numberOfPoints]);
 
   const measurementExists = (measurement: SingleFlowMeasurement) => {
-    const filtered = measurements.filter((item: SingleFlowMeasurement) => (measurement.axisNumber === item.axisNumber) && (measurement.pointOnAxis === item.pointOnAxis))
+    const filtered = measurements.filter(
+      (item: SingleFlowMeasurement) =>
+        measurement.axisNumber === item.axisNumber &&
+        measurement.pointOnAxis === item.pointOnAxis,
+    );
     return filtered.length > 0;
-  }
+  };
 
   const {t} = useTranslation();
 
   return (
-    <View>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', gap: defaultGap }}>
+    <View style={styles.mainContainer}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'flex-start',
+          gap: defaultGap,
+        }}>
         <SelectorBar
           label={
             t(`flowsScreen:pipeCrossSection`) + ':'
           }
           selections={[t('pipeCrossSectionTypes:ROUND'), t('pipeCrossSectionTypes:RECTANGULAR')]}
           onSelect={(selectedItem: string, _index: number) => {
-            setMode(selectedItem !== 'Kołowy')
-            console.log(JSON.stringify(measurements, null, 2))
+            setMode(selectedItem !== 'Kołowy');
+            console.log(JSON.stringify(measurements, null, 2));
           }}
         />
-        {mode ?
+        {mode ? (
           <>
             <NumberInputBar
               placeholder=""
@@ -95,7 +99,7 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
               value={pipeDimensions[0]}
               onChangeText={text => {
                 const width = pipeDimensions[1];
-                const height = parseFloat(text);
+                const height = text;
                 const new_value = [height, width];
                 setPipeDimensions(new_value);
               }}
@@ -109,7 +113,7 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
               value={pipeDimensions[1]}
               onChangeText={text => {
                 const height = pipeDimensions[0];
-                const width = parseFloat(text);
+                const width = text;
                 const new_value = [height, width];
                 setPipeDimensions(new_value);
               }}
@@ -117,20 +121,21 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
                 t(`flowsScreen:width`) + ':'
               }
             />
-          </> :
+          </>
+        ) : (
           <NumberInputBar
             placeholder=""
             valueUnit="m"
             value={pipeDiameter}
-            onChangeText={text => setPipeDiameter(parseFloat(text))}
+            onChangeText={text => setPipeDiameter(text)}
             label={
               t(`flowsScreen:pipeDiameter`) + ':'
             }
           />
-        }
+        )}
         <NumberInputBar
           placeholder=""
-          value={numberOfSpigots}
+          value={numberOfSpigots.toString()}
           onChangeText={text => setNumberOfSpigots(parseFloat(text))}
           label={
             t(`flowsScreen:numberOfSpigots`) + ':'
@@ -138,7 +143,7 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
         />
         <NumberInputBar
           placeholder=""
-          value={numberOfPoints}
+          value={numberOfPoints.toString()}
           onChangeText={text => setNumberOfPoints(parseFloat(text))}
           label={
             t(`flowsScreen:numberOfPoints`) + ':'
@@ -149,32 +154,44 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
             t(`flowsScreen:axisNumber`) + ':'
           }
           selections={selectionsSpigots}
-          onSelect={(selectedItem: string, _index: number) => {
-            const newAxisNumber = _index;
+          onSelect={(_selectedItem: string, index: number) => {
+            const newAxisNumber = index;
 
             // Save the current measurement
             if (measurementExists(currentMeasurement)) {
               // Remove the old version of the measurement for the current selection of axis and point on the axis
-              const newMeasurements = measurements.filter((item: SingleFlowMeasurement) => currentMeasurement.axisNumber != item.axisNumber || currentMeasurement.pointOnAxis != item.pointOnAxis)
+              const newMeasurements = measurements.filter(
+                (item: SingleFlowMeasurement) =>
+                  currentMeasurement.axisNumber != item.axisNumber ||
+                  currentMeasurement.pointOnAxis != item.pointOnAxis,
+              );
               newMeasurements.push({...currentMeasurement});
-              setMeasurements(newMeasurements)
+              setMeasurements(newMeasurements);
             } else {
               measurements.push({...currentMeasurement});
-              setMeasurements(measurements)
-            }               
+              setMeasurements(measurements);
+            }
 
             // Load / flush the new measurement
             const newMeasurement = {...currentMeasurement};
             newMeasurement.axisNumber = newAxisNumber;
 
             if (measurementExists(newMeasurement)) {
-              const loadedMeasurement = measurements.filter((item: SingleFlowMeasurement) => newMeasurement.axisNumber === item.axisNumber && newMeasurement.pointOnAxis === item.pointOnAxis)[0]
+              const loadedMeasurement = measurements.filter(
+                (item: SingleFlowMeasurement) =>
+                  newMeasurement.axisNumber === item.axisNumber &&
+                  newMeasurement.pointOnAxis === item.pointOnAxis,
+              )[0];
               setCurrentMeasurement({...loadedMeasurement});
             } else {
-              setCurrentMeasurement({...initialState, axisNumber: newMeasurement.axisNumber, pointOnAxis: newMeasurement.pointOnAxis})
+              setCurrentMeasurement({
+                ...initialState,
+                axisNumber: newMeasurement.axisNumber,
+                pointOnAxis: newMeasurement.pointOnAxis,
+              });
             }
 
-            console.log(measurements)
+            console.log(measurements);
           }}
         />
         <SelectorBar
@@ -182,44 +199,55 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
             t(`flowsScreen:pointOnAxis`) + ':'
           }
           selections={selectionsPoints}
-          onSelect={(selectedItem: string, _index: number) => {
-            const newPointOnAxis = _index;
+          onSelect={(_selectedItem: string, index: number) => {
+            const newPointOnAxis = index;
 
             // Save the current measurement
             if (measurementExists(currentMeasurement)) {
               // Remove the old version of the measurement for the current selection of axis and point on the axis
-              const newMeasurements = measurements.filter((item: SingleFlowMeasurement) => currentMeasurement.axisNumber != item.axisNumber || currentMeasurement.pointOnAxis != item.pointOnAxis)
+              const newMeasurements = measurements.filter(
+                (item: SingleFlowMeasurement) =>
+                  currentMeasurement.axisNumber != item.axisNumber ||
+                  currentMeasurement.pointOnAxis != item.pointOnAxis,
+              );
               newMeasurements.push({...currentMeasurement});
-              setMeasurements(newMeasurements)
+              setMeasurements(newMeasurements);
             } else {
               measurements.push({...currentMeasurement});
-              setMeasurements(measurements)
-            }               
+              setMeasurements(measurements);
+            }
 
             // Load / flush the new measurement
             const newMeasurement = {...currentMeasurement};
             newMeasurement.pointOnAxis = newPointOnAxis;
 
             if (measurementExists(newMeasurement)) {
-              const loadedMeasurement = measurements.filter((item: SingleFlowMeasurement) => newMeasurement.axisNumber === item.axisNumber && newMeasurement.pointOnAxis === item.pointOnAxis)[0]
+              const loadedMeasurement = measurements.filter(
+                (item: SingleFlowMeasurement) =>
+                  newMeasurement.axisNumber === item.axisNumber &&
+                  newMeasurement.pointOnAxis === item.pointOnAxis,
+              )[0];
               setCurrentMeasurement({...loadedMeasurement});
             } else {
-              setCurrentMeasurement({...initialState, axisNumber: newMeasurement.axisNumber, pointOnAxis: newMeasurement.pointOnAxis})
+              setCurrentMeasurement({
+                ...initialState,
+                axisNumber: newMeasurement.axisNumber,
+                pointOnAxis: newMeasurement.pointOnAxis,
+              });
             }
-            
           }}
         />
         <NumberInputBar
           placeholder=""
           value={currentMeasurement.dynamicPressure[0]}
           onChangeText={text => {
-            const value0 = parseFloat(text)
-            const value1 = currentMeasurement.dynamicPressure[1]
-            const value2 = currentMeasurement.dynamicPressure[2]
-            const value3 = currentMeasurement.dynamicPressure[3]
-            const newValue = [value0, value1, value2, value3]
+            const value0 = text;
+            const value1 = currentMeasurement.dynamicPressure[1];
+            const value2 = currentMeasurement.dynamicPressure[2];
+            const value3 = currentMeasurement.dynamicPressure[3];
+            const newValue = [value0, value1, value2, value3];
 
-            updateSingleFlowMeasurement({ dynamicPressure: newValue })
+            updateSingleFlowMeasurement({dynamicPressure: newValue});
           }}
           label={
             t(`flowsScreen:dynamicPressure`) + ' 1:'
@@ -229,13 +257,13 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
           placeholder=""
           value={currentMeasurement.dynamicPressure[1]}
           onChangeText={text => {
-            const value0 = currentMeasurement.dynamicPressure[0]
-            const value1 = parseFloat(text)
-            const value2 = currentMeasurement.dynamicPressure[2]
-            const value3 = currentMeasurement.dynamicPressure[3]
-            const newValue = [value0, value1, value2, value3]
+            const value0 = currentMeasurement.dynamicPressure[0];
+            const value1 = text;
+            const value2 = currentMeasurement.dynamicPressure[2];
+            const value3 = currentMeasurement.dynamicPressure[3];
+            const newValue = [value0, value1, value2, value3];
 
-            updateSingleFlowMeasurement({ dynamicPressure: newValue })
+            updateSingleFlowMeasurement({dynamicPressure: newValue});
           }}
           label={
             t(`flowsScreen:dynamicPressure`) + ' 2:'
@@ -245,13 +273,13 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
           placeholder=""
           value={currentMeasurement.dynamicPressure[2]}
           onChangeText={text => {
-            const value0 = currentMeasurement.dynamicPressure[0]
-            const value1 = currentMeasurement.dynamicPressure[1]
-            const value2 = parseFloat(text)
-            const value3 = currentMeasurement.dynamicPressure[3]
-            const newValue = [value0, value1, value2, value3]
+            const value0 = currentMeasurement.dynamicPressure[0];
+            const value1 = currentMeasurement.dynamicPressure[1];
+            const value2 = text;
+            const value3 = currentMeasurement.dynamicPressure[3];
+            const newValue = [value0, value1, value2, value3];
 
-            updateSingleFlowMeasurement({ dynamicPressure: newValue })
+            updateSingleFlowMeasurement({dynamicPressure: newValue});
           }}
           label={
             t(`flowsScreen:dynamicPressure`) + ' 3:'
@@ -261,13 +289,13 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
           placeholder=""
           value={currentMeasurement.dynamicPressure[3]}
           onChangeText={text => {
-            const value0 = currentMeasurement.dynamicPressure[0]
-            const value1 = currentMeasurement.dynamicPressure[1]
-            const value2 = currentMeasurement.dynamicPressure[2]
-            const value3 = parseFloat(text)
-            const newValue = [value0, value1, value2, value3]
+            const value0 = currentMeasurement.dynamicPressure[0];
+            const value1 = currentMeasurement.dynamicPressure[1];
+            const value2 = currentMeasurement.dynamicPressure[2];
+            const value3 = text;
+            const newValue = [value0, value1, value2, value3];
 
-            updateSingleFlowMeasurement({ dynamicPressure: newValue })
+            updateSingleFlowMeasurement({dynamicPressure: newValue});
           }}
           label={
             t(`flowsScreen:dynamicPressure`) + ' 4:'
@@ -276,7 +304,7 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
         <NumberInputBar
           placeholder=""
           value={currentMeasurement.temperature}
-          onChangeText={text => { updateSingleFlowMeasurement({ temperature: parseFloat(text) }) }}
+          onChangeText={text => { updateSingleFlowMeasurement({ temperature: text}) }}
           label={
             t(`flowsScreen:temperature`) + ':'
           }
@@ -284,7 +312,9 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
         <NumberInputBar
           placeholder=""
           value={currentMeasurement.angle}
-          onChangeText={text => { updateSingleFlowMeasurement({ angle: text }) }}
+          onChangeText={text => { 
+            updateSingleFlowMeasurement({ angle: text });
+          }}
           label={
             t(`flowsScreen:angle`) + ':'
           }

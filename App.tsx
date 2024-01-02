@@ -1,7 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {useColorScheme} from 'react-native';
 
 import {AspirationScreen} from './src/screens/AspirationScreen';
 import {DustScreen} from './src/screens/DustScreen';
@@ -16,7 +15,6 @@ import {SettingsScreen} from './src/screens/SettingsScreen';
 import {useTranslation} from 'react-i18next';
 import {Screens} from './src/constants';
 import {MenuBar} from './src/components/MenuBar';
-import {TutorialMainScreen} from './src/tutorials/TutorialMainScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -76,11 +74,6 @@ function App(): JSX.Element {
             name={Screens.settings}
             component={SettingsScreen}
             options={{title: t(`userInterface:${Screens.settings}`)}}
-          />
-          <Stack.Screen
-            name={'Tutorial Screen'}
-            component={TutorialMainScreen}
-            options={{title: 'Tutorial'}}
           />
         </Stack.Navigator>
         <MenuBar />
