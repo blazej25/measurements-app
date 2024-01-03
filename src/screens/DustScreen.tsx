@@ -1,5 +1,5 @@
-import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   NumberInputBar,
   SelectorBar,
@@ -13,8 +13,8 @@ import {
   defaultPadding,
   styles,
 } from '../styles/common-styles';
-import {useTranslation} from 'react-i18next';
-import {DustMeasurementDataSchema} from '../constants';
+import { useTranslation } from 'react-i18next';
+import { DustMeasurementDataSchema } from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface DustMeasurementData {
@@ -37,8 +37,8 @@ const initialData: DustMeasurementData = {
 
 const NEW_MEASUREMENT = -1;
 
-export const DustScreen = ({navigation}: {navigation: any}) => {
-  const {t} = useTranslation();
+export const DustScreen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
 
   const [data, setData] = useState(initialData);
 
@@ -64,45 +64,45 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   );
 
   return (
-      <View style={local_styles.mainContainer}>
-        <NumberInputBar
-          placeholder="0"
-          value={numberOfMeasurements.toString()}
-          onChangeText={text =>
-            setNumberOfMeasurements(text ? parseInt(text) : 0)
-          }
-          label={t(
-            `dustScreen:${DustMeasurementDataSchema.numberOfMeasurements}`,
-          )}
-        />
-        <DustSingleMeasurementComponent
-          data={data}
-          setData={setData}
-          savedMeasurements={savedMeasurements}
-          setSavedMeasurements={setSavedMeasurements}
-          measurementIndex={measurementIndex}
-          setMeasurementIndex={setMeasurementIndex}
-          numberOfMeasurements={numberOfMeasurements}
-        />
-        <SelectorBar
-          label={
-            t(`dustScreen:${DustMeasurementDataSchema.measurementNumber}`) + ':'
-          }
-          selections={selections}
-          onSelect={(_selectedItem: string, index: number) => {
-            setMeasurementIndex(index);
-            setData(savedMeasurements[index]);
-          }}
-          // If we are adding a new measurement, the selector should display its
-          // number at the top.
-          selectionToText={selection =>
-            addingANewMeasurement()
-              ? savedMeasurements.length.toString()
-              : selection
-          }
-          rowTextForSelection={selection => selection}
-        />
-      </View>
+    <View style={local_styles.mainContainer}>
+      <NumberInputBar
+        placeholder="0"
+        value={numberOfMeasurements.toString()}
+        onChangeText={text =>
+          setNumberOfMeasurements(text ? parseInt(text) : 0)
+        }
+        label={t(
+          `dustScreen:${DustMeasurementDataSchema.numberOfMeasurements}`,
+        )}
+      />
+      <DustSingleMeasurementComponent
+        data={data}
+        setData={setData}
+        savedMeasurements={savedMeasurements}
+        setSavedMeasurements={setSavedMeasurements}
+        measurementIndex={measurementIndex}
+        setMeasurementIndex={setMeasurementIndex}
+        numberOfMeasurements={numberOfMeasurements}
+      />
+      <SelectorBar
+        label={
+          t(`dustScreen:${DustMeasurementDataSchema.measurementNumber}`) + ':'
+        }
+        selections={selections}
+        onSelect={(_selectedItem: string, index: number) => {
+          setMeasurementIndex(index);
+          setData(savedMeasurements[index]);
+        }}
+        // If we are adding a new measurement, the selector should display its
+        // number at the top.
+        selectionToText={selection =>
+          addingANewMeasurement()
+            ? savedMeasurements.length.toString()
+            : selection
+        }
+        rowTextForSelection={selection => selection}
+      />
+    </View>
   );
 };
 
@@ -125,7 +125,7 @@ const DustSingleMeasurementComponent = ({
   setMeasurementIndex: React.Dispatch<React.SetStateAction<number>>;
   numberOfMeasurements: number;
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const updateField = (field: any) => {
     setData({
@@ -138,40 +138,41 @@ const DustSingleMeasurementComponent = ({
 
   return (
     <View style={styles.defaultView}>
-      <TextInputBar
+      <NumberInputBar
+        placeholder='0'
         value={data.selectedEndDiameter}
-        label={t(`dustScreen:${DustMeasurementDataSchema.selectedEndDiameter}`)}
-        onChangeText={text => updateField({selectedEndDiameter: text})}
+        label={t(`dustScreen:${DustMeasurementDataSchema.selectedEndDiameter}`) + ':'}
+        onChangeText={text => updateField({ selectedEndDiameter: text })}
       />
       <TimeSelector
         timeLabel={t(
           `dustScreen:${DustMeasurementDataSchema.measurementStartTime}`,
-        )}
+        ) + ':'}
         date={data.measurementStartTime}
-        setDate={date => updateField({measurementStartTime: date})}
+        setDate={date => updateField({ measurementStartTime: date })}
       />
       <NumberInputBar
         placeholder="0"
         value={data.aspirationTime}
         valueUnit="min"
-        onChangeText={text => updateField({aspirationTime: text})}
-        label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`)}
+        onChangeText={text => updateField({ aspirationTime: text })}
+        label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`) + ':'}
       />
       <NumberInputBar
         placeholder="0"
         value={data.aspiratedVolume}
-        onChangeText={text => updateField({aspiratedVolume: text})}
-        label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`)}
+        onChangeText={text => updateField({ aspiratedVolume: text })}
+        label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`) + ':'}
       />
       <TextInputBar
         value={data.filterType}
-        label={t(`dustScreen:${DustMeasurementDataSchema.filterType}`)}
-        onChangeText={text => updateField({filterType: text})}
+        label={t(`dustScreen:${DustMeasurementDataSchema.filterType}`) + ':'}
+        onChangeText={text => updateField({ filterType: text })}
       />
       <TextInputBar
         value={data.water}
-        label={t(`dustScreen:${DustMeasurementDataSchema.water}`)}
-        onChangeText={text => updateField({water: text})}
+        label={t(`dustScreen:${DustMeasurementDataSchema.water}`) + ':'}
+        onChangeText={text => updateField({ water: text })}
       />
       <TouchableOpacity
         style={local_styles.saveButton}
@@ -181,9 +182,9 @@ const DustSingleMeasurementComponent = ({
           }
           var newSavedMesurements = [...savedMeasurements];
           if (addingNewMeasurement()) {
-            newSavedMesurements.push({...data});
+            newSavedMesurements.push({ ...data });
           } else {
-            newSavedMesurements[measurementIndex] = {...data};
+            newSavedMesurements[measurementIndex] = { ...data };
             setMeasurementIndex(NEW_MEASUREMENT);
           }
           setSavedMeasurements(newSavedMesurements);
@@ -207,7 +208,7 @@ const local_styles = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: defaultGap,
   },
-  saveIcon: {marginTop: 10},
+  saveIcon: { marginTop: 10 },
   saveButton: {
     borderRadius: defaultBorderRadius,
     flexDirection: 'row',

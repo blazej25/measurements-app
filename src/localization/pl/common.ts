@@ -13,7 +13,7 @@ export const pl = {
     changeLanguage: 'Zmień język',
     polish: 'Polski',
     english: 'Angielski',
-    settings: 'Ustawienia',
+    language: 'Język',
   },
   commonDataForm: {
     dummyName: 'Jan Kowalski',
@@ -64,8 +64,14 @@ export const pl = {
     dynamicPressure: 'Ciśnienie dynamiczne',
     staticPressure: 'Ciśnienie statyczne',
     temperature: 'Temperatura',
-    angle: 'Kąt', 
+    angle: 'Kąt',
     axisNumber: 'Numer osi pomiarowej',
     pointOnAxis: 'Punkt na osi',
+  },
+  utilitiesScreen: {
+    utilities: 'Pomocnicze',
+    measurementDuration: 'Czas trwania pomiaru',
+    breakTime: "Przerwa między pomiarami",
+    startingHour: 'Czas rozpoczęcia pierwszego pomiaru',
   }
 };

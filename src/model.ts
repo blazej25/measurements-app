@@ -23,6 +23,6 @@ export type CommonMeasurementData = {
   emissionSource: string;
   pipeCrossSectionType: PipeCrossSectionType;
   staffResponsibleForMeasurement: Person[];
-  temperature: number;
-  pressure: number;
+  temperature: string;
+  pressure: string;
 };

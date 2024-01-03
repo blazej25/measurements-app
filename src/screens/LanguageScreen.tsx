@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {Text, View} from 'react-native';
 import {colors, styles} from '../styles/common-styles';
 
-export const SettingsScreen = ({navigation, route}: any) => {
+export const LanguageScreen = ({navigation, route}: any) => {
   const {t, i18n} = useTranslation();
   const [language, changeLanguage] = useState('pl');
   const currentLanguageCode = i18n.language;

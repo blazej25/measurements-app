@@ -8,7 +8,7 @@ export const Screens = {
   gasAnalyzerCheck: 'gasAnalyzerCheck',
   utilities: 'utilities',
   equipmentBase: 'equipmentBase',
-  settings: 'settings',
+  language: 'language',
 };
 
 export const CommonDataSchema = {

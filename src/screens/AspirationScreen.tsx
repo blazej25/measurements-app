@@ -38,6 +38,7 @@ interface MeasurementPerCompound {
   aspiratedVolume: string;
   initialVolume: string;
   sampleId: number;
+
 }
 
 const TESTED_COMPOUNDS: string[] = [
@@ -72,7 +73,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       compoundName: compound,
     };
   }
-
   // dataIndex is used to select the current measurement that is being modified.
   const [dataIndex, setDataIndex] = useState(0);
 
@@ -156,7 +156,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // This helper can be used for updating the array by overwriting a single
   // field inside of it. The field should be an object with a single field
   // that we want to update, e.g. {date: new Date()}
-  const updateCurrentCompound = (field: any) => {
+  const updateCurrentCompound = (field: Partial<MeasurementPerCompound>) => {
     setCurrentCompoundData({
       ...currentCompoundData,
       ...field,
@@ -186,7 +186,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       <ScrollView contentContainerStyle={local_styles.defaultScrollView}>
         <DataBar
           label={
-            t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'
+            t(`aspirationScreen:${AspirationDataSchema.measurementNumber}`) + ':'
           }>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
@@ -254,7 +254,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           value={currentCompoundData.sampleId.toString()}
           onChangeText={text => {
             updateCurrentCompound({
-              testNumber: parseInt(text),
+              sampleId: text == '' ? 0 : parseInt(text)
             });
           }}
           label={t(`aspirationScreen:${AspirationDataSchema.sampleId}`) + ':'}
