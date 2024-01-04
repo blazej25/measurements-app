@@ -42,10 +42,6 @@ export const MenuBar = () => {
         navigation={navigation}
         destinationScreen={Screens.dust}
       />
-      <NavigationButton
-        navigation={navigation}
-        destinationScreen={Screens.utilities}
-      />
     </View>
   );
 };

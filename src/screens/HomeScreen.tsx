@@ -37,6 +37,7 @@ export const HomeScreen = ({ navigation }: { navigation: any }) => {
       <LanguagePanel navigation={navigation} />
       <WelcomeHeader />
       <CommonDataInput data={measurementData} setter={setMeasurementData} />
+      <UtilitiesNavigation navigation={navigation} />
     </>
   );
 };
@@ -160,5 +161,22 @@ const CommonDataInput = ({
         label={t(`commonDataForm:${CommonDataSchema.pressure}`) + ':'}
       />
     </ScrollView>
+  );
+};
+
+const UtilitiesNavigation = ({ navigation }: { navigation: any }) => {
+  return (
+    <View
+      style={{
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        marginTop: 5,
+        marginBottom: 150
+      }}>
+      <NavigationButton
+        navigation={navigation}
+        destinationScreen={Screens.utilities}
+      />
+    </View>
   );
 };

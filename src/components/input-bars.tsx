@@ -516,3 +516,84 @@ export const DateTimeSelectorGroup = ({
     </>
   );
 };
+
+export const StartEndBar = ({
+  start,
+  end,
+}: {
+  start: Date;
+  end: Date;
+}) => {
+  const t = useTranslation()
+
+  return (
+    <TouchableOpacity
+      activeOpacity={1.0}
+      style={{
+        borderRadius: largeBorderRadius,
+        flexDirection: 'row',
+        backgroundColor: colors.buttonBlue,
+        marginHorizontal: defaultGap,
+        justifyContent: 'space-between',
+      }}>
+      <Text
+        style={{
+          ...styles.buttonText1,
+          alignSelf: 'center',
+          margin: defaultGap,
+          marginLeft: defaultPadding,
+        }}>
+        {'Start'}
+      </Text>
+      <TouchableOpacity
+      activeOpacity={1.0}
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          margin: defaultGap,
+          paddingHorizontal: defaultPadding,
+          backgroundColor: colors.secondaryBlue,
+          height: 40,
+        }}>
+        <Text
+          style={{
+            alignSelf: 'center',
+            margin: defaultGap,
+            marginLeft: defaultPadding,
+            color: 'black'
+          }}>
+          {start.toLocaleTimeString('EU', {hour: 'numeric', minute: 'numeric'})}
+        </Text>
+      </TouchableOpacity>
+      <Text
+        style={{
+          ...styles.buttonText1,
+          alignSelf: 'center',
+          margin: defaultGap,
+          marginLeft: defaultPadding,
+        }}>
+        {'Koniec'}
+      </Text>
+      <TouchableOpacity
+        activeOpacity={1.0}
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          margin: defaultGap,
+          paddingHorizontal: defaultPadding,
+          backgroundColor: colors.secondaryBlue,
+          height: 40,
+        }}>
+        <Text
+          style={{
+            alignSelf: 'center',
+            margin: defaultGap,
+            marginLeft: defaultPadding,
+            color: 'black'
+          }}>
+          {end.toLocaleTimeString('EU', {hour: 'numeric', minute: 'numeric'})}
+        </Text>
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+};
