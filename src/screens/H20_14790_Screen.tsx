@@ -119,7 +119,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           justifyContent: 'flex-start',
           gap: defaultGap,
         }}>
-        <DataBar label={'Numer Pomiaru:'}>
+        <DataBar label={''}>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
         <TimeSelector
@@ -137,7 +137,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           onChangeText={text => {
             setCurrentMeasurement({...currentMeasurement, leakTightnessTest: text});
           }}
-          label={'Próba szczelności:'}
+        label={''}
         />
         <NumberInputBar
           placeholder="0"
@@ -146,7 +146,8 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           onChangeText={(text) => {
             setCurrentMeasurement({...currentMeasurement, aspiratorFlow: text});
           }}
-          label={'Przepływ przez aspirator:'}
+          // TODO
+          label={''}
         />
         <NumberInputBar
           placeholder="0"

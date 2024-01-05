@@ -53,6 +53,17 @@ export const en = {
     sampleId: 'Sample ID number',
     compoundType: 'Sample Type',
   },
+  h20Screen: {
+    arrivalTime: 'Time of Arrival',
+    measurementNumber: 'Measurement no.',
+    leakTightnessTest: 'Leak-tightness Test',
+    aspiratorFlow: 'Aspirator flow',
+    aspiratedVolume: 'Aspirated Volume',
+    initialMass: 'Initial Mass',
+    initialVolume: 'Initial Mass',
+    sampleId: 'Sample ID number',
+    compoundType: 'Sample Type',
+  },
   flowsScreen: {
     pipeCrossSection: 'Pipe Cross-Section',
     numberOfSpigots: 'Number of Spigots',

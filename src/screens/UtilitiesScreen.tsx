@@ -6,16 +6,31 @@ import { DateTimeSelectorGroup, NumberInputBar, TimeSelector, StartEndBar} from 
 import { useTranslation } from 'react-i18next';
 import { defaultGap } from '../styles/common-styles';
 
+interface singleMeasurement {
+  startingHour: Date;
+  endingHour: Date;
+}
+
 export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
   const [date, setDate] = useState(new Date());
   const [measurementDuration, setMeasurementDuration] = useState(0);
   const [breakTime, setBreakTime] = useState(0);
   const [startingHour, setStartingHour] = useState(new Date);
-  const [endingHour, setEndingHour] = useState(new Date);
   
   const {t} = useTranslation();
 
-  const endHour = startingHour.getTime() + measurementDuration * 60 * 1000
+  // const x = 5
+  // const double = (x: number) => 2 * x
+  // const triple = (x: number) => { return 3 * x; }
+  // const add = (x: number, y: number) => { return x + y; }
+
+  const toNewTime = (date: Date, time: number) => {
+    const newTime = new Date
+    newTime.setTime(date.getTime() + time * 60 * 1000)
+    return newTime
+  }
+
+  const numbers = [1, 2, 3];
 
   return (
     <ScrollView
@@ -38,14 +53,14 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
         placeholder="60"
         valueUnit="min"
         value={measurementDuration.toString()}
-        onChangeText={(text) => setMeasurementDuration(parseInt(text))}
+        onChangeText={text => {text == '' ? setMeasurementDuration(0) : setMeasurementDuration(parseInt(text))}}
         label={t('utilitiesScreen:measurementDuration') + ':'}
       />
       <NumberInputBar
         placeholder="15"
         valueUnit="min"
         value={breakTime.toString()}
-        onChangeText={(text) => setBreakTime(parseInt(text))}
+        onChangeText={text => {text == '' ? setBreakTime(0) : setBreakTime(parseInt(text))}}
         label={t('utilitiesScreen:breakTime') + ':'}
       />
       <TimeSelector
@@ -57,8 +72,17 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
       />
       <StartEndBar
         start = {startingHour}
-        end = {startingHour}
+        end = {toNewTime(startingHour, measurementDuration)}
       />
+    { numbers.map((x : number) => {
+      return (
+      <StartEndBar
+        key = {x}
+        start = {startingHour}
+        end = {toNewTime(startingHour, measurementDuration)}
+      />
+      );
+    })}
     </ScrollView>
   );
 };

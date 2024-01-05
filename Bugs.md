@@ -16,7 +16,6 @@
 - [ ] File output functionality
 - [ ] Load state from file functionality 
 - [ ] Add proper duration selector to replace number inputs in the UtilitiesScreen
-- [ ] Add bottom bar scrolling / nice setup for handling multiple screens
 - [ ] Add proper translation to the h2o screen
 
 
@@ -26,3 +25,4 @@
 - [x] FlowsScreen (input capabilties - no file load/store)
 - [x] DustScreen (input capabilties - no file load/store)
 - [x] AspirationScreen (input capabilties - no file load/store)
+- [X] Add bottom bar scrolling / nice setup for handling multiple screens (Blazej fixed by adding the pomocnicze button)
