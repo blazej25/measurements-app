@@ -60,9 +60,7 @@ export const en = {
     aspiratorFlow: 'Aspirator flow',
     aspiratedVolume: 'Aspirated Volume',
     initialMass: 'Initial Mass',
-    initialVolume: 'Initial Mass',
-    sampleId: 'Sample ID number',
-    compoundType: 'Sample Type',
+    massAfterMeasurement: 'Initial Mass',
   },
   flowsScreen: {
     pipeCrossSection: 'Pipe Cross-Section',
