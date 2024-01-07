@@ -13,7 +13,7 @@ export const en = {
     changeLanguage: 'Change language',
     polish: 'Polish',
     english: 'English',
-    settings: 'Settings',
+    language: 'Language',
   },
   commonDataForm: {
     date: 'Date',
@@ -34,7 +34,7 @@ export const en = {
   dustScreen: {
     measurementNumber: 'Measurement no.',
     numberOfMeasurements: 'Number of Measurements',
-    selectedEndType: 'Selected End Type',
+    selectedEndDiameter: 'Selected End Diameter',
     measurementStartTime: 'Start Time',
     aspirationTime: 'Aspiration Time',
     aspiratedVolume: 'Aspirated Volume',
@@ -53,4 +53,33 @@ export const en = {
     sampleId: 'Sample ID number',
     compoundType: 'Sample Type',
   },
+  h20Screen: {
+    arrivalTime: 'Time of Arrival',
+    measurementNumber: 'Measurement no.',
+    leakTightnessTest: 'Leak-tightness Test',
+    aspiratorFlow: 'Aspirator flow',
+    aspiratedVolume: 'Aspirated Volume',
+    initialMass: 'Initial Mass',
+    massAfterMeasurement: 'Initial Mass',
+  },
+  flowsScreen: {
+    pipeCrossSection: 'Pipe Cross-Section',
+    numberOfSpigots: 'Number of Spigots',
+    numberOfPoints: 'Number of Points',
+    width: 'Width',
+    height: 'Height',
+    pipeDiameter: 'Diameter of the Pipe',
+    dynamicPressure: 'Dynamic Pressure',
+    staticPressure: 'Static Pressure',
+    temperature: 'Temperature',
+    angle: 'Angle',
+    axisNumber: 'Number of Axes',
+    pointOnAxis: 'Point on the Axis',
+  },
+  utilitiesScreen: {
+    utilities: 'Utilities',
+    measurementDuration: 'Measurement Duration',
+    breakTime: "Time Between Measurements",
+    startingHour: 'First Measurement Start Time',
+  }
 };

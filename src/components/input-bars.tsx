@@ -24,18 +24,20 @@ export const SelectorBar = ({
   selections,
   onSelect,
   selectionToText,
+  rowTextForSelection,
 }: {
   label: string;
   selections: string[];
   onSelect: (selectedItem: string, index: number) => void;
   selectionToText?: (selectedItem: string) => string;
+  rowTextForSelection?: (selectedItem: string) => string;
 }) => {
   const selectorItemStyle = {
     borderRadius: defaultBorderRadius,
     backgroundColor: colors.secondaryBlue,
     marginBottom: defaultGap,
     height: 40,
-    maxWidth: 130,
+    maxWidth: 110,
   };
 
   const dropdownStyle = {
@@ -69,7 +71,11 @@ export const SelectorBar = ({
               return selectionToText ? selectionToText(item) : item;
             }}
             rowTextForSelection={(item, _index) => {
-              return selectionToText ? selectionToText(item) : item;
+              return rowTextForSelection
+                ? rowTextForSelection(item)
+                : selectionToText
+                ? selectionToText(item)
+                : item;
             }}
           />
         ) : (
@@ -277,7 +283,7 @@ export const NumberInputBar = ({
   valueUnit,
   onChangeText,
 }: {
-  value?: number;
+  value?: string;
   label: string;
   placeholder: string;
   valueUnit?: string;
@@ -289,7 +295,7 @@ export const NumberInputBar = ({
         keyboardType={'numeric'}
         placeholderTextColor={'gray'}
         placeholder={placeholder}
-        value={value ? value.toString() : ''}
+        value={value}
         onChangeText={onChangeText}
         textAlign={'right'}
         style={styles.dataSelectorText}
@@ -301,16 +307,19 @@ export const NumberInputBar = ({
 
 export const TextInputBar = ({
   label,
+  value,
   placeholder,
   onChangeText,
 }: {
   label: string;
+  value?: string;
   placeholder?: string;
   onChangeText: (text: string) => void;
 }) => {
   return (
     <DataBar label={label}>
       <TextInput
+        value={placeholder}
         placeholderTextColor={'gray'}
         placeholder={placeholder}
         onChangeText={onChangeText}
@@ -505,5 +514,86 @@ export const DateTimeSelectorGroup = ({
         </TouchableOpacity>
       </DataBar>
     </>
+  );
+};
+
+export const StartEndBar = ({
+  start,
+  end,
+}: {
+  start: Date;
+  end: Date;
+}) => {
+  const t = useTranslation()
+
+  return (
+    <TouchableOpacity
+      activeOpacity={1.0}
+      style={{
+        borderRadius: largeBorderRadius,
+        flexDirection: 'row',
+        backgroundColor: colors.buttonBlue,
+        marginHorizontal: defaultGap,
+        justifyContent: 'space-between',
+      }}>
+      <Text
+        style={{
+          ...styles.buttonText1,
+          alignSelf: 'center',
+          margin: defaultGap,
+          marginLeft: defaultPadding,
+        }}>
+        {'Start'}
+      </Text>
+      <TouchableOpacity
+      activeOpacity={1.0}
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          margin: defaultGap,
+          paddingHorizontal: defaultPadding,
+          backgroundColor: colors.secondaryBlue,
+          height: 40,
+        }}>
+        <Text
+          style={{
+            alignSelf: 'center',
+            margin: defaultGap,
+            marginLeft: defaultPadding,
+            color: 'black'
+          }}>
+          {start.toLocaleTimeString('EU', {hour: 'numeric', minute: 'numeric'})}
+        </Text>
+      </TouchableOpacity>
+      <Text
+        style={{
+          ...styles.buttonText1,
+          alignSelf: 'center',
+          margin: defaultGap,
+          marginLeft: defaultPadding,
+        }}>
+        {'Koniec'}
+      </Text>
+      <TouchableOpacity
+        activeOpacity={1.0}
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          margin: defaultGap,
+          paddingHorizontal: defaultPadding,
+          backgroundColor: colors.secondaryBlue,
+          height: 40,
+        }}>
+        <Text
+          style={{
+            alignSelf: 'center',
+            margin: defaultGap,
+            marginLeft: defaultPadding,
+            color: 'black'
+          }}>
+          {end.toLocaleTimeString('EU', {hour: 'numeric', minute: 'numeric'})}
+        </Text>
+      </TouchableOpacity>
+    </TouchableOpacity>
   );
 };

@@ -1,7 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {useColorScheme} from 'react-native';
 
 import {AspirationScreen} from './src/screens/AspirationScreen';
 import {DustScreen} from './src/screens/DustScreen';
@@ -12,11 +11,10 @@ import {H2O_14790_Screen} from './src/screens/H20_14790_Screen';
 import {MeasurementsScreen} from './src/screens/MeasurementScreen';
 import {HomeScreen} from './src/screens/HomeScreen';
 import {UtilitiesScreen} from './src/screens/UtilitiesScreen';
-import {SettingsScreen} from './src/screens/SettingsScreen';
+import {LanguageScreen} from './src/screens/LanguageScreen';
 import {useTranslation} from 'react-i18next';
 import {Screens} from './src/constants';
 import {MenuBar} from './src/components/MenuBar';
-import {TutorialMainScreen} from './src/tutorials/TutorialMainScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -73,14 +71,9 @@ function App(): JSX.Element {
             options={{title: t(`userInterface:${Screens.equipmentBase}`)}}
           />
           <Stack.Screen
-            name={Screens.settings}
-            component={SettingsScreen}
-            options={{title: t(`userInterface:${Screens.settings}`)}}
-          />
-          <Stack.Screen
-            name={'Tutorial Screen'}
-            component={TutorialMainScreen}
-            options={{title: 'Tutorial'}}
+            name={Screens.language}
+            component={LanguageScreen}
+            options={{title: t(`userInterface:${Screens.language}`)}}
           />
         </Stack.Navigator>
         <MenuBar />

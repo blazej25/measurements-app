@@ -13,7 +13,7 @@ export const pl = {
     changeLanguage: 'Zmień język',
     polish: 'Polski',
     english: 'Angielski',
-    settings: 'Ustawienia',
+    language: 'Język',
   },
   commonDataForm: {
     dummyName: 'Jan Kowalski',
@@ -45,7 +45,7 @@ export const pl = {
   aspirationScreen: {
     date: 'Data',
     arrivalTime: 'Godzina przyjazdu',
-    measurementNumber: 'Numer Pomiaru',
+    measurementNumber: 'Numer pomiaru',
     compoundName: 'Rodzaj próbki',
     leakTightnessTest: 'Próba szczelności - przepływ',
     aspiratorFlow: 'Przepływ przez aspirator',
@@ -54,4 +54,34 @@ export const pl = {
     sampleId: 'Nr identyfikacyjny próbki',
     compoundType: 'Rodzaj próbki',
   },
+  h20Screen: {
+    arrivalTime: 'Godzina przyjazdu',
+    measurementNumber: 'Numer pomiaru',
+    // TODO
+    leakTightnessTest: 'Próba szczelności',
+    aspiratorFlow: 'Przepływ przez aspirator',
+    aspiratedVolume: 'Aspirated Volume',
+    initialMass: 'Initial Mass',
+    massAfterMeasurement: 'Initial Mass',
+  },
+  flowsScreen: {
+    pipeCrossSection: 'Przekrój przewodu',
+    numberOfSpigots: 'Ilość osi pomiarowych',
+    numberOfPoints: 'Ilość punktów na ois',
+    width: 'Szerokość',
+    height: 'Wysokość',
+    pipeDiameter: 'Średnica przewodu',
+    dynamicPressure: 'Ciśnienie dynamiczne',
+    staticPressure: 'Ciśnienie statyczne',
+    temperature: 'Temperatura',
+    angle: 'Kąt',
+    axisNumber: 'Numer osi pomiarowej',
+    pointOnAxis: 'Punkt na osi',
+  },
+  utilitiesScreen: {
+    utilities: 'Pomocnicze',
+    measurementDuration: 'Czas trwania pomiaru',
+    breakTime: "Przerwa między pomiarami",
+    startingHour: 'Czas rozpoczęcia pierwszego pomiaru',
+  }
 };

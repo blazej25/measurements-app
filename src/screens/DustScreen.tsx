@@ -1,5 +1,5 @@
-import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   NumberInputBar,
   SelectorBar,
@@ -11,31 +11,34 @@ import {
   defaultBorderRadius,
   defaultGap,
   defaultPadding,
+  styles,
 } from '../styles/common-styles';
-import {useTranslation} from 'react-i18next';
-import {DustMeasurementDataSchema} from '../constants';
+import { useTranslation } from 'react-i18next';
+import { DustMeasurementDataSchema } from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface DustMeasurementData {
-  selectedEndDiameter: number;
+  selectedEndDiameter: string;
   measurementStartTime: Date;
-  aspirationTime: number;
-  aspiratedVolume: number;
+  aspirationTime: string;
+  aspiratedVolume: string;
   filterType: string;
   water: string;
 }
 
 const initialData: DustMeasurementData = {
-  selectedEndDiameter: 0,
+  selectedEndDiameter: '',
   measurementStartTime: new Date(),
-  aspirationTime: 0,
-  aspiratedVolume: 0,
+  aspirationTime: '',
+  aspiratedVolume: '',
   filterType: '',
   water: '',
 };
 
-export const DustScreen = ({navigation}: {navigation: any}) => {
-  const {t} = useTranslation();
+const NEW_MEASUREMENT = -1;
+
+export const DustScreen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
 
   const [data, setData] = useState(initialData);
 
@@ -44,53 +47,62 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     Dispatch<SetStateAction<DustMeasurementData[]>>,
   ] = useState([] as DustMeasurementData[]);
 
-  const [measurementIndex, setMeasurementIndex] = useState(-1);
-
-  // Here we need to have the derived state so tha he measurement number selector
-  // has the correct set of strings to display and select from.
-  const selections = useMemo(
-    () =>
-      savedMeasurements
-        .map(measurement => savedMeasurements.indexOf(measurement))
-        .map(index => index.toString()),
-    [savedMeasurements],
-  );
-
+  const [measurementIndex, setMeasurementIndex] = useState(NEW_MEASUREMENT);
   const [numberOfMeasurements, setNumberOfMeasurements] = useState(0);
 
+  const addingANewMeasurement = () => measurementIndex == NEW_MEASUREMENT;
+
+  // Here we need to have the derived state so that the measurement number selector
+  // has the correct set of strings to display and select from.
+  const selections: string[] = useMemo(
+    () =>
+      savedMeasurements
+        .map(measurement => savedMeasurements.indexOf(measurement) + 1)
+        .map(index => index.toString())
+        .slice(0, numberOfMeasurements),
+    [savedMeasurements, numberOfMeasurements],
+  );
 
   return (
-    <>
-      <View style={local_styles.mainContainer}>
-        <NumberInputBar
-          placeholder="0"
-          value={numberOfMeasurements}
-          onChangeText={text => setNumberOfMeasurements(parseInt(text))}
-          label={t(
-            `dustScreen:${DustMeasurementDataSchema.numberOfMeasurements}`,
-          )}
-        />
-        <DustSingleMeasurementComponent
-          data={data}
-          setData={setData}
-          savedMeasurements={savedMeasurements}
-          setSavedMeasurements={setSavedMeasurements}
-          measurementIndex={measurementIndex}
-          setMeasurementIndex={setMeasurementIndex}
-        />
-        <SelectorBar
-          label={
-            t(`dustScreen:${DustMeasurementDataSchema.measurementNumber}`) + ':'
-          }
-          selections={selections}
-          onSelect={(selectedItem: string, index: number) => {
-            setMeasurementIndex(index);
-            setData(savedMeasurements[index]);
-          }}
-          selectionToText={selection => selection}
-        />
-      </View>
-    </>
+    <View style={local_styles.mainContainer}>
+      <NumberInputBar
+        placeholder="0"
+        value={numberOfMeasurements.toString()}
+        onChangeText={text =>
+          setNumberOfMeasurements(text ? parseInt(text) : 0)
+        }
+        label={t(
+          `dustScreen:${DustMeasurementDataSchema.numberOfMeasurements}`,
+        )}
+      />
+      <DustSingleMeasurementComponent
+        data={data}
+        setData={setData}
+        savedMeasurements={savedMeasurements}
+        setSavedMeasurements={setSavedMeasurements}
+        measurementIndex={measurementIndex}
+        setMeasurementIndex={setMeasurementIndex}
+        numberOfMeasurements={numberOfMeasurements}
+      />
+      <SelectorBar
+        label={
+          t(`dustScreen:${DustMeasurementDataSchema.measurementNumber}`) + ':'
+        }
+        selections={selections}
+        onSelect={(_selectedItem: string, index: number) => {
+          setMeasurementIndex(index);
+          setData(savedMeasurements[index]);
+        }}
+        // If we are adding a new measurement, the selector should display its
+        // number at the top.
+        selectionToText={selection =>
+          addingANewMeasurement()
+            ? savedMeasurements.length.toString()
+            : selection
+        }
+        rowTextForSelection={selection => selection}
+      />
+    </View>
   );
 };
 
@@ -101,6 +113,7 @@ const DustSingleMeasurementComponent = ({
   setSavedMeasurements,
   measurementIndex,
   setMeasurementIndex,
+  numberOfMeasurements,
 }: {
   data: DustMeasurementData;
   setData: React.Dispatch<React.SetStateAction<DustMeasurementData>>;
@@ -110,8 +123,9 @@ const DustSingleMeasurementComponent = ({
   >;
   measurementIndex: number;
   setMeasurementIndex: React.Dispatch<React.SetStateAction<number>>;
+  numberOfMeasurements: number;
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const updateField = (field: any) => {
     setData({
@@ -120,61 +134,64 @@ const DustSingleMeasurementComponent = ({
     });
   };
 
+  const addingNewMeasurement = () => measurementIndex == NEW_MEASUREMENT;
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'flex-start',
-        gap: defaultGap,
-      }}>
-      <TextInputBar
-        label={t(`dustScreen:${DustMeasurementDataSchema.selectedEndDiameter}`)}
-        onChangeText={text =>
-          updateField({selectedEndDiameter: parseInt(text)})
-        }
+    <View style={styles.defaultView}>
+      <NumberInputBar
+        placeholder='0'
+        value={data.selectedEndDiameter}
+        label={t(`dustScreen:${DustMeasurementDataSchema.selectedEndDiameter}`) + ':'}
+        onChangeText={text => updateField({ selectedEndDiameter: text })}
       />
       <TimeSelector
         timeLabel={t(
           `dustScreen:${DustMeasurementDataSchema.measurementStartTime}`,
-        )}
+        ) + ':'}
         date={data.measurementStartTime}
-        setDate={date => updateField({measurementStartTime: date})}
+        setDate={date => updateField({ measurementStartTime: date })}
+      />
+      <NumberInputBar
+        placeholder="0"
+        value={data.aspirationTime}
+        valueUnit="min"
+        onChangeText={text => updateField({ aspirationTime: text })}
+        label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`) + ':'}
       />
       <NumberInputBar
         placeholder="0"
         value={data.aspiratedVolume}
-        onChangeText={text => updateField({aspiratedVolume: parseInt(text)})}
-        label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`)}
+        onChangeText={text => updateField({ aspiratedVolume: text })}
+        label={t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`) + ':'}
       />
       <TextInputBar
-        label={t(`dustScreen:${DustMeasurementDataSchema.filterType}`)}
-        onChangeText={text => updateField({filterType: text})}
+        value={data.filterType}
+        label={t(`dustScreen:${DustMeasurementDataSchema.filterType}`) + ':'}
+        onChangeText={text => updateField({ filterType: text })}
       />
       <TextInputBar
-        label={t(`dustScreen:${DustMeasurementDataSchema.water}`)}
-        onChangeText={text => updateField({water: text})}
+        value={data.water}
+        label={t(`dustScreen:${DustMeasurementDataSchema.water}`) + ':'}
+        onChangeText={text => updateField({ water: text })}
       />
       <TouchableOpacity
         style={local_styles.saveButton}
-        onPress={
-          // Here we use the spread operator to have a copy of the data
-          () => {
-            // TODO: test if this actually modifies the state correctly.
-            // I suspect that we would need to modify the array by maintaining
-            // an id with each entry and then filtering the array and
-            // using the setter to finally update the state.
-            if (measurementIndex == -1) {
-              savedMeasurements.push({...data});
-              console.log(savedMeasurements);
-            } else {
-              savedMeasurements[measurementIndex] = {...data};
-              setMeasurementIndex(-1);
-            }
-            setData(initialData);
+        onPress={() => {
+          if (savedMeasurements.length == numberOfMeasurements) {
+            return;
           }
-        }>
+          var newSavedMesurements = [...savedMeasurements];
+          if (addingNewMeasurement()) {
+            newSavedMesurements.push({ ...data });
+          } else {
+            newSavedMesurements[measurementIndex] = { ...data };
+            setMeasurementIndex(NEW_MEASUREMENT);
+          }
+          setSavedMeasurements(newSavedMesurements);
+          setData(initialData);
+        }}>
         <Icon
-          name={measurementIndex == -1 ? 'plus' : 'content-save-edit'}
+          name={addingNewMeasurement() ? 'plus' : 'content-save-edit'}
           style={local_styles.saveIcon}
           size={20}
           color={colors.buttonBlue}
@@ -191,7 +208,7 @@ const local_styles = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: defaultGap,
   },
-  saveIcon: {marginTop: 10},
+  saveIcon: { marginTop: 10 },
   saveButton: {
     borderRadius: defaultBorderRadius,
     flexDirection: 'row',

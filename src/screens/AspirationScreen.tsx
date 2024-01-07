@@ -34,11 +34,12 @@ interface AspirationMeasurement {
 interface MeasurementPerCompound {
   compoundName: string;
   date: Date;
-  leakTightnessTest: number;
-  aspiratorFlow: number;
-  aspiratedVolume: number;
-  initialVolume: number;
+  leakTightnessTest: string;
+  aspiratorFlow: string;
+  aspiratedVolume: string;
+  initialVolume: string;
   sampleId: number;
+
 }
 
 const TESTED_COMPOUNDS: string[] = [
@@ -55,10 +56,10 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   const initialState: MeasurementPerCompound = {
     compoundName: TESTED_COMPOUNDS[0],
     date: new Date(),
-    leakTightnessTest: 0,
-    aspiratorFlow: 0,
-    aspiratedVolume: 0,
-    initialVolume: 0,
+    leakTightnessTest: '',
+    aspiratorFlow: '',
+    aspiratedVolume: '',
+    initialVolume: '',
     sampleId: 0,
   };
 
@@ -75,7 +76,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       compoundName: compound,
     };
   }
-
   // dataIndex is used to select the current measurement that is being modified.
   const [dataIndex, setDataIndex] = useState(0);
 
@@ -160,7 +160,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // This helper can be used for updating the array by overwriting a single
   // field inside of it. The field should be an object with a single field
   // that we want to update, e.g. {date: new Date()}
-  const updateCurrentCompound = (field: any) => {
+  const updateCurrentCompound = (field: Partial<MeasurementPerCompound>) => {
     setCurrentCompoundData({
       ...currentCompoundData,
       ...field,
@@ -170,11 +170,11 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
 
   return (
-    <View>
+    <View style={styles.mainContainer}>
       <ScrollView contentContainerStyle={local_styles.defaultScrollView}>
         <DataBar
           label={
-            t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'
+            t(`aspirationScreen:${AspirationDataSchema.measurementNumber}`) + ':'
           }>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
@@ -183,7 +183,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="ml"
           value={currentCompoundData.initialVolume}
           onChangeText={text => {
-            updateCurrentCompound({initialVolume: parseFloat(text)});
+            updateCurrentCompound({initialVolume: text});
           }}
           label={
             t(`aspirationScreen:${AspirationDataSchema.initialVolume}`) + ':'
@@ -194,9 +194,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="l/h"
           value={currentCompoundData.aspiratorFlow}
           onChangeText={text => {
-            updateCurrentCompound({
-              aspiratorFlow: parseFloat(text),
-            });
+            updateCurrentCompound({aspiratorFlow: text});
           }}
           label={
             t(`aspirationScreen:${AspirationDataSchema.aspiratorFlow}`) + ':'
@@ -208,7 +206,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           value={currentCompoundData.leakTightnessTest}
           onChangeText={text => {
             updateCurrentCompound({
-              leakTightnessTest: parseFloat(text),
+              leakTightnessTest: text,
             });
           }}
           label={
@@ -231,7 +229,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           value={currentCompoundData.aspiratedVolume}
           onChangeText={text => {
             updateCurrentCompound({
-              aspiratedVolume: parseFloat(text),
+              aspiratedVolume: text,
             });
           }}
           label={
@@ -241,10 +239,10 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
         <NumberInputBar
           placeholder="0"
           valueUnit=""
-          value={currentCompoundData.sampleId}
+          value={currentCompoundData.sampleId.toString()}
           onChangeText={text => {
             updateCurrentCompound({
-              testNumber: parseInt(text),
+              sampleId: text == '' ? 0 : parseInt(text)
             });
           }}
           label={t(`aspirationScreen:${AspirationDataSchema.sampleId}`) + ':'}
