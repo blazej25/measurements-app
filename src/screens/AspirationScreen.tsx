@@ -65,6 +65,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
 
   const fileSystemService = new FileSystemService();
 
+
+
   const emptyMeasurement: AspirationMeasurement = {
     id: 0,
     compounds: {},
@@ -89,7 +91,11 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     useState(emptyMeasurement);
 
   const [measurements, setMeasurements] = useState([emptyMeasurement]);
+  fileSystemService.loadLocal('aspiration-measurements.txt').then(loadedMeasurements => {
+    const measurements = loadedMeasurements as AspirationMeasurement[];
+    setMeasurements(measurements)
 
+  })
   const loadPreviousMeasurement = () => {
     if (dataIndex > 0) {
       const newIndex = dataIndex - 1;
@@ -126,6 +132,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     setMeasurements(newMeasurements);
 
     fileSystemService.saveJSON(newMeasurements, 'aspiration-measurements.txt');
+    fileSystemService.saveLocal(newMeasurements, 'aspiration-measurements.txt');
   };
 
   const loadNextMeasurement = () => {
@@ -285,7 +292,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
         <TouchableOpacity
           style={local_styles.navigationButton}
           onPress={() => {
-            FilePickerManager.showFilePicker(null, (response: any) => {
+            FilePickerManager.showFilePicker((response: any) => {
               console.log('Response = ', response);
 
               if (response.didCancel) {
@@ -299,7 +306,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
               }
             });
           }}>
-          <ButtonIcon materialIconName="content-save" />
+          <ButtonIcon materialIconName="folder-open" />
         </TouchableOpacity>
       </ScrollView>
     </View>
