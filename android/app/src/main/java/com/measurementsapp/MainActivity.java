@@ -1,5 +1,6 @@
 package com.measurementsapp;
 import com.rnfs.RNFSPackage; // <------- add package
+import com.filepicker.FilePickerPackage;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
