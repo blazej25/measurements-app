@@ -1,37 +1,44 @@
 import RNFS from 'react-native-fs';
+
 class FileSystemService {
-  saveJSON(json: Object, fileName: string) {
-    // create a path you want to write to
-    // :warning: on iOS, you cannot write into `RNFS.MainBundlePath`,
-    // but `RNFS.DocumentDirectoryPath` exists on both platforms and is writable
+  saveToExternalStorage(json: Object, fileName: string) {
     var path = RNFS.DownloadDirectoryPath + '/' + fileName;
+    this._writeToPath(JSON.stringify(json, null, 2), path)
+  }
+  saveToInternalStorage(json: Object, fileName: string) {
+    // DocumentDirectoryPath is located in the internal storage, we 
+    // use the internal storage for persiting the transient state
+    // when the app is closed.
+    var path = RNFS.DocumentDirectoryPath + '/' + fileName
+    this._writeToPath(JSON.stringify(json, null, 2), path)
+  }
 
-    // write the file
-    RNFS.writeFile(path, JSON.stringify(json, null, 2), 'utf8')
-      .then(success => {
+  _writeToPath(contents: string, path: string) {
+    RNFS.writeFile(path, contents, 'utf8')
+      .then(_success => {
         console.log('File written to: ' + path);
       })
       .catch(err => {
         console.log(err.message);
       });
   }
-  saveLocal(json: Object, fileName: string) {
-    // DocumentDirectoryPath is located in the internal storage
+
+  async loadJSONFromInternalStorage(fileName: string): Promise<Object> {
     var path = RNFS.DocumentDirectoryPath + '/' + fileName;
 
-    // write the file
-    RNFS.writeFile(path, JSON.stringify(json, null, 2), 'utf8')
+    return RNFS.readFile(path, 'ascii')
       .then(success => {
-        console.log('File written to: ' + path);
+        const fileContents = success
+        return JSON.parse(fileContents)
       })
       .catch(err => {
         console.log(err.message);
+        return {}
       });
   }
-  loadLocal(fileName: string): Promise<Object> {
-    var path = RNFS.DocumentDirectoryPath + '/' + fileName;
 
-    // write the file
+  async loadJSONFromPath(path: string): Promise<Object> {
+
     return RNFS.readFile(path, 'ascii')
       .then(success => {
         const fileContents = success

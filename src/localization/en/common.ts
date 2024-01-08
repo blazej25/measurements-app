@@ -58,9 +58,10 @@ export const en = {
     measurementNumber: 'Measurement no.',
     leakTightnessTest: 'Leak-tightness Test',
     aspiratorFlow: 'Aspirator flow',
-    aspiratedVolume: 'Aspirated Volume',
-    initialMass: 'Initial Mass',
-    massAfterMeasurement: 'Initial Mass',
+    aspiratedVolume: 'Aspirated volume',
+    initialMass: 'Initial mass',
+    massAfterMeasurement: 'End mass',
+    scrubberNumber: 'Number of the scrubber',
   },
   flowsScreen: {
     pipeCrossSection: 'Pipe Cross-Section',

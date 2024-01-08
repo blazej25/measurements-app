@@ -60,9 +60,10 @@ export const pl = {
     // TODO
     leakTightnessTest: 'Próba szczelności',
     aspiratorFlow: 'Przepływ przez aspirator',
-    aspiratedVolume: 'Aspirated Volume',
-    initialMass: 'Initial Mass',
-    massAfterMeasurement: 'Initial Mass',
+    aspiratedVolume: 'Objętość zaaspirowana',
+    initialMass: 'Masa początkowa',
+    massAfterMeasurement: 'Masa końcowa',
+    scrubberNumber: 'Numer płuczki',
   },
   flowsScreen: {
     pipeCrossSection: 'Przekrój przewodu',

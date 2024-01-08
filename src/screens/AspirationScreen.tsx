@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -24,7 +24,9 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTranslation} from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
-import FilePickerManager from 'react-native-file-picker';
+import DocumentPicker from 'react-native-document-picker';
+
+import {request, PERMISSIONS} from 'react-native-permissions';
 
 interface AspirationMeasurement {
   id: number;
@@ -39,7 +41,6 @@ interface MeasurementPerCompound {
   aspiratedVolume: string;
   initialVolume: string;
   sampleId: number;
-
 }
 
 const TESTED_COMPOUNDS: string[] = [
@@ -53,6 +54,7 @@ const TESTED_COMPOUNDS: string[] = [
 ];
 
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
+  // Template constants for empty measurements
   const initialState: MeasurementPerCompound = {
     compoundName: TESTED_COMPOUNDS[0],
     date: new Date(),
@@ -63,45 +65,90 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     sampleId: 0,
   };
 
-  const fileSystemService = new FileSystemService();
-
-
-
   const emptyMeasurement: AspirationMeasurement = {
     id: 0,
     compounds: {},
   };
 
+  // Need to initialise the empty measurement to have an
+  // empty measurement per compound for each compound measured.
   for (const compound of TESTED_COMPOUNDS) {
     emptyMeasurement.compounds[compound] = {
       ...initialState,
       compoundName: compound,
     };
   }
+
+  const fileSystemService = new FileSystemService();
+  const {t} = useTranslation();
+
   // dataIndex is used to select the current measurement that is being modified.
   const [dataIndex, setDataIndex] = useState(0);
 
   // currentCompundData is used for storing the state of the measurement of
   // the current compound that is being entered / edited.
-  const [currentCompoundData, setCurrentCompoundData] = useState(initialState);
+  const [currentCompoundData, setCurrentCompoundData] = useState({
+    ...initialState,
+  });
 
   // current measurement is the measurement for which we are currently modifying
   // the respective compounds.
-  const [currentMeasurement, setCurrentMeasurement] =
-    useState(emptyMeasurement);
+  const [currentMeasurement, setCurrentMeasurement] = useState({
+    ...emptyMeasurement,
+  });
 
-  const [measurements, setMeasurements] = useState([emptyMeasurement]);
-  fileSystemService.loadLocal('aspiration-measurements.txt').then(loadedMeasurements => {
-    const measurements = loadedMeasurements as AspirationMeasurement[];
-    setMeasurements(measurements)
+  const [measurements, setMeasurements] = useState([{...emptyMeasurement}]);
 
-  })
+  // Need this to parse dates properly
+  const parseDates = (measurements: AspirationMeasurement[]) => {
+    for (var measurement of [...measurements]) {
+      for (var compound of TESTED_COMPOUNDS) {
+        measurement.compounds[compound].date = new Date(
+          measurement.compounds[compound].date,
+        );
+      }
+    }
+    return measurements;
+  };
+
+  const restoreStateFrom = (loadedMeasurements: Object) => {
+    var measurements = loadedMeasurements as AspirationMeasurement[];
+    // Call to pare dates replaces all date fields with the actual Typescript
+    // date object so that it can be manipulated correctly by the UI.
+    measurements = parseDates(measurements);
+
+    const mostRecentMeasurement = measurements[measurements.length - 1];
+    // Load state of all measurements and load the current measurement so that the values get
+    // loaded appropriately.
+    setDataIndex(measurements.length - 1);
+    setMeasurements(measurements);
+    setCurrentMeasurement({...mostRecentMeasurement});
+    setCurrentCompoundData({
+      ...mostRecentMeasurement.compounds[TESTED_COMPOUNDS[0]],
+    });
+  };
+
+  const loadMeasurements = () => {
+    fileSystemService
+      .loadJSONFromInternalStorage('aspiration-measurements.txt')
+      .then(loadedMeasurements => {
+        restoreStateFrom(loadedMeasurements);
+      });
+  };
+
+  // The aim here is to load the state from the storage on each re-render of the
+  // component
+  useEffect(loadMeasurements, []);
+
+  /* Logic for state transitions when switching between measurements follows */
+
   const loadPreviousMeasurement = () => {
     if (dataIndex > 0) {
       const newIndex = dataIndex - 1;
-      setCurrentCompoundData(
-        measurements[newIndex].compounds[currentCompoundData.compoundName],
-      );
+      setCurrentCompoundData({
+        ...measurements[newIndex].compounds[currentCompoundData.compoundName],
+      });
+      setCurrentMeasurement({...measurements[newIndex]});
       setDataIndex(newIndex);
     }
   };
@@ -114,7 +161,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     ]);
     setDataIndex(dataIndex + 1);
     // Erase the fields so that new input can be collected.
-    setCurrentCompoundData(initialState);
+    setCurrentCompoundData({...initialState});
+    console.log(JSON.stringify(measurements, null, 2));
   };
 
   const saveModifications = () => {
@@ -123,29 +171,34 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     modifiedMeasurement.compounds[currentCompoundData.compoundName] = {
       ...currentCompoundData,
     };
-    setCurrentMeasurement(modifiedMeasurement);
+
     const newMeasurements: AspirationMeasurement[] = measurements.map(
       measurement => {
-        return measurement.id == dataIndex ? currentMeasurement : measurement;
+        return measurement.id === dataIndex ? modifiedMeasurement : measurement;
       },
     );
     setMeasurements(newMeasurements);
 
-    fileSystemService.saveJSON(newMeasurements, 'aspiration-measurements.txt');
-    fileSystemService.saveLocal(newMeasurements, 'aspiration-measurements.txt');
+    fileSystemService.saveToExternalStorage(
+      newMeasurements,
+      'aspiration-measurements.txt',
+    );
+    fileSystemService.saveToInternalStorage(
+      newMeasurements,
+      'aspiration-measurements.txt',
+    );
   };
 
   const loadNextMeasurement = () => {
-    if (isLatestMeasurement()) {
-      setCurrentCompoundData(initialState);
+    if (dataIndex == measurements.length - 1) {
+      return;
     }
     const newIndex = dataIndex + 1;
-    if (dataIndex < measurements.length - 1) {
-      setCurrentCompoundData(
-        measurements[newIndex].compounds[currentCompoundData.compoundName],
-      );
-      setDataIndex(newIndex);
-    }
+    setCurrentCompoundData(
+      measurements[newIndex].compounds[currentCompoundData.compoundName],
+    );
+    setCurrentMeasurement(measurements[newIndex]);
+    setDataIndex(newIndex);
   };
 
   const changeCurrentCompound = (compound: string) => {
@@ -156,12 +209,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     modifiedMeasurement.compounds[currentCompoundData.compoundName] = {
       ...currentCompoundData,
     };
-    setCurrentCompoundData(modifiedMeasurement.compounds[compound]);
-    setCurrentMeasurement(modifiedMeasurement);
-  };
-
-  const isLatestMeasurement = () => {
-    return dataIndex == measurements.length - 1;
+    setCurrentCompoundData({...modifiedMeasurement.compounds[compound]});
+    setCurrentMeasurement({...modifiedMeasurement});
   };
 
   // This helper can be used for updating the array by overwriting a single
@@ -174,14 +223,13 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     });
   };
 
-  const {t} = useTranslation();
-
   return (
     <View style={styles.mainContainer}>
       <ScrollView contentContainerStyle={local_styles.defaultScrollView}>
         <DataBar
           label={
-            t(`aspirationScreen:${AspirationDataSchema.measurementNumber}`) + ':'
+            t(`aspirationScreen:${AspirationDataSchema.measurementNumber}`) +
+            ':'
           }>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
@@ -249,7 +297,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           value={currentCompoundData.sampleId.toString()}
           onChangeText={text => {
             updateCurrentCompound({
-              sampleId: text == '' ? 0 : parseInt(text)
+              sampleId: text == '' ? 0 : parseInt(text),
             });
           }}
           label={t(`aspirationScreen:${AspirationDataSchema.sampleId}`) + ':'}
@@ -262,6 +310,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           onSelect={(selectedItem: string, _index: number) => {
             changeCurrentCompound(selectedItem);
           }}
+          selectionToText={selection => currentCompoundData.compoundName}
+          rowTextForSelection={selection => selection}
         />
         <View style={local_styles.buttonContainer}>
           <TouchableOpacity
@@ -269,7 +319,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
             onPress={loadPreviousMeasurement}>
             <ButtonIcon materialIconName="arrow-left-circle" />
           </TouchableOpacity>
-          {isLatestMeasurement() ? (
+          {dataIndex == measurements.length - 1 ? (
             <TouchableOpacity
               style={local_styles.navigationButton}
               onPress={addNewMeasurement}>
@@ -292,18 +342,12 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
         <TouchableOpacity
           style={local_styles.navigationButton}
           onPress={() => {
-            FilePickerManager.showFilePicker((response: any) => {
-              console.log('Response = ', response);
-
-              if (response.didCancel) {
-                console.log('User cancelled file picker');
-              } else if (response.error) {
-                console.log('FilePickerManager Error: ', response.error);
-              } else {
-                console.log({
-                  file: response,
-                });
-              }
+            DocumentPicker.pickSingle().then((response: any) => {
+              const result: Promise<Object> =
+                fileSystemService.loadJSONFromPath(response['uri']);
+              result.then((file: Object) => {
+                restoreStateFrom(file);
+              });
             });
           }}>
           <ButtonIcon materialIconName="folder-open" />

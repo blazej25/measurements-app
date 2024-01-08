@@ -119,7 +119,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           justifyContent: 'flex-start',
           gap: defaultGap,
         }}>
-        <DataBar label={''}>
+        <DataBar label={t('h20Screen:measurementNumber') + ':'}>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
         <TimeSelector
@@ -137,7 +137,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           onChangeText={text => {
             setCurrentMeasurement({...currentMeasurement, leakTightnessTest: text});
           }}
-        label={''}
+        label={t('h20Screen:leakTightnessTest') + ':'}
         />
         <NumberInputBar
           placeholder="0"
@@ -147,7 +147,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
             setCurrentMeasurement({...currentMeasurement, aspiratorFlow: text});
           }}
           // TODO
-          label={''}
+          label={t('h20Screen:aspiratorFlow') + ':'}
         />
         <NumberInputBar
           placeholder="0"
@@ -156,10 +156,10 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           onChangeText={text => {
             setCurrentMeasurement({...currentMeasurement, aspiratedGases : text})
          }}
-          label={'Ilość zaaspirowanych gazów:'}
+          label={t('h20Screen:aspiratedVolume') + ':'}
         />
         <SelectorBar
-          label={'Numer płuczki: '}
+          label={t('h20Screen:scrubberNumber') + ':'}
           selections={['1', '2', '3']}
           onSelect={(selectedItem: string, _index: number) => {
             // We subtract 1 because the UI displays the numbers of the scrubbers
@@ -179,7 +179,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
             setCurrentMeasurement({...currentMeasurement, initialMass: newInitialMass});
           }}
           value={initialMassShowingValue}
-          label={'Masa początkowa płuczki:'}
+          label={t('h20Screen:initialMass') + ':'}
         />
         <NumberInputBar
           placeholder="0"
@@ -192,7 +192,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
               );
             setCurrentMeasurement({...currentMeasurement, afterMass: newAfterMass});
           }}
-          label={'Masa płuczki po pomiarze:'}
+          label={t('h20Screen:massAfterMeasurement') + ':'}
         />
         <View
           // This is the main button component
