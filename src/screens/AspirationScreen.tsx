@@ -199,7 +199,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     setMeasurements(newMeasurements);
 
     // The modifications are saved to the internal storage.
-    fileSystemService.saveToInternalStorage(
+    fileSystemService.saveObjectToInternalStorage(
       newMeasurements,
       INTERNAL_STORAGE_FILE_NAME,
     );

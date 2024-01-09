@@ -1,16 +1,24 @@
 import RNFS from 'react-native-fs';
 
 class FileSystemService {
-  saveToExternalStorage(json: Object, fileName: string) {
+  saveToExternalStorage(contents: string, fileName: string) {
     var path = RNFS.DownloadDirectoryPath + '/' + fileName;
-    this._writeToPath(JSON.stringify(json, null, 2), path)
+    this._writeToPath(contents, path);
   }
-  saveToInternalStorage(json: Object, fileName: string) {
-    // DocumentDirectoryPath is located in the internal storage, we 
+  saveToInternalStorage(contents: string, fileName: string) {
+    var path = RNFS.DocumentDirectoryPath + '/' + fileName;
+    this._writeToPath(contents, path);
+  }
+  saveObjectToExternalStorage(json: Object, fileName: string) {
+    var path = RNFS.DownloadDirectoryPath + '/' + fileName;
+    this._writeToPath(JSON.stringify(json, null, 2), path);
+  }
+  saveObjectToInternalStorage(json: Object, fileName: string) {
+    // DocumentDirectoryPath is located in the internal storage, we
     // use the internal storage for persiting the transient state
     // when the app is closed.
-    var path = RNFS.DocumentDirectoryPath + '/' + fileName
-    this._writeToPath(JSON.stringify(json, null, 2), path)
+    var path = RNFS.DocumentDirectoryPath + '/' + fileName;
+    this._writeToPath(JSON.stringify(json, null, 2), path);
   }
 
   _writeToPath(contents: string, path: string) {
@@ -28,25 +36,24 @@ class FileSystemService {
 
     return RNFS.readFile(path, 'ascii')
       .then(success => {
-        const fileContents = success
-        return JSON.parse(fileContents)
+        const fileContents = success;
+        return JSON.parse(fileContents);
       })
       .catch(err => {
         console.log(err.message);
-        return {}
+        return {};
       });
   }
 
   async loadJSONFromPath(path: string): Promise<Object> {
-
     return RNFS.readFile(path, 'ascii')
       .then(success => {
-        const fileContents = success
-        return JSON.parse(fileContents)
+        const fileContents = success;
+        return JSON.parse(fileContents);
       })
       .catch(err => {
         console.log(err.message);
-        return {}
+        return {};
       });
   }
 }

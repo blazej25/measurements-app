@@ -63,6 +63,12 @@ export const styles = StyleSheet.create({
     marginLeft: defaultPadding,
     color: colors.buttonBlue,
   },
+  uiPromptText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.buttonBlue,
+    alignSelf: 'center',
+  },
   defaultScrollView: {
     flexGrow: 1,
     justifyContent: 'flex-start',
