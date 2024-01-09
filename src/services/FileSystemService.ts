@@ -52,7 +52,7 @@ class FileSystemService {
   async loadJSONFromInternalStorage(fileName: string): Promise<Object> {
     var path = RNFS.DocumentDirectoryPath + '/' + fileName;
 
-    return RNFS.readFile(path, 'ascii')
+    return RNFS.readFile(path, 'utf8')
       .then(success => {
         const fileContents = success;
         return JSON.parse(fileContents);
@@ -64,7 +64,7 @@ class FileSystemService {
   }
 
   async loadJSONFromPath(path: string): Promise<Object> {
-    return RNFS.readFile(path, 'ascii')
+    return RNFS.readFile(path, 'utf8')
       .then(success => {
         const fileContents = success;
         return JSON.parse(fileContents);
@@ -72,6 +72,17 @@ class FileSystemService {
       .catch(err => {
         console.log(err.message);
         return {};
+      });
+  }
+  async loadStringFromPath(path: string): Promise<string> {
+    return RNFS.readFile(path, 'utf8')
+      .then(success => {
+        const fileContents = success;
+        return fileContents;
+      })
+      .catch(err => {
+        console.log(err.message);
+        return '';
       });
   }
 }

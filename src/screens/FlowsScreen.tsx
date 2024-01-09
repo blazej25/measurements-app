@@ -89,7 +89,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           }
           selections={[t('pipeCrossSectionTypes:ROUND'), t('pipeCrossSectionTypes:RECTANGULAR')]}
           onSelect={(selectedItem: string, _index: number) => {
-            setMode(selectedItem !== 'Kołowy');
+            setMode(selectedItem !== t('pipeCrossSectionTypes:ROUND'))
           }}
         />
         {mode ? (

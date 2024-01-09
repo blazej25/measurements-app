@@ -23,7 +23,7 @@ export const en = {
     measurementRequestor: 'Principal',
     emissionSource: 'Emmission source',
     pipeCrossSectionType: 'Pipe cross section type',
-    staffResponsibleForMeasurement: 'Staff carrying out measurements',
+    staffResponsibleForMeasurement: 'Staff conducting measurements',
     nameAndSurname: 'Name and surname',
     temperature: 'Ambient temperature',
     pressure: 'Atmospheric pressure',

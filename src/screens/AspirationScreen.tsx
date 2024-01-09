@@ -1,11 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {AspirationDataSchema} from '../constants';
 import {
   DataBar,
@@ -13,22 +7,12 @@ import {
   SelectorBar,
   TimeSelector,
 } from '../components/input-bars';
-import {
-  colors,
-  defaultBorderRadius,
-  defaultGap,
-  defaultPadding,
-  largeBorderRadius,
-  styles,
-} from '../styles/common-styles';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {styles} from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
-import DocumentPicker from 'react-native-document-picker';
 import {ButtonIcon} from '../components/ButtonIcon';
-import {FilePicker} from '../components/FilePicker';
-import {SaveChangesButton} from '../components/SaveChangesButton';
 import {SaveAndLoadGroup} from '../components/SaveAndLoadGroup';
+import {jsonToCSV, readString} from 'react-native-csv';
 
 interface AspirationMeasurement {
   id: number;
@@ -43,6 +27,17 @@ interface MeasurementPerCompound {
   aspiratedVolume: string;
   initialVolume: string;
   sampleId: number;
+}
+
+interface AspirationMeasurementCSVRow {
+  'Numer pomiaru': string;
+  'Rodzaj związku': string;
+  Data: Date;
+  'Próba szczelności - przepływ': string;
+  'Przepływ przez aspirator': string;
+  'Objętość zaaspirowana': string;
+  'Objętość początkowa roztworu': string;
+  'Numer identyfikacyjny próbki': string;
 }
 
 const TESTED_COMPOUNDS: string[] = [
@@ -226,6 +221,76 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     });
   };
 
+  const exportMeasurementsAsCSV = () => {
+    const csvRows: AspirationMeasurementCSVRow[] = [];
+    for (const measurement of measurements) {
+      for (const compound of TESTED_COMPOUNDS) {
+        const compoundData = measurement.compounds[compound];
+        csvRows.push({
+          'Numer pomiaru': (measurement.id + 1).toString(),
+          'Rodzaj związku': compoundData.compoundName,
+          Data: compoundData.date,
+          'Próba szczelności - przepływ': compoundData.leakTightnessTest,
+          'Przepływ przez aspirator': compoundData.aspiratorFlow,
+          'Objętość zaaspirowana': compoundData.aspiratedVolume,
+          'Objętość początkowa roztworu': compoundData.initialVolume,
+          'Numer identyfikacyjny próbki': compoundData.sampleId.toString(),
+        });
+      }
+    }
+    const csvString = jsonToCSV(csvRows);
+    console.log(csvString);
+    return csvString;
+  };
+
+  const restoreStateFromCSV = (fileContents: string) => {
+    const csvRows: AspirationMeasurementCSVRow[] = readString(fileContents, {
+      header: true,
+    })['data'] as AspirationMeasurementCSVRow[];
+
+    const newMeasurements: AspirationMeasurement[] = [];
+    for (const row of csvRows) {
+      console.log(JSON.stringify(row));
+      if (row['Numer pomiaru'] == undefined) {
+        continue;
+      }
+
+      const measurementNumber = parseInt(row['Numer pomiaru']);
+      if (
+        newMeasurements.length == 0 ||
+        newMeasurements[newMeasurements.length - 1].id != measurementNumber
+      ) {
+        const newData: AspirationMeasurement = {
+          id: measurementNumber,
+          compounds: {},
+        };
+        for (const compound of TESTED_COMPOUNDS) {
+          newData.compounds[compound] = {
+            ...initialState,
+            compoundName: compound,
+          };
+        }
+        newMeasurements.push(newData);
+      }
+
+      if (newMeasurements.length >= measurementNumber) {
+        newMeasurements[measurementNumber - 1].compounds[
+          row['Rodzaj związku']
+        ] = {
+          compoundName: row['Rodzaj związku'],
+          date: new Date(row['Data']),
+          leakTightnessTest: row['Próba szczelności - przepływ'],
+          aspiratorFlow: row['Przepływ przez aspirator'],
+          aspiratedVolume: row['Objętość zaaspirowana'],
+          initialVolume: row['Objętość początkowa roztworu'],
+          sampleId: parseInt(row['Numer identyfikacyjny próbki']),
+        };
+      }
+    }
+    setMeasurements([...newMeasurements]);
+    setDataIndex(0);
+    setCurrentCompoundData(newMeasurements[0].compounds[TESTED_COMPOUNDS[0]]);
+  };
   return (
     <View style={styles.mainContainer}>
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
@@ -346,8 +411,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
         </View>
       </ScrollView>
       <SaveAndLoadGroup
-        getSavedFileContents={() => 'test'}
-        fileContentsHandler={restoreStateFrom}
+        getSavedFileContents={() => exportMeasurementsAsCSV()}
+        fileContentsHandler={restoreStateFromCSV}
       />
     </View>
   );

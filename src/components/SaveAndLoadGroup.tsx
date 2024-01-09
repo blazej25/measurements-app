@@ -9,7 +9,7 @@ export const SaveAndLoadGroup = ({
   fileContentsHandler,
 }: {
   getSavedFileContents: () => string;
-  fileContentsHandler: (contents: Object) => void;
+  fileContentsHandler: (contents: string) => void;
 }) => {
   const {t} = useTranslation();
   return (
@@ -19,7 +19,7 @@ export const SaveAndLoadGroup = ({
         label={t('aspirationScreen:saveChanges')}
       />
       <FilePicker
-        fileContentsHandler={fileContentsHandler}
+        fileContentsProcessor={fileContentsHandler}
         label={t('aspirationScreen:loadFromStorage')}
       />
     </View>
