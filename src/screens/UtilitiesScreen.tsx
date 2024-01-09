@@ -26,6 +26,7 @@ import {
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FilePicker} from '../components/FilePicker';
+import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
 
 interface SingleMeasurement {
   startingHour: Date;
@@ -150,9 +151,9 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
           <ButtonIcon materialIconName="minus" />
         </TouchableOpacity>
       </ScrollView>
-      <FilePicker
+      <SaveAndLoadGroup
+        getSavedFileContents={() => 'test'}
         fileContentsHandler={(contents: Object) => {}}
-        label={t('aspirationScreen:loadFromStorage')}
       />
     </View>
   );

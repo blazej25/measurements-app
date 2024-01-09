@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { DustMeasurementDataSchema } from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { FilePicker } from '../components/FilePicker';
+import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
 
 interface DustMeasurementData {
   selectedEndDiameter: string;
@@ -76,7 +77,10 @@ export const DustScreen = ({ navigation }: { navigation: any }) => {
         numberOfMeasurements={numberOfMeasurements}
       />
       </ScrollView>
-      <FilePicker fileContentsHandler = {(contents: Object) => {}} label = {t('aspirationScreen:loadFromStorage')}/>
+      <SaveAndLoadGroup
+        getSavedFileContents={() => 'test'}
+        fileContentsHandler={(contents: Object) => {}}
+      />
     </View>
   );
 };

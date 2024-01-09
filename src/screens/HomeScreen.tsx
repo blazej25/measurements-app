@@ -18,7 +18,7 @@ import {
   PipeCrossSectionType,
   crossSectionTypeFrom,
 } from '../model';
-import {FilePicker} from '../components/FilePicker';
+import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
   const empty_data: CommonMeasurementData = {
@@ -42,9 +42,9 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
         <CommonDataInput data={measurementData} setter={setMeasurementData} />
         <UtilitiesNavigation navigation={navigation} />
       </ScrollView>
-      <FilePicker
+      <SaveAndLoadGroup
+        getSavedFileContents={() => 'test'}
         fileContentsHandler={(contents: Object) => {}}
-        label={t('aspirationScreen:loadFromStorage')}
       />
     </View>
   );

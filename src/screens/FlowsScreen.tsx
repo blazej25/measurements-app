@@ -7,6 +7,7 @@ import { NumberInputBar, SelectorBar } from '../components/input-bars';
 import { defaultGap, styles } from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
 import { FilePicker } from '../components/FilePicker';
+import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
 
 
 interface SingleFlowMeasurement {
@@ -320,7 +321,10 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           }
         />
       </ScrollView>
-      <FilePicker fileContentsHandler = {(contents: Object) => {}} label = {t('aspirationScreen:loadFromStorage')}/>
+      <SaveAndLoadGroup
+        getSavedFileContents={() => 'test'}
+        fileContentsHandler={(contents: Object) => {}}
+      />
     </View>
   );
 };

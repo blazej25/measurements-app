@@ -27,6 +27,8 @@ import FileSystemService from '../services/FileSystemService';
 import DocumentPicker from 'react-native-document-picker';
 import {ButtonIcon} from '../components/ButtonIcon';
 import {FilePicker} from '../components/FilePicker';
+import {SaveChangesButton} from '../components/SaveChangesButton';
+import {SaveAndLoadGroup} from '../components/SaveAndLoadGroup';
 
 interface AspirationMeasurement {
   id: number;
@@ -343,9 +345,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <FilePicker
+      <SaveAndLoadGroup
+        getSavedFileContents={() => 'test'}
         fileContentsHandler={restoreStateFrom}
-        label={t('aspirationScreen:loadFromStorage')}
       />
     </View>
   );

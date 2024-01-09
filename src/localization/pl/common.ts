@@ -54,7 +54,8 @@ export const pl = {
     initialVolume: 'Objętość początkowa roztworu',
     sampleId: 'Nr identyfikacyjny próbki',
     compoundType: 'Rodzaj próbki',
-    loadFromStorage: 'Wczytaj dane z pliku',
+    loadFromStorage: 'Załaduj dane',
+    saveChanges: 'Zapisz zmiany',
   },
   h20Screen: {
     arrivalTime: 'Godzina przyjazdu',

@@ -53,7 +53,8 @@ export const en = {
     initialVolume: 'Initial Volume',
     sampleId: 'Sample ID number',
     compoundType: 'Sample Type',
-    loadFromStorage: 'Load Data from File',
+    loadFromStorage: 'Load Data',
+    saveChanges: 'Save Changes',
   },
   h20Screen: {
     arrivalTime: 'Time of Arrival',
