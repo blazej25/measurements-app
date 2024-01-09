@@ -5636,11 +5636,6 @@ react-native-document-picker@^9.1.0:
   dependencies:
     invariant "^2.2.4"
 
-react-native-file-picker@^0.0.21:
-  version "0.0.21"
-  resolved "https://registry.npmjs.org/react-native-file-picker/-/react-native-file-picker-0.0.21.tgz"
-  integrity sha512-qsvdqYmDjjgPFNlabBXFNU+h1Yndl35aEsGlnPVV070qRYuCOaDx6VQYHLBqMequppb98Gb82zIGjvekbILMXQ==
-
 react-native-fs@^2.20.0:
   version "2.20.0"
   resolved "https://registry.npmjs.org/react-native-fs/-/react-native-fs-2.20.0.tgz"
