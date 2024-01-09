@@ -6,6 +6,7 @@ import { TextInput } from 'react-native';
 import { NumberInputBar, SelectorBar } from '../components/input-bars';
 import { defaultGap, styles } from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
+import { FilePicker } from '../components/FilePicker';
 
 
 interface SingleFlowMeasurement {
@@ -311,7 +312,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
         <NumberInputBar
           placeholder=""
           value={currentMeasurement.angle}
-          onChangeText={text => { 
+          onChangeText={text => {
             updateSingleFlowMeasurement({ angle: text });
           }}
           label={
@@ -319,6 +320,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           }
         />
       </ScrollView>
+      <FilePicker fileContentsHandler = {(contents: Object) => {}} label = {t('aspirationScreen:loadFromStorage')}/>
     </View>
   );
 };

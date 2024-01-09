@@ -25,8 +25,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTranslation} from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
 import DocumentPicker from 'react-native-document-picker';
-
-import {request, PERMISSIONS} from 'react-native-permissions';
+import {ButtonIcon} from '../components/ButtonIcon';
+import {FilePicker} from '../components/FilePicker';
 
 interface AspirationMeasurement {
   id: number;
@@ -53,6 +53,7 @@ const TESTED_COMPOUNDS: string[] = [
   'PB',
 ];
 
+const INTERNAL_STORAGE_FILE_NAME = 'aspiration-measurements.txt';
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // Template constants for empty measurements
   const initialState: MeasurementPerCompound = {
@@ -91,12 +92,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     ...initialState,
   });
 
-  // current measurement is the measurement for which we are currently modifying
-  // the respective compounds.
-  const [currentMeasurement, setCurrentMeasurement] = useState({
-    ...emptyMeasurement,
-  });
-
   const [measurements, setMeasurements] = useState([{...emptyMeasurement}]);
 
   // Need this to parse dates properly
@@ -122,7 +117,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     // loaded appropriately.
     setDataIndex(measurements.length - 1);
     setMeasurements(measurements);
-    setCurrentMeasurement({...mostRecentMeasurement});
     setCurrentCompoundData({
       ...mostRecentMeasurement.compounds[TESTED_COMPOUNDS[0]],
     });
@@ -130,7 +124,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
 
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage('aspiration-measurements.txt')
+      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         restoreStateFrom(loadedMeasurements);
       });
@@ -142,17 +136,36 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
 
   /* Logic for state transitions when switching between measurements follows */
 
+  // Responsible for changing the UI state to the previous measurement in the list,
+  // triggered when 'to-the-left' button is pressed in the control component
+  // below the list of measurements.
   const loadPreviousMeasurement = () => {
-    if (dataIndex > 0) {
-      const newIndex = dataIndex - 1;
-      setCurrentCompoundData({
-        ...measurements[newIndex].compounds[currentCompoundData.compoundName],
-      });
-      setCurrentMeasurement({...measurements[newIndex]});
-      setDataIndex(newIndex);
+    if (dataIndex == 0) {
+      return;
     }
+    const newIndex = dataIndex - 1;
+    setCurrentCompoundData({
+      ...measurements[newIndex].compounds[currentCompoundData.compoundName],
+    });
+    setDataIndex(newIndex);
   };
 
+  // Responsible for loading the next measurement in the list. Triggered when
+  // the 'to-the-right' button is pressed in the control component.
+  const loadNextMeasurement = () => {
+    if (dataIndex == measurements.length - 1) {
+      return;
+    }
+    const newIndex = dataIndex + 1;
+    setCurrentCompoundData({
+      ...measurements[newIndex].compounds[currentCompoundData.compoundName],
+    });
+    setDataIndex(newIndex);
+  };
+
+  // Saves the currently modified measurement and adds a new empty measurement
+  // at the end of the list of measurements. Triggered when the 'plus' button
+  // is pressed in the control component.
   const addNewMeasurement = () => {
     saveModifications();
     setMeasurements([
@@ -162,43 +175,32 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     setDataIndex(dataIndex + 1);
     // Erase the fields so that new input can be collected.
     setCurrentCompoundData({...initialState});
-    console.log(JSON.stringify(measurements, null, 2));
   };
 
+  // Responsible for saving the currently modified compound in the UI
   const saveModifications = () => {
     // Update the currently selected measurement with the new values.
     var modifiedMeasurement = measurements[dataIndex];
+
+    // First overwrite the stored compound measurement data
     modifiedMeasurement.compounds[currentCompoundData.compoundName] = {
       ...currentCompoundData,
     };
 
+    // Then overwrite the modified measurement.
     const newMeasurements: AspirationMeasurement[] = measurements.map(
       measurement => {
         return measurement.id === dataIndex ? modifiedMeasurement : measurement;
       },
     );
+
     setMeasurements(newMeasurements);
 
-    fileSystemService.saveToExternalStorage(
-      newMeasurements,
-      'aspiration-measurements.txt',
-    );
+    // The modifications are saved to the internal storage.
     fileSystemService.saveToInternalStorage(
       newMeasurements,
-      'aspiration-measurements.txt',
+      INTERNAL_STORAGE_FILE_NAME,
     );
-  };
-
-  const loadNextMeasurement = () => {
-    if (dataIndex == measurements.length - 1) {
-      return;
-    }
-    const newIndex = dataIndex + 1;
-    setCurrentCompoundData(
-      measurements[newIndex].compounds[currentCompoundData.compoundName],
-    );
-    setCurrentMeasurement(measurements[newIndex]);
-    setDataIndex(newIndex);
   };
 
   const changeCurrentCompound = (compound: string) => {
@@ -210,7 +212,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       ...currentCompoundData,
     };
     setCurrentCompoundData({...modifiedMeasurement.compounds[compound]});
-    setCurrentMeasurement({...modifiedMeasurement});
   };
 
   // This helper can be used for updating the array by overwriting a single
@@ -225,7 +226,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
 
   return (
     <View style={styles.mainContainer}>
-      <ScrollView contentContainerStyle={local_styles.defaultScrollView}>
+      <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar
           label={
             t(`aspirationScreen:${AspirationDataSchema.measurementNumber}`) +
@@ -310,85 +311,42 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           onSelect={(selectedItem: string, _index: number) => {
             changeCurrentCompound(selectedItem);
           }}
-          selectionToText={selection => currentCompoundData.compoundName}
+          // Ensure that when the current compound is changed implicitly (e.g.
+          // by adding a new measurement), the text displayed on the selector
+          // needs to reflect that instead of the last selected value.
+          selectionToText={_selection => currentCompoundData.compoundName}
           rowTextForSelection={selection => selection}
         />
-        <View style={local_styles.buttonContainer}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={local_styles.navigationButton}
+            style={styles.navigationButton}
             onPress={loadPreviousMeasurement}>
             <ButtonIcon materialIconName="arrow-left-circle" />
           </TouchableOpacity>
           {dataIndex == measurements.length - 1 ? (
             <TouchableOpacity
-              style={local_styles.navigationButton}
+              style={styles.navigationButton}
               onPress={addNewMeasurement}>
               <ButtonIcon materialIconName="plus" />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={local_styles.navigationButton}
+              style={styles.navigationButton}
               onPress={saveModifications}>
               <ButtonIcon materialIconName="content-save" />
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            style={local_styles.navigationButton}
+            style={styles.navigationButton}
             onPress={loadNextMeasurement}>
             <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          style={local_styles.navigationButton}
-          onPress={() => {
-            DocumentPicker.pickSingle().then((response: any) => {
-              const result: Promise<Object> =
-                fileSystemService.loadJSONFromPath(response['uri']);
-              result.then((file: Object) => {
-                restoreStateFrom(file);
-              });
-            });
-          }}>
-          <ButtonIcon materialIconName="folder-open" />
-        </TouchableOpacity>
       </ScrollView>
+      <FilePicker
+        fileContentsHandler={restoreStateFrom}
+        label={t('aspirationScreen:loadFromStorage')}
+      />
     </View>
   );
 };
-
-const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
-  return (
-    <Icon
-      name={materialIconName}
-      style={{marginTop: 10}}
-      size={20}
-      color={colors.buttonBlue}
-    />
-  );
-};
-
-const local_styles = StyleSheet.create({
-  navigationButton: {
-    borderRadius: defaultBorderRadius,
-    flexDirection: 'row',
-    margin: defaultGap,
-    paddingHorizontal: defaultPadding,
-    backgroundColor: 'white',
-    height: 40,
-  },
-  defaultScrollView: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    gap: defaultGap,
-  },
-  buttonContainer: {
-    borderRadius: largeBorderRadius,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    backgroundColor: colors.secondaryBlue,
-    padding: defaultPadding,
-    alignSelf: 'center',
-    gap: defaultGap,
-  },
-});

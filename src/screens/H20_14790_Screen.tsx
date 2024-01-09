@@ -24,6 +24,7 @@ import {
   styles,
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { FilePicker } from '../components/FilePicker';
 
 interface Measurement {
   id: number;
@@ -280,6 +281,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <FilePicker fileContentsHandler = {(contents: Object) => {}} label = {t('aspirationScreen:loadFromStorage')}/>
     </View>
   );
 };

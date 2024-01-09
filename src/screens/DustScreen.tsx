@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useMemo, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   NumberInputBar,
   SelectorBar,
@@ -16,6 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { DustMeasurementDataSchema } from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { FilePicker } from '../components/FilePicker';
 
 interface DustMeasurementData {
   selectedEndDiameter: string;
@@ -50,21 +51,11 @@ export const DustScreen = ({ navigation }: { navigation: any }) => {
   const [measurementIndex, setMeasurementIndex] = useState(NEW_MEASUREMENT);
   const [numberOfMeasurements, setNumberOfMeasurements] = useState(0);
 
-  const addingANewMeasurement = () => measurementIndex == NEW_MEASUREMENT;
-
-  // Here we need to have the derived state so that the measurement number selector
-  // has the correct set of strings to display and select from.
-  const selections: string[] = useMemo(
-    () =>
-      savedMeasurements
-        .map(measurement => savedMeasurements.indexOf(measurement) + 1)
-        .map(index => index.toString())
-        .slice(0, numberOfMeasurements),
-    [savedMeasurements, numberOfMeasurements],
-  );
 
   return (
-    <View style={local_styles.mainContainer}>
+    <View style={styles.mainContainer}>
+      <ScrollView
+        contentContainerStyle={styles.defaultScrollView}>
       <NumberInputBar
         placeholder="0"
         value={numberOfMeasurements.toString()}
@@ -84,24 +75,8 @@ export const DustScreen = ({ navigation }: { navigation: any }) => {
         setMeasurementIndex={setMeasurementIndex}
         numberOfMeasurements={numberOfMeasurements}
       />
-      <SelectorBar
-        label={
-          t(`dustScreen:${DustMeasurementDataSchema.measurementNumber}`) + ':'
-        }
-        selections={selections}
-        onSelect={(_selectedItem: string, index: number) => {
-          setMeasurementIndex(index);
-          setData(savedMeasurements[index]);
-        }}
-        // If we are adding a new measurement, the selector should display its
-        // number at the top.
-        selectionToText={selection =>
-          addingANewMeasurement()
-            ? savedMeasurements.length.toString()
-            : selection
-        }
-        rowTextForSelection={selection => selection}
-      />
+      </ScrollView>
+      <FilePicker fileContentsHandler = {(contents: Object) => {}} label = {t('aspirationScreen:loadFromStorage')}/>
     </View>
   );
 };
@@ -136,8 +111,20 @@ const DustSingleMeasurementComponent = ({
 
   const addingNewMeasurement = () => measurementIndex == NEW_MEASUREMENT;
 
+  // Here we need to have the derived state so that the measurement number selector
+  // has the correct set of strings to display and select from.
+  const selections: string[] = useMemo(
+    () =>
+      savedMeasurements
+        .map(measurement => savedMeasurements.indexOf(measurement) + 1)
+        .map(index => index.toString())
+        .slice(0, numberOfMeasurements),
+    [savedMeasurements, numberOfMeasurements],
+  );
+
+
   return (
-    <View style={styles.defaultView}>
+    <View style= {{...styles.mainContainer, margin: 0}}>
       <NumberInputBar
         placeholder='0'
         value={data.selectedEndDiameter}
@@ -174,8 +161,26 @@ const DustSingleMeasurementComponent = ({
         label={t(`dustScreen:${DustMeasurementDataSchema.water}`) + ':'}
         onChangeText={text => updateField({ water: text })}
       />
+      <SelectorBar
+        label={
+          t(`dustScreen:${DustMeasurementDataSchema.measurementNumber}`) + ':'
+        }
+        selections={selections}
+        onSelect={(_selectedItem: string, index: number) => {
+          setMeasurementIndex(index);
+          setData(savedMeasurements[index]);
+        }}
+        // If we are adding a new measurement, the selector should display its
+        // number at the top.
+        selectionToText={selection =>
+          addingNewMeasurement()
+            ? savedMeasurements.length.toString()
+            : selection
+        }
+        rowTextForSelection={selection => selection}
+      />
       <TouchableOpacity
-        style={local_styles.saveButton}
+        style={styles.saveButton}
         onPress={() => {
           if (savedMeasurements.length == numberOfMeasurements) {
             return;
@@ -192,7 +197,7 @@ const DustSingleMeasurementComponent = ({
         }}>
         <Icon
           name={addingNewMeasurement() ? 'plus' : 'content-save-edit'}
-          style={local_styles.saveIcon}
+          style={styles.saveIcon}
           size={20}
           color={colors.buttonBlue}
         />
@@ -200,21 +205,3 @@ const DustSingleMeasurementComponent = ({
     </View>
   );
 };
-
-const local_styles = StyleSheet.create({
-  mainContainer: {
-    margin: defaultGap,
-    flex: 1,
-    justifyContent: 'flex-start',
-    gap: defaultGap,
-  },
-  saveIcon: { marginTop: 10 },
-  saveButton: {
-    borderRadius: defaultBorderRadius,
-    flexDirection: 'row',
-    margin: defaultGap,
-    paddingHorizontal: defaultPadding,
-    backgroundColor: colors.secondaryBlue,
-    height: 40,
-  },
-});
