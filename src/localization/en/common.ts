@@ -9,6 +9,7 @@ export const en = {
     measurements: 'Measurements',
     gasAnalyzerCheck: 'Gas Analyzer Check',
     utilities: 'Utilities',
+    settings: 'Settings',
     equipmentBase: 'Equipment Base',
     changeLanguage: 'Change language',
     polish: 'Polish',
@@ -52,6 +53,7 @@ export const en = {
     initialVolume: 'Initial Volume',
     sampleId: 'Sample ID number',
     compoundType: 'Sample Type',
+    loadFromStorage: 'Load Data from File',
   },
   h20Screen: {
     arrivalTime: 'Time of Arrival',
@@ -61,7 +63,7 @@ export const en = {
     aspiratedVolume: 'Aspirated volume',
     initialMass: 'Initial mass',
     massAfterMeasurement: 'End mass',
-    scrubberNumber: 'Number of the scrubber',
+    scrubberNumber: 'Scrubber no.',
   },
   flowsScreen: {
     pipeCrossSection: 'Pipe Cross-Section',
@@ -80,7 +82,7 @@ export const en = {
   utilitiesScreen: {
     utilities: 'Utilities',
     measurementDuration: 'Measurement Duration',
-    breakTime: "Time Between Measurements",
+    breakTime: 'Time Between Measurements',
     startingHour: 'First Measurement Start Time',
-  }
+  },
 };
