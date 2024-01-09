@@ -239,6 +239,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       }
     }
     const csvString = jsonToCSV(csvRows);
+    console.log("Exporting a CSV file: ");
     console.log(csvString);
     return csvString;
   };
@@ -248,9 +249,11 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       header: true,
     })['data'] as AspirationMeasurementCSVRow[];
 
+
+    console.log("Restoring state from a CSV file: ");
+    console.log(JSON.stringify(csvRows, null, 2));
     const newMeasurements: AspirationMeasurement[] = [];
     for (const row of csvRows) {
-      console.log(JSON.stringify(row));
       if (row['Numer pomiaru'] == undefined) {
         continue;
       }
@@ -261,7 +264,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
         newMeasurements[newMeasurements.length - 1].id != measurementNumber
       ) {
         const newData: AspirationMeasurement = {
-          id: measurementNumber,
+          id: measurementNumber - 1,
           compounds: {},
         };
         for (const compound of TESTED_COMPOUNDS) {
@@ -409,6 +412,16 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
             <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+        // TODO: figure out how to handle deletion of everything properly.
+          style={{...styles.navigationButton, alignSelf: 'center'}}
+          onPress={() => {
+            setMeasurements([{...emptyMeasurement}]);
+            setDataIndex(0);
+            setCurrentCompoundData({...initialState});
+          }}>
+          <ButtonIcon materialIconName="delete" />
+        </TouchableOpacity>
       </ScrollView>
       <SaveAndLoadGroup
         getSavedFileContents={() => exportMeasurementsAsCSV()}
