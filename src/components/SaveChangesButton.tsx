@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {
   colors,
@@ -28,23 +28,38 @@ export const SaveChangesButton = ({
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}>
-        <View style={styles.mainContainer}>
-          <Text style={{color: colors.buttonBlue}}> Select what to do </Text>
+        <View
+          style={{
+            margin: defaultGap,
+            flex: 1,
+            justifyContent: 'center',
+            gap: defaultGap,
+          }}>
+          <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.buttonBlue, alignSelf: 'center'}}>
+            Where do you want to save the file?
+          </Text>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => {
+              setModalVisible(true);
+            }}>
+            <Text style={styles.actionButtonText}>Create a new file</Text>
+            <ButtonIcon materialIconName="plus" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => {
+              setModalVisible(true);
+            }}>
+            <Text style={styles.actionButtonText}>
+              Overwrite an existing file
+            </Text>
+            <ButtonIcon materialIconName="content-save" />
+          </TouchableOpacity>
         </View>
       </Modal>
       <TouchableOpacity
-        activeOpacity={1.0}
-        style={{
-          flexDirection: 'row',
-          backgroundColor: colors.secondaryBlue,
-          marginHorizontal: defaultGap,
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderRadius: defaultBorderRadius,
-          margin: defaultGap,
-          paddingHorizontal: defaultPadding,
-          height: 40,
-        }}
+        style={styles.actionButton}
         onPress={() => {
           setModalVisible(true);
         }}>
