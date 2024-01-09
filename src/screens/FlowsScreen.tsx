@@ -6,6 +6,8 @@ import { TextInput } from 'react-native';
 import { NumberInputBar, SelectorBar } from '../components/input-bars';
 import { defaultGap, styles } from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
+import { FilePicker } from '../components/FilePicker';
+import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
 
 
 interface SingleFlowMeasurement {
@@ -87,7 +89,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           }
           selections={[t('pipeCrossSectionTypes:ROUND'), t('pipeCrossSectionTypes:RECTANGULAR')]}
           onSelect={(selectedItem: string, _index: number) => {
-            setMode(selectedItem !== 'Kołowy');
+            setMode(selectedItem !== t('pipeCrossSectionTypes:ROUND'))
           }}
         />
         {mode ? (
@@ -311,7 +313,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
         <NumberInputBar
           placeholder=""
           value={currentMeasurement.angle}
-          onChangeText={text => { 
+          onChangeText={text => {
             updateSingleFlowMeasurement({ angle: text });
           }}
           label={
@@ -319,6 +321,10 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           }
         />
       </ScrollView>
+      <SaveAndLoadGroup
+        getSavedFileContents={() => 'test'}
+        fileContentsHandler={(contents: Object) => {}}
+      />
     </View>
   );
 };

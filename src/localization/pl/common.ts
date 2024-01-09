@@ -8,6 +8,7 @@ export const pl = {
     home: 'Strona główna',
     measurements: 'Pomiary',
     gasAnalyzerCheck: 'Sprawdzenie analizatora gazu',
+    settings: 'Ustawienia',
     utilities: 'Pomocnicze',
     equipmentBase: 'Baza sprzętu',
     changeLanguage: 'Zmień język',
@@ -53,6 +54,8 @@ export const pl = {
     initialVolume: 'Objętość początkowa roztworu',
     sampleId: 'Nr identyfikacyjny próbki',
     compoundType: 'Rodzaj próbki',
+    loadFromStorage: 'Załaduj dane',
+    saveChanges: 'Zapisz zmiany',
   },
   h20Screen: {
     arrivalTime: 'Godzina przyjazdu',
@@ -68,7 +71,7 @@ export const pl = {
   flowsScreen: {
     pipeCrossSection: 'Przekrój przewodu',
     numberOfSpigots: 'Ilość osi pomiarowych',
-    numberOfPoints: 'Ilość punktów na ois',
+    numberOfPoints: 'Ilość punktów na osi',
     width: 'Szerokość',
     height: 'Wysokość',
     pipeDiameter: 'Średnica przewodu',
@@ -82,7 +85,17 @@ export const pl = {
   utilitiesScreen: {
     utilities: 'Pomocnicze',
     measurementDuration: 'Czas trwania pomiaru',
-    breakTime: "Przerwa między pomiarami",
+    breakTime: 'Przerwa między pomiarami',
     startingHour: 'Czas rozpoczęcia pierwszego pomiaru',
-  }
+  },
+  fileSaving: {
+    howToSave: 'Wybierz sposób zapisu pliku',
+    overwrite: 'Nadpisz istniejący plik',
+    enterNewName: 'Wprowadź nazwę nowego pliku',
+    yourFileWillBeSaved: "Twój plik zostanie utworzony w katalogu 'Downloads'.",
+    createFile: 'Zapisz plik',
+    createANewFile: 'Utwórz nowy plik',
+    fileSavedSuccessfully: 'Plik zapisany pomyślnie!',
+    error: 'Wystąpił błąd podczas zapisu pliku, spróbuj ponownie.',
+  },
 };

@@ -319,7 +319,7 @@ export const TextInputBar = ({
   return (
     <DataBar label={label}>
       <TextInput
-        value={placeholder}
+        value={value}
         placeholderTextColor={'gray'}
         placeholder={placeholder}
         onChangeText={onChangeText}

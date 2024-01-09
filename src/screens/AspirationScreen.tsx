@@ -1,11 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {AspirationDataSchema} from '../constants';
 import {
   DataBar,
@@ -13,20 +7,12 @@ import {
   SelectorBar,
   TimeSelector,
 } from '../components/input-bars';
-import {
-  colors,
-  defaultBorderRadius,
-  defaultGap,
-  defaultPadding,
-  largeBorderRadius,
-  styles,
-} from '../styles/common-styles';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {styles} from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
-import DocumentPicker from 'react-native-document-picker';
-
-import {request, PERMISSIONS} from 'react-native-permissions';
+import {ButtonIcon} from '../components/ButtonIcon';
+import {SaveAndLoadGroup} from '../components/SaveAndLoadGroup';
+import {jsonToCSV, readString} from 'react-native-csv';
 
 interface AspirationMeasurement {
   id: number;
@@ -43,6 +29,17 @@ interface MeasurementPerCompound {
   sampleId: number;
 }
 
+interface AspirationMeasurementCSVRow {
+  'Numer pomiaru': string;
+  'Rodzaj związku': string;
+  Data: Date;
+  'Próba szczelności - przepływ': string;
+  'Przepływ przez aspirator': string;
+  'Objętość zaaspirowana': string;
+  'Objętość początkowa roztworu': string;
+  'Numer identyfikacyjny próbki': string;
+}
+
 const TESTED_COMPOUNDS: string[] = [
   'HCL',
   'HF',
@@ -53,6 +50,7 @@ const TESTED_COMPOUNDS: string[] = [
   'PB',
 ];
 
+const INTERNAL_STORAGE_FILE_NAME = 'aspiration-measurements.txt';
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // Template constants for empty measurements
   const initialState: MeasurementPerCompound = {
@@ -79,8 +77,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     };
   }
 
-  const fileSystemService = new FileSystemService();
   const {t} = useTranslation();
+  const fileSystemService = new FileSystemService();
 
   // dataIndex is used to select the current measurement that is being modified.
   const [dataIndex, setDataIndex] = useState(0);
@@ -89,12 +87,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // the current compound that is being entered / edited.
   const [currentCompoundData, setCurrentCompoundData] = useState({
     ...initialState,
-  });
-
-  // current measurement is the measurement for which we are currently modifying
-  // the respective compounds.
-  const [currentMeasurement, setCurrentMeasurement] = useState({
-    ...emptyMeasurement,
   });
 
   const [measurements, setMeasurements] = useState([{...emptyMeasurement}]);
@@ -122,7 +114,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     // loaded appropriately.
     setDataIndex(measurements.length - 1);
     setMeasurements(measurements);
-    setCurrentMeasurement({...mostRecentMeasurement});
     setCurrentCompoundData({
       ...mostRecentMeasurement.compounds[TESTED_COMPOUNDS[0]],
     });
@@ -130,7 +121,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
 
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage('aspiration-measurements.txt')
+      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         restoreStateFrom(loadedMeasurements);
       });
@@ -142,17 +133,36 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
 
   /* Logic for state transitions when switching between measurements follows */
 
+  // Responsible for changing the UI state to the previous measurement in the list,
+  // triggered when 'to-the-left' button is pressed in the control component
+  // below the list of measurements.
   const loadPreviousMeasurement = () => {
-    if (dataIndex > 0) {
-      const newIndex = dataIndex - 1;
-      setCurrentCompoundData({
-        ...measurements[newIndex].compounds[currentCompoundData.compoundName],
-      });
-      setCurrentMeasurement({...measurements[newIndex]});
-      setDataIndex(newIndex);
+    if (dataIndex == 0) {
+      return;
     }
+    const newIndex = dataIndex - 1;
+    setCurrentCompoundData({
+      ...measurements[newIndex].compounds[currentCompoundData.compoundName],
+    });
+    setDataIndex(newIndex);
   };
 
+  // Responsible for loading the next measurement in the list. Triggered when
+  // the 'to-the-right' button is pressed in the control component.
+  const loadNextMeasurement = () => {
+    if (dataIndex == measurements.length - 1) {
+      return;
+    }
+    const newIndex = dataIndex + 1;
+    setCurrentCompoundData({
+      ...measurements[newIndex].compounds[currentCompoundData.compoundName],
+    });
+    setDataIndex(newIndex);
+  };
+
+  // Saves the currently modified measurement and adds a new empty measurement
+  // at the end of the list of measurements. Triggered when the 'plus' button
+  // is pressed in the control component.
   const addNewMeasurement = () => {
     saveModifications();
     setMeasurements([
@@ -162,43 +172,32 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     setDataIndex(dataIndex + 1);
     // Erase the fields so that new input can be collected.
     setCurrentCompoundData({...initialState});
-    console.log(JSON.stringify(measurements, null, 2));
   };
 
+  // Responsible for saving the currently modified compound in the UI
   const saveModifications = () => {
     // Update the currently selected measurement with the new values.
     var modifiedMeasurement = measurements[dataIndex];
+
+    // First overwrite the stored compound measurement data
     modifiedMeasurement.compounds[currentCompoundData.compoundName] = {
       ...currentCompoundData,
     };
 
+    // Then overwrite the modified measurement.
     const newMeasurements: AspirationMeasurement[] = measurements.map(
       measurement => {
         return measurement.id === dataIndex ? modifiedMeasurement : measurement;
       },
     );
+
     setMeasurements(newMeasurements);
 
-    fileSystemService.saveToExternalStorage(
+    // The modifications are saved to the internal storage.
+    fileSystemService.saveObjectToInternalStorage(
       newMeasurements,
-      'aspiration-measurements.txt',
+      INTERNAL_STORAGE_FILE_NAME,
     );
-    fileSystemService.saveToInternalStorage(
-      newMeasurements,
-      'aspiration-measurements.txt',
-    );
-  };
-
-  const loadNextMeasurement = () => {
-    if (dataIndex == measurements.length - 1) {
-      return;
-    }
-    const newIndex = dataIndex + 1;
-    setCurrentCompoundData(
-      measurements[newIndex].compounds[currentCompoundData.compoundName],
-    );
-    setCurrentMeasurement(measurements[newIndex]);
-    setDataIndex(newIndex);
   };
 
   const changeCurrentCompound = (compound: string) => {
@@ -210,7 +209,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       ...currentCompoundData,
     };
     setCurrentCompoundData({...modifiedMeasurement.compounds[compound]});
-    setCurrentMeasurement({...modifiedMeasurement});
   };
 
   // This helper can be used for updating the array by overwriting a single
@@ -223,9 +221,82 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     });
   };
 
+  const exportMeasurementsAsCSV = () => {
+    const csvRows: AspirationMeasurementCSVRow[] = [];
+    for (const measurement of measurements) {
+      for (const compound of TESTED_COMPOUNDS) {
+        const compoundData = measurement.compounds[compound];
+        csvRows.push({
+          'Numer pomiaru': (measurement.id + 1).toString(),
+          'Rodzaj związku': compoundData.compoundName,
+          Data: compoundData.date,
+          'Próba szczelności - przepływ': compoundData.leakTightnessTest,
+          'Przepływ przez aspirator': compoundData.aspiratorFlow,
+          'Objętość zaaspirowana': compoundData.aspiratedVolume,
+          'Objętość początkowa roztworu': compoundData.initialVolume,
+          'Numer identyfikacyjny próbki': compoundData.sampleId.toString(),
+        });
+      }
+    }
+    const csvString = jsonToCSV(csvRows);
+    console.log("Exporting a CSV file: ");
+    console.log(csvString);
+    return csvString;
+  };
+
+  const restoreStateFromCSV = (fileContents: string) => {
+    const csvRows: AspirationMeasurementCSVRow[] = readString(fileContents, {
+      header: true,
+    })['data'] as AspirationMeasurementCSVRow[];
+
+
+    console.log("Restoring state from a CSV file: ");
+    console.log(JSON.stringify(csvRows, null, 2));
+    const newMeasurements: AspirationMeasurement[] = [];
+    for (const row of csvRows) {
+      if (row['Numer pomiaru'] == undefined) {
+        continue;
+      }
+
+      const measurementNumber = parseInt(row['Numer pomiaru']);
+      if (
+        newMeasurements.length == 0 ||
+        newMeasurements[newMeasurements.length - 1].id != measurementNumber
+      ) {
+        const newData: AspirationMeasurement = {
+          id: measurementNumber - 1,
+          compounds: {},
+        };
+        for (const compound of TESTED_COMPOUNDS) {
+          newData.compounds[compound] = {
+            ...initialState,
+            compoundName: compound,
+          };
+        }
+        newMeasurements.push(newData);
+      }
+
+      if (newMeasurements.length >= measurementNumber) {
+        newMeasurements[measurementNumber - 1].compounds[
+          row['Rodzaj związku']
+        ] = {
+          compoundName: row['Rodzaj związku'],
+          date: new Date(row['Data']),
+          leakTightnessTest: row['Próba szczelności - przepływ'],
+          aspiratorFlow: row['Przepływ przez aspirator'],
+          aspiratedVolume: row['Objętość zaaspirowana'],
+          initialVolume: row['Objętość początkowa roztworu'],
+          sampleId: parseInt(row['Numer identyfikacyjny próbki']),
+        };
+      }
+    }
+    setMeasurements([...newMeasurements]);
+    setDataIndex(0);
+    setCurrentCompoundData(newMeasurements[0].compounds[TESTED_COMPOUNDS[0]]);
+  };
   return (
     <View style={styles.mainContainer}>
-      <ScrollView contentContainerStyle={local_styles.defaultScrollView}>
+      <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar
           label={
             t(`aspirationScreen:${AspirationDataSchema.measurementNumber}`) +
@@ -310,85 +381,52 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           onSelect={(selectedItem: string, _index: number) => {
             changeCurrentCompound(selectedItem);
           }}
-          selectionToText={selection => currentCompoundData.compoundName}
+          // Ensure that when the current compound is changed implicitly (e.g.
+          // by adding a new measurement), the text displayed on the selector
+          // needs to reflect that instead of the last selected value.
+          selectionToText={_selection => currentCompoundData.compoundName}
           rowTextForSelection={selection => selection}
         />
-        <View style={local_styles.buttonContainer}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={local_styles.navigationButton}
+            style={styles.navigationButton}
             onPress={loadPreviousMeasurement}>
             <ButtonIcon materialIconName="arrow-left-circle" />
           </TouchableOpacity>
           {dataIndex == measurements.length - 1 ? (
             <TouchableOpacity
-              style={local_styles.navigationButton}
+              style={styles.navigationButton}
               onPress={addNewMeasurement}>
               <ButtonIcon materialIconName="plus" />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={local_styles.navigationButton}
+              style={styles.navigationButton}
               onPress={saveModifications}>
               <ButtonIcon materialIconName="content-save" />
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            style={local_styles.navigationButton}
+            style={styles.navigationButton}
             onPress={loadNextMeasurement}>
             <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
         </View>
-
         <TouchableOpacity
-          style={local_styles.navigationButton}
+        // TODO: figure out how to handle deletion of everything properly.
+          style={{...styles.navigationButton, alignSelf: 'center'}}
           onPress={() => {
-            DocumentPicker.pickSingle().then((response: any) => {
-              const result: Promise<Object> =
-                fileSystemService.loadJSONFromPath(response['uri']);
-              result.then((file: Object) => {
-                restoreStateFrom(file);
-              });
-            });
+            setMeasurements([{...emptyMeasurement}]);
+            setDataIndex(0);
+            setCurrentCompoundData({...initialState});
           }}>
-          <ButtonIcon materialIconName="folder-open" />
+          <ButtonIcon materialIconName="delete" />
         </TouchableOpacity>
       </ScrollView>
+      <SaveAndLoadGroup
+        getSavedFileContents={() => exportMeasurementsAsCSV()}
+        fileContentsHandler={restoreStateFromCSV}
+      />
     </View>
   );
 };
-
-const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
-  return (
-    <Icon
-      name={materialIconName}
-      style={{marginTop: 10}}
-      size={20}
-      color={colors.buttonBlue}
-    />
-  );
-};
-
-const local_styles = StyleSheet.create({
-  navigationButton: {
-    borderRadius: defaultBorderRadius,
-    flexDirection: 'row',
-    margin: defaultGap,
-    paddingHorizontal: defaultPadding,
-    backgroundColor: 'white',
-    height: 40,
-  },
-  defaultScrollView: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    gap: defaultGap,
-  },
-  buttonContainer: {
-    borderRadius: largeBorderRadius,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    backgroundColor: colors.secondaryBlue,
-    padding: defaultPadding,
-    alignSelf: 'center',
-    gap: defaultGap,
-  },
-});

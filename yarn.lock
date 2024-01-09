@@ -1883,6 +1883,13 @@
   dependencies:
     "@babel/types" "^7.20.7"
 
+"@types/csv-parse@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/@types/csv-parse/-/csv-parse-1.2.2.tgz"
+  integrity sha512-k33tLtRKTQxf7hQfMlkWoS2TQYsnpk1ibZN+rzbuCkeBs8m23nHTeDTF1wb/e7/MSLdtgCzqu3oM1I101kd6yw==
+  dependencies:
+    csv-parse "*"
+
 "@types/graceful-fs@^4.1.3":
   version "4.1.7"
   resolved "https://registry.npmjs.org/@types/graceful-fs/-/graceful-fs-4.1.7.tgz"
@@ -1923,6 +1930,13 @@
   version "20.7.0"
   resolved "https://registry.npmjs.org/@types/node/-/node-20.7.0.tgz"
   integrity sha512-zI22/pJW2wUZOVyguFaUL1HABdmSVxpXrzIqkjsHmyUjNhPoWM1CKfvVuXfetHhIok4RY573cqS0mZ1SJEnoTg==
+
+"@types/papaparse@^5.2.5":
+  version "5.3.14"
+  resolved "https://registry.npmjs.org/@types/papaparse/-/papaparse-5.3.14.tgz"
+  integrity sha512-LxJ4iEFcpqc6METwp9f6BV6VVc43m6MfH0VqFosHvrUgfXiFe6ww7R3itkOQ+TCK6Y+Iv/+RnnvtRZnkc5Kc9g==
+  dependencies:
+    "@types/node" "*"
 
 "@types/prop-types@*":
   version "15.7.7"
@@ -2819,6 +2833,11 @@ csstype@^3.0.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.2.tgz"
   integrity sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==
+
+csv-parse@*, csv-parse@^5.5.3:
+  version "5.5.3"
+  resolved "https://registry.npmjs.org/csv-parse/-/csv-parse-5.5.3.tgz"
+  integrity sha512-v0KW6C0qlZzoGjk6u5tLmVfyZxNgPGXZsWTXshpAgKVGmGXzaVWGdlCFxNx5iuzcXT/oJN1HHM9DZKwtAtYa+A==
 
 dayjs@^1.8.15:
   version "1.11.10"
@@ -5382,6 +5401,11 @@ p-try@^2.0.0:
   resolved "https://registry.npmjs.org/p-try/-/p-try-2.2.0.tgz"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
+papaparse@^5.3.0:
+  version "5.4.1"
+  resolved "https://registry.npmjs.org/papaparse/-/papaparse-5.4.1.tgz"
+  integrity sha512-HipMsgJkZu8br23pW15uvo6sib6wne/4woLZPlFf3rpDyMe9ywEXUsuD7+6K9PRkJlVT51j/sCOYDKGGS3ZJrw==
+
 parent-module@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/parent-module/-/parent-module-1.0.1.tgz"
@@ -5629,17 +5653,20 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-csv@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.npmjs.org/react-native-csv/-/react-native-csv-0.2.0.tgz"
+  integrity sha512-4KJ6l5trEd/g5sAZe29QZdbFdANw0dASO3l5f7YRY+TM82HI3ysh122zE39QhT0Q/6KT0cJhKCdZZ7+ocSzBag==
+  dependencies:
+    "@types/papaparse" "^5.2.5"
+    papaparse "^5.3.0"
+
 react-native-document-picker@^9.1.0:
   version "9.1.0"
   resolved "https://registry.npmjs.org/react-native-document-picker/-/react-native-document-picker-9.1.0.tgz"
   integrity sha512-SRKPIAzUtcPDUstLRhQeebVVM+x+1I24iSvoy5mFp1KAD+6+UyDEle0SoD96k7MxVH5o46wPifWCYOA3FuQOyw==
   dependencies:
     invariant "^2.2.4"
-
-react-native-file-picker@^0.0.21:
-  version "0.0.21"
-  resolved "https://registry.npmjs.org/react-native-file-picker/-/react-native-file-picker-0.0.21.tgz"
-  integrity sha512-qsvdqYmDjjgPFNlabBXFNU+h1Yndl35aEsGlnPVV070qRYuCOaDx6VQYHLBqMequppb98Gb82zIGjvekbILMXQ==
 
 react-native-fs@^2.20.0:
   version "2.20.0"

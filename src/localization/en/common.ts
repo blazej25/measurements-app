@@ -9,6 +9,7 @@ export const en = {
     measurements: 'Measurements',
     gasAnalyzerCheck: 'Gas Analyzer Check',
     utilities: 'Utilities',
+    settings: 'Settings',
     equipmentBase: 'Equipment Base',
     changeLanguage: 'Change language',
     polish: 'Polish',
@@ -22,7 +23,7 @@ export const en = {
     measurementRequestor: 'Principal',
     emissionSource: 'Emmission source',
     pipeCrossSectionType: 'Pipe cross section type',
-    staffResponsibleForMeasurement: 'Staff carrying out measurements',
+    staffResponsibleForMeasurement: 'Staff conducting measurements',
     nameAndSurname: 'Name and surname',
     temperature: 'Ambient temperature',
     pressure: 'Atmospheric pressure',
@@ -52,6 +53,8 @@ export const en = {
     initialVolume: 'Initial Volume',
     sampleId: 'Sample ID number',
     compoundType: 'Sample Type',
+    loadFromStorage: 'Load Data',
+    saveChanges: 'Save Changes',
   },
   h20Screen: {
     arrivalTime: 'Time of Arrival',
@@ -61,7 +64,7 @@ export const en = {
     aspiratedVolume: 'Aspirated volume',
     initialMass: 'Initial mass',
     massAfterMeasurement: 'End mass',
-    scrubberNumber: 'Number of the scrubber',
+    scrubberNumber: 'Scrubber no.',
   },
   flowsScreen: {
     pipeCrossSection: 'Pipe Cross-Section',
@@ -80,7 +83,17 @@ export const en = {
   utilitiesScreen: {
     utilities: 'Utilities',
     measurementDuration: 'Measurement Duration',
-    breakTime: "Time Between Measurements",
+    breakTime: 'Time Between Measurements',
     startingHour: 'First Measurement Start Time',
-  }
+  },
+  fileSaving: {
+    howToSave: 'How do you want to save the file?',
+    overwrite: 'Overwrite an existing file',
+    enterNewName: 'Please enter the name of the file to create.',
+    yourFileWillBeSaved: 'Your file will be saved in the Downloads directory.',
+    createFile: 'Create the file',
+    createANewFile: 'Create a new file',
+    fileSavedSuccessfully: 'File saved successfully!',
+    error: 'There was an error when saving the file, please try again.',
+  },
 };
