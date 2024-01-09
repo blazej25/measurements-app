@@ -10,6 +10,8 @@ import FileSystemService from '../services/FileSystemService';
 import DocumentPicker from 'react-native-document-picker';
 import {ButtonIcon} from './ButtonIcon';
 import {TextInputBar} from './input-bars';
+import {PermissionsAndroid} from 'react-native';
+import {useTranslation} from 'react-i18next';
 
 export const SaveChangesButton = ({
   getSavedFileContents,
@@ -18,8 +20,8 @@ export const SaveChangesButton = ({
   getSavedFileContents: () => string;
   label: string;
 }) => {
-  const fileSystemService = new FileSystemService();
   const [modalVisible, setModalVisible] = useState(false);
+  const {t} = useTranslation();
 
   return (
     <>
@@ -36,10 +38,11 @@ export const SaveChangesButton = ({
             justifyContent: 'center',
             gap: defaultGap,
           }}>
-          <Text style={styles.uiPromptText}>
-            How do you want to save the file?
-          </Text>
-          <CreateNewFileModal />
+          <Text style={styles.uiPromptText}>{t('fileSaving:howToSave')}</Text>
+          <CreateNewFileModal
+            getSavedFileContents={getSavedFileContents}
+            setOuterModalVisible={setModalVisible}
+          />
           <OverwriteExistingFileButton
             getSavedFileContents={getSavedFileContents}
           />
@@ -50,7 +53,7 @@ export const SaveChangesButton = ({
         onPress={() => {
           setModalVisible(true);
         }}>
-        <Text style={styles.actionButton}>{label}</Text>
+        <Text style={styles.actionButtonText}>{label}</Text>
         <ButtonIcon materialIconName="content-save" />
       </TouchableOpacity>
     </>
@@ -62,30 +65,42 @@ const OverwriteExistingFileButton = ({
 }: {
   getSavedFileContents: () => string;
 }) => {
+  const {t} = useTranslation();
   const fileSystemService = new FileSystemService();
   return (
     <TouchableOpacity
       style={styles.actionButton}
       onPress={() => {
-        DocumentPicker.pickSingle()
+        DocumentPicker.pickSingle({mode: 'import', copyTo: 'documentDirectory'})
           .then((response: any) => {
-            const fileName = response['uri'];
-            fileSystemService.saveToExternalStorage(
+            console.log(response);
+            const fileName = response['name'];
+            fileSystemService.saveToExternalStorageAlert(
               getSavedFileContents(),
               fileName,
+              t('fileSaving:fileSavedSuccessfully'),
+              t('fileSaving:error'),
             );
           })
           .catch((error: any) => {
             console.log(error);
           });
       }}>
-      <Text style={styles.actionButtonText}> Overwrite an existing file </Text>
+      <Text style={styles.actionButtonText}> {t('fileSaving:overwrite')}</Text>
       <ButtonIcon materialIconName="content-save" />
     </TouchableOpacity>
   );
 };
 
-const CreateNewFileModal = () => {
+const CreateNewFileModal = ({
+  getSavedFileContents,
+  setOuterModalVisible,
+}: {
+  getSavedFileContents: () => string;
+  setOuterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const {t} = useTranslation();
+  const fileSystemService = new FileSystemService();
   const [modalVisible, setModalVisible] = useState(false);
   const [fileName, setFileName] = useState('');
   return (
@@ -104,21 +119,30 @@ const CreateNewFileModal = () => {
             gap: defaultGap,
           }}>
           <Text style={styles.uiPromptText}>
-            Please enter the name of the file to create.
+            {t('fileSaving:enterNewName')}
           </Text>
           <TextInputBar
             label="File name:"
             onChangeText={text => setFileName(text)}
           />
           <Text style={styles.uiPromptText}>
-            Your file will be saved in the Downloads directory.
+            {t('fileSaving:yourFileWillBeSaved')}
           </Text>
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => {
+              fileSystemService.saveToExternalStorageAlert(
+                getSavedFileContents(),
+                fileName,
+                t('fileSaving:fileSavedSuccessfully'),
+                t('fileSaving:error'),
+              );
               setModalVisible(false);
+              setOuterModalVisible(false);
             }}>
-            <Text style={styles.actionButtonText}>Create the file</Text>
+            <Text style={styles.actionButtonText}>
+              {t('fileSaving:createFile')}
+            </Text>
             <ButtonIcon materialIconName="plus" />
           </TouchableOpacity>
         </View>
@@ -128,7 +152,9 @@ const CreateNewFileModal = () => {
         onPress={() => {
           setModalVisible(true);
         }}>
-        <Text style={styles.actionButtonText}>Create a new file</Text>
+        <Text style={styles.actionButtonText}>
+          {t('fileSaving:createANewFile')}
+        </Text>
         <ButtonIcon materialIconName="plus" />
       </TouchableOpacity>
     </View>

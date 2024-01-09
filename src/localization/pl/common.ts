@@ -88,4 +88,14 @@ export const pl = {
     breakTime: 'Przerwa między pomiarami',
     startingHour: 'Czas rozpoczęcia pierwszego pomiaru',
   },
+  fileSaving: {
+    howToSave: 'Wybierz sposób zapisu pliku',
+    overwrite: 'Nadpisz istniejący plik',
+    enterNewName: 'Wprowadź nazwę nowego pliku',
+    yourFileWillBeSaved: "Twój plik zostanie utworzony w katalogu 'Downloads'.",
+    createFile: 'Zapisz plik',
+    createANewFile: 'Utwórz nowy plik',
+    fileSavedSuccessfully: 'Plik zapisany pomyślnie!',
+    error: 'Wystąpił błąd podczas zapisu pliku, spróbuj ponownie.',
+  },
 };

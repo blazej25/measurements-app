@@ -86,4 +86,14 @@ export const en = {
     breakTime: 'Time Between Measurements',
     startingHour: 'First Measurement Start Time',
   },
+  fileSaving: {
+    howToSave: 'How do you want to save the file?',
+    overwrite: 'Overwrite an existing file',
+    enterNewName: 'Please enter the name of the file to create.',
+    yourFileWillBeSaved: 'Your file will be saved in the Downloads directory.',
+    createFile: 'Create the file',
+    createANewFile: 'Create a new file',
+    fileSavedSuccessfully: 'File saved successfully!',
+    error: 'There was an error when saving the file, please try again.',
+  },
 };

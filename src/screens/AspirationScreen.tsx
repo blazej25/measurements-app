@@ -82,8 +82,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     };
   }
 
-  const fileSystemService = new FileSystemService();
   const {t} = useTranslation();
+  const fileSystemService = new FileSystemService();
 
   // dataIndex is used to select the current measurement that is being modified.
   const [dataIndex, setDataIndex] = useState(0);

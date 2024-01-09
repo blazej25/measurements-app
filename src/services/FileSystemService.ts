@@ -1,3 +1,4 @@
+import {Alert} from 'react-native';
 import RNFS from 'react-native-fs';
 
 class FileSystemService {
@@ -31,6 +32,23 @@ class FileSystemService {
       });
   }
 
+  saveToExternalStorageAlert(
+    contents: string,
+    fileName: string,
+    alertSuccess: string,
+    alertError: string,
+  ) {
+    var path = RNFS.DownloadDirectoryPath + '/' + fileName;
+    RNFS.writeFile(path, contents, 'utf8')
+      .then(_success => {
+        console.log('File written to: ' + path);
+        Alert.alert(alertSuccess);
+      })
+      .catch(err => {
+        console.log(err.message);
+        Alert.alert(alertError);
+      });
+  }
   async loadJSONFromInternalStorage(fileName: string): Promise<Object> {
     var path = RNFS.DocumentDirectoryPath + '/' + fileName;
 
