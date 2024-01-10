@@ -88,7 +88,7 @@ export const pl = {
     utilities: 'Pomocnicze',
     measurementDuration: 'Czas trwania pomiaru',
     breakTime: 'Przerwa między pomiarami',
-    startingHour: 'Czas rozpoczęcia pierwszego pomiaru',
+    startingHour: 'Czas rozpoczęcia pomiarów',
   },
   fileSaving: {
     howToSave: 'Wybierz sposób zapisu pliku',
