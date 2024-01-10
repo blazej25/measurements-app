@@ -1,16 +1,13 @@
 import React, {useState} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {
-  colors,
   defaultGap,
-  defaultPadding,
   styles,
 } from '../styles/common-styles';
 import FileSystemService from '../services/FileSystemService';
 import DocumentPicker from 'react-native-document-picker';
 import {ButtonIcon} from './ButtonIcon';
 import {TextInputBar} from './input-bars';
-import {PermissionsAndroid} from 'react-native';
 import {useTranslation} from 'react-i18next';
 
 export const SaveChangesButton = ({
@@ -45,6 +42,7 @@ export const SaveChangesButton = ({
           />
           <OverwriteExistingFileButton
             getSavedFileContents={getSavedFileContents}
+            setModalVisible={setModalVisible}
           />
         </View>
       </Modal>
@@ -62,8 +60,10 @@ export const SaveChangesButton = ({
 
 const OverwriteExistingFileButton = ({
   getSavedFileContents,
+  setModalVisible,
 }: {
   getSavedFileContents: () => string;
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const {t} = useTranslation();
   const fileSystemService = new FileSystemService();
@@ -71,6 +71,7 @@ const OverwriteExistingFileButton = ({
     <TouchableOpacity
       style={styles.actionButton}
       onPress={() => {
+        setModalVisible(false);
         DocumentPicker.pickSingle({mode: 'import', copyTo: 'documentDirectory'})
           .then((response: any) => {
             console.log(response);
