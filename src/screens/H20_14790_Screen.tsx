@@ -1,32 +1,18 @@
-import React, {useMemo, useState} from 'react';
-import {
-  ScrollView,
-  StyleProp,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {CommonDataSchema} from '../constants';
-import {t} from 'i18next';
 import {
   DataBar,
   NumberInputBar,
   SelectorBar,
   TimeSelector,
 } from '../components/input-bars';
-import {
-  colors,
-  defaultBorderRadius,
-  defaultGap,
-  defaultPadding,
-  largeBorderRadius,
-  styles,
-} from '../styles/common-styles';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {styles} from '../styles/common-styles';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import {ButtonIcon} from '../components/ButtonIcon';
+import FileSystemService from '../services/FileSystemService';
+import {useTranslation} from 'react-i18next';
 
 interface Measurement {
   id: number;
@@ -38,7 +24,13 @@ interface Measurement {
   aspiratedGases: string;
 }
 
+const INTERNAL_STORAGE_FILE_NAME = 'h2o-14790.txt';
+
 export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
+  const {t} = useTranslation();
+  const fileSystemService = new FileSystemService();
+
+  /* State variables */
   const [measurements, setMeasurements]: [
     measurements: Measurement[],
     setMeasurements: any,
@@ -87,10 +79,17 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   };
 
   const saveCurrentMeasurement = () => {
-    setMeasurements(measurements.concat({...currentMeasurement}));
+    const newMeasurements = measurements.concat({...currentMeasurement});
+    setMeasurements(newMeasurements);
     setDataIndex(dataIndex + 1);
     setCurrentMeasurement(initialState);
     setScrubberIndex(0);
+
+    // The modifications are saved to the internal storage.
+    fileSystemService.saveObjectToInternalStorage(
+      newMeasurements,
+      INTERNAL_STORAGE_FILE_NAME,
+    );
   };
 
   const saveModifiedMeasurement = () => {
@@ -101,6 +100,12 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
         : measurement;
     });
     setMeasurements(newMeasurements);
+
+    // The modifications are saved to the internal storage.
+    fileSystemService.saveObjectToInternalStorage(
+      newMeasurements,
+      INTERNAL_STORAGE_FILE_NAME,
+    );
   };
 
   const setNextMeasurement = () => {
@@ -122,6 +127,41 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
       setCurrentMeasurement(initialState);
     }
   };
+
+  /* Logic for saving the UI state as JSON into internal storage so that
+   * the data stays in the UI when the app is closed. */
+
+  const loadMeasurements = () => {
+    fileSystemService
+      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .then(loadedMeasurements => {
+        restoreStateFrom(loadedMeasurements);
+      });
+  };
+
+  const restoreStateFrom = (loadedMeasurements: Object) => {
+    var measurements = loadedMeasurements as Measurement[];
+    // Call to pare dates replaces all date fields with the actual Typescript
+    // date object so that it can be manipulated correctly by the UI.
+    measurements = parseDates(measurements);
+
+    // Load state of all measurements and load the current measurement so that the values get
+    // loaded appropriately.
+    setDataIndex(measurements.length - 1);
+    setMeasurements(measurements);
+  };
+
+  // Ensures that the dates are parsed correctly after loading the saved
+  // JSON object with the measurements
+  const parseDates = (measurements: Measurement[]) => {
+    for (var measurement of [...measurements]) {
+      measurement.date = new Date(measurement.date);
+    }
+    return measurements;
+  };
+
+  useEffect(loadMeasurements, []);
+
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
@@ -164,11 +204,11 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           label={t('h20Screen:scrubberNumber') + ':'}
           selections={['1', '2', '3']}
           onSelect={(selectedItem: string, _index: number) => {
-            // We subtract 1 because the UI displays the numbers of the scrubbers
-            // starting from 1, but the array of scrubbers uses usual 0-based
-            // indexing.
+            // Subtract for 0-based indexing.
             setScrubberIndex(parseInt(selectedItem) - 1);
           }}
+          selectionToText={_selection => (scrubberIndex + 1).toString() }
+          rowTextForSelection={selection => selection}
         />
         <NumberInputBar
           placeholder="0"

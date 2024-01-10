@@ -12,8 +12,8 @@ import {useTranslation} from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
 import {ButtonIcon} from '../components/ButtonIcon';
 import {jsonToCSV, readString} from 'react-native-csv';
-import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
-import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
+import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
+import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 
 interface AspirationMeasurement {
   id: number;
@@ -52,8 +52,13 @@ const TESTED_COMPOUNDS: string[] = [
 ];
 
 const INTERNAL_STORAGE_FILE_NAME = 'aspiration-measurements.txt';
+
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
-  // Template constants for empty measurements
+  // Initialise services
+  const {t} = useTranslation();
+  const fileSystemService = new FileSystemService();
+
+  /* State variables */
   const initialState: MeasurementPerCompound = {
     compoundName: TESTED_COMPOUNDS[0],
     date: new Date(),
@@ -78,9 +83,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     };
   }
 
-  const {t} = useTranslation();
-  const fileSystemService = new FileSystemService();
-
   // dataIndex is used to select the current measurement that is being modified.
   const [dataIndex, setDataIndex] = useState(0);
 
@@ -90,47 +92,8 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     ...initialState,
   });
 
+  // Stores all measurements
   const [measurements, setMeasurements] = useState([{...emptyMeasurement}]);
-
-  // Need this to parse dates properly
-  const parseDates = (measurements: AspirationMeasurement[]) => {
-    for (var measurement of [...measurements]) {
-      for (var compound of TESTED_COMPOUNDS) {
-        measurement.compounds[compound].date = new Date(
-          measurement.compounds[compound].date,
-        );
-      }
-    }
-    return measurements;
-  };
-
-  const restoreStateFrom = (loadedMeasurements: Object) => {
-    var measurements = loadedMeasurements as AspirationMeasurement[];
-    // Call to pare dates replaces all date fields with the actual Typescript
-    // date object so that it can be manipulated correctly by the UI.
-    measurements = parseDates(measurements);
-
-    const mostRecentMeasurement = measurements[measurements.length - 1];
-    // Load state of all measurements and load the current measurement so that the values get
-    // loaded appropriately.
-    setDataIndex(measurements.length - 1);
-    setMeasurements(measurements);
-    setCurrentCompoundData({
-      ...mostRecentMeasurement.compounds[TESTED_COMPOUNDS[0]],
-    });
-  };
-
-  const loadMeasurements = () => {
-    fileSystemService
-      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
-      .then(loadedMeasurements => {
-        restoreStateFrom(loadedMeasurements);
-      });
-  };
-
-  // The aim here is to load the state from the storage on each re-render of the
-  // component
-  useEffect(loadMeasurements, []);
 
   /* Logic for state transitions when switching between measurements follows */
 
@@ -222,6 +185,48 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     });
   };
 
+  /* Logic for saving the UI state as JSON into internal storage so that
+   * the data stays in the UI when the app is closed. */
+
+  const loadMeasurements = () => {
+    fileSystemService
+      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .then(loadedMeasurements => {
+        restoreStateFrom(loadedMeasurements);
+      });
+  };
+
+  const restoreStateFrom = (loadedMeasurements: Object) => {
+    var measurements = loadedMeasurements as AspirationMeasurement[];
+    // Call to pare dates replaces all date fields with the actual Typescript
+    // date object so that it can be manipulated correctly by the UI.
+    measurements = parseDates(measurements);
+
+    const mostRecentMeasurement = measurements[measurements.length - 1];
+    // Load state of all measurements and load the current measurement so that the values get
+    // loaded appropriately.
+    setDataIndex(measurements.length - 1);
+    setMeasurements(measurements);
+    setCurrentCompoundData({
+      ...mostRecentMeasurement.compounds[TESTED_COMPOUNDS[0]],
+    });
+  };
+
+  // Ensures that the dates are parsed correctly after loading the saved
+  // JSON object with the measurements
+  const parseDates = (measurements: AspirationMeasurement[]) => {
+    for (var measurement of [...measurements]) {
+      for (var compound of TESTED_COMPOUNDS) {
+        measurement.compounds[compound].date = new Date(
+          measurement.compounds[compound].date,
+        );
+      }
+    }
+    return measurements;
+  };
+
+  /* Logic for saving and loading the file from external storage as CSV */
+
   const exportMeasurementsAsCSV = () => {
     const csvRows: AspirationMeasurementCSVRow[] = [];
     for (const measurement of measurements) {
@@ -240,7 +245,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       }
     }
     const csvString = jsonToCSV(csvRows);
-    console.log("Exporting a CSV file: ");
+    console.log('Exporting a CSV file: ');
     console.log(csvString);
     return csvString;
   };
@@ -250,8 +255,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       header: true,
     })['data'] as AspirationMeasurementCSVRow[];
 
-
-    console.log("Restoring state from a CSV file: ");
+    console.log('Restoring state from a CSV file: ');
     console.log(JSON.stringify(csvRows, null, 2));
     const newMeasurements: AspirationMeasurement[] = [];
     for (const row of csvRows) {
@@ -295,15 +299,20 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     setDataIndex(0);
     setCurrentCompoundData(newMeasurements[0].compounds[TESTED_COMPOUNDS[0]]);
   };
+
+  // The aim here is to load the state from the storage on each re-render of the
+  // whole component
+  useEffect(loadMeasurements, []);
+
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         getSavedFileContents={() => exportMeasurementsAsCSV()}
         onDelete={() => {
-            setMeasurements([{...emptyMeasurement}]);
-            setDataIndex(0);
-            setCurrentCompoundData({...initialState});
-          }}
+          setMeasurements([{...emptyMeasurement}]);
+          setDataIndex(0);
+          setCurrentCompoundData({...initialState});
+        }}
         fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
@@ -340,11 +349,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           placeholder="0"
           valueUnit="l/h"
           value={currentCompoundData.leakTightnessTest}
-          onChangeText={text => {
-            updateCurrentCompound({
-              leakTightnessTest: text,
-            });
-          }}
+          onChangeText={text =>
+            updateCurrentCompound({leakTightnessTest: text})
+          }
           label={
             t(`aspirationScreen:${AspirationDataSchema.leakTightnessTest}`) +
             ':'
@@ -355,19 +362,13 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
             t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'
           }
           date={currentCompoundData.date}
-          setDate={date => {
-            updateCurrentCompound({date: date});
-          }}
+          setDate={date => updateCurrentCompound({date: date})}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="l"
           value={currentCompoundData.aspiratedVolume}
-          onChangeText={text => {
-            updateCurrentCompound({
-              aspiratedVolume: text,
-            });
-          }}
+          onChangeText={text => updateCurrentCompound({aspiratedVolume: text})}
           label={
             t(`aspirationScreen:${AspirationDataSchema.aspiratedVolume}`) + ':'
           }
@@ -376,11 +377,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           placeholder="0"
           valueUnit=""
           value={currentCompoundData.sampleId.toString()}
-          onChangeText={text => {
-            updateCurrentCompound({
-              sampleId: text == '' ? 0 : parseInt(text),
-            });
-          }}
+          onChangeText={text =>
+            updateCurrentCompound({sampleId: text == '' ? 0 : parseInt(text)})
+          }
           label={t(`aspirationScreen:${AspirationDataSchema.sampleId}`) + ':'}
         />
         <SelectorBar
@@ -388,9 +387,9 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
             t(`aspirationScreen:${AspirationDataSchema.compoundType}`) + ':'
           }
           selections={TESTED_COMPOUNDS}
-          onSelect={(selectedItem: string, _index: number) => {
-            changeCurrentCompound(selectedItem);
-          }}
+          onSelect={(selectedItem: string, _index: number) =>
+            changeCurrentCompound(selectedItem)
+          }
           // Ensure that when the current compound is changed implicitly (e.g.
           // by adding a new measurement), the text displayed on the selector
           // needs to reflect that instead of the last selected value.
