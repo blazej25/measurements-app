@@ -262,7 +262,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       const measurementNumber = parseInt(row['Numer pomiaru']);
       if (
         newMeasurements.length == 0 ||
-        newMeasurements[newMeasurements.length - 1].id != measurementNumber
+        newMeasurements[newMeasurements.length - 1].id != measurementNumber - 1
       ) {
         const newData: AspirationMeasurement = {
           id: measurementNumber - 1,
