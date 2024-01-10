@@ -79,7 +79,7 @@ export const en = {
     staticPressure: 'Static Pressure',
     temperature: 'Temperature',
     angle: 'Angle',
-    axisNumber: 'Number of Axes',
+    axisNumber: 'Axis Number',
     pointOnAxis: 'Point on the Axis',
   },
   utilitiesScreen: {

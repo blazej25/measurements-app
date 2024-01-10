@@ -50,7 +50,7 @@ export const SelectorBar = ({
     height: Math.min(
       selectorItemStyle.height * selections.length +
         defaultGap * (selections.length + 1),
-      600,
+      400,
     ),
   };
   return (

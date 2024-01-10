@@ -139,7 +139,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
         <NumberInputBar
           placeholder=""
           value={numberOfSpigots.toString()}
-          onChangeText={text => setNumberOfSpigots(parseFloat(text))}
+          onChangeText={text => setNumberOfSpigots(text === '' ? 0 : parseInt(text))}
           label={
             t(`flowsScreen:numberOfSpigots`) + ':'
           }
@@ -147,7 +147,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
         <NumberInputBar
           placeholder=""
           value={numberOfPoints.toString()}
-          onChangeText={text => setNumberOfPoints(parseFloat(text))}
+          onChangeText={text => setNumberOfPoints(text === '' ? 0 : parseInt(text))}
           label={
             t(`flowsScreen:numberOfPoints`) + ':'
           }

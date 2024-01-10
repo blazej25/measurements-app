@@ -4,7 +4,7 @@ import {ScrollView, Text, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
-import {styles} from '../styles/common-styles';
+import {colors, styles} from '../styles/common-styles';
 import {
   DateTimeSelectorGroup,
   NumberInputBar,
@@ -61,7 +61,7 @@ const WelcomeHeader = () => {
         alignItems: 'center',
         marginBottom: 15,
       }}>
-      <Text style={{fontSize: 22, fontWeight: 'bold', color: 'black'}}>
+      <Text style={{fontSize: 22, fontWeight: 'bold', color: colors.buttonBlue}}>
         {t('userInterface:welcome')}
       </Text>
     </View>
