@@ -78,6 +78,13 @@ export const styles = StyleSheet.create({
     color: colors.buttonBlue,
     alignSelf: 'center',
   },
+  explanationText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.buttonBlue,
+    alignSelf: 'flex-start',
+    marginHorizontal: 10,
+  },
   defaultScrollView: {
     flexGrow: 1,
     justifyContent: 'flex-start',

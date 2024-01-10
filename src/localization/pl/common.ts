@@ -105,4 +105,19 @@ export const pl = {
     yes: 'Tak',
     no: 'Nie',
   },
+  helpModal: {
+    header: 'Pomoc',
+    loadExplanation:
+      'Załaduj dane - wczytuje dane z pliku CSV do aktualnego ekranu. Wgrywany plik musi znajdować się w folderze Downloads i być utworzony przez tę aplikację.',
+    deleteExplanation: 'Kosz - usuń dane zebrane w aktualnym ekranie.',
+    saveExplanation:
+      'Zapisz zmiany - zapisuje dane z aktualnego ekranu (nie ze wszystkich).',
+    helpExplanation: 'Pytajnik - wyświetla ten ekran.',
+    settingsExplanation: 'Ustawienia - dostosowanie języka aplikacji.',
+    measurementPreviousExplanation:
+      'Wstecz - załaduj poprzedni pomiar na ekranie.',
+    measurementSaveExplanation:
+      'Zapisz - zapisuje wprowadzone dane w pamięci aplikacji (nie tworzy pliku).',
+    measurementNextExplanation: 'Naprzód - załaduj następny pomiar na ekranie.',
+  },
 };

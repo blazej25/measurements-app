@@ -103,4 +103,21 @@ export const en = {
     yes: 'Yes',
     no: 'No',
   },
+  helpModal: {
+    header: 'Help',
+    loadExplanation:
+      'Load from file - loads CSV data into the current screen, the loaded file needs to be located in the Downloads directory and created by this app.',
+    deleteExplanation:
+      'Trash - delete all data collected in the current screen.',
+    saveExplanation:
+      'Save changes - saves all data present in the current screen.',
+    helpExplanation: 'Help - show this screen.',
+    settingsExplanation: 'Settings - change application language',
+    measurementPreviousExplanation:
+      'Previous - load the previous measurement present in the current screen.',
+    measurementSaveExplanation:
+      "Save - save the data entered in the current screen into app's memory (doesn't create a new file)",
+    measurementNextExplanation:
+      'Next - load the next measurement present in the current screen.',
+  },
 };

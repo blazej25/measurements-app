@@ -126,7 +126,12 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
           <ButtonIcon materialIconName="plus" />
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={{...styles.defaultScrollView, margin: 5, marginHorizontal: 35}}>
+      <ScrollView
+        contentContainerStyle={{
+          ...styles.defaultScrollView,
+          margin: 5,
+          marginHorizontal: 35,
+        }}>
         {times.map((x: SingleMeasurement) => {
           return (
             <StartEndBar
