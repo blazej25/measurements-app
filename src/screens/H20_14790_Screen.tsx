@@ -10,6 +10,7 @@ import {
 import {styles} from '../styles/common-styles';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
+import {jsonToCSV, readString} from 'react-native-csv';
 import {ButtonIcon} from '../components/ButtonIcon';
 import FileSystemService from '../services/FileSystemService';
 import {useTranslation} from 'react-i18next';
@@ -22,6 +23,20 @@ interface Measurement {
   leakTightnessTest: string;
   aspiratorFlow: string;
   aspiratedGases: string;
+}
+
+interface MeasurementCSVRow {
+  'Numer pomiaru': string;
+  'Godzina przyjazdu': string;
+  'Próba szczelności': string;
+  'Przepływ przez aspirator': string;
+  'Objętość zaaspirowana': string;
+  'Masa początkowa płuczka 1': string;
+  'Masa końcowa płuczka 1': string;
+  'Masa początkowa płuczka 2': string;
+  'Masa końcowa płuczka 2': string;
+  'Masa początkowa płuczka 3': string;
+  'Masa końcowa płuczka 3': string;
 }
 
 const INTERNAL_STORAGE_FILE_NAME = 'h2o-14790.txt';
@@ -48,7 +63,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
   const [dataIndex, setDataIndex] = useState(0);
   const [scrubberIndex, setScrubberIndex] = useState(0);
-  const [currentMeasurement, setCurrentMeasurement] = useState(initialState);
+  const [currentMeasurement, setCurrentMeasurement] = useState({...initialState});
 
   // Derived state used for displaying the curren scrubber masses.
   const afterMassDisplayValue = useMemo(
@@ -82,7 +97,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     const newMeasurements = measurements.concat({...currentMeasurement});
     setMeasurements(newMeasurements);
     setDataIndex(dataIndex + 1);
-    setCurrentMeasurement(initialState);
+    setCurrentMeasurement({...initialState, id: newMeasurements.length});
     setScrubberIndex(0);
 
     // The modifications are saved to the internal storage.
@@ -124,7 +139,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     // We erase the current values only if the user transitions from viewing the
     // last saved measurement to adding the new one.
     if (dataIndex + 1 == measurements.length) {
-      setCurrentMeasurement(initialState);
+      setCurrentMeasurement({...initialState});
     }
   };
 
@@ -160,14 +175,57 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     return measurements;
   };
 
+  /* Logic for saving and loading the file from external storage as CSV */
+
+  const exportMeasurementsAsCSV = () => {
+    const csvRows: MeasurementCSVRow[] = [];
+    for (const measurement of measurements) {
+      csvRows.push({
+        'Numer pomiaru': (measurement.id + 1).toString(),
+        'Godzina przyjazdu': measurement.date.toString(),
+        'Próba szczelności': measurement.leakTightnessTest,
+        'Przepływ przez aspirator': measurement.aspiratorFlow,
+        'Objętość zaaspirowana': measurement.aspiratedGases,
+        'Masa początkowa płuczka 1': measurement.initialMass[0],
+        'Masa końcowa płuczka 1': measurement.afterMass[0],
+        'Masa początkowa płuczka 2': measurement.initialMass[1],
+        'Masa końcowa płuczka 2': measurement.afterMass[1],
+        'Masa początkowa płuczka 3': measurement.initialMass[2],
+        'Masa końcowa płuczka 3': measurement.afterMass[2],
+      });
+    }
+    const csvString = jsonToCSV(csvRows);
+    console.log('Exporting a CSV file: ');
+    console.log(csvString);
+    return csvString;
+  };
+
+  const restoreStateFromCSV = (fileContents: string) => {
+    const csvRows: MeasurementCSVRow[] = readString(fileContents, {
+      header: true,
+    })['data'] as MeasurementCSVRow[];
+
+    console.log('Restoring state from a CSV file: ');
+    console.log(JSON.stringify(csvRows, null, 2));
+    const newMeasurements: Measurement[] = [];
+    for (const row of csvRows) {
+
+    }
+    setMeasurements([...newMeasurements]);
+    setDataIndex(0);
+  };
+
   useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={() => 'test'}
-        onDelete={() => {}}
-        fileContentsHandler={(contents: Object) => {}}
+        getSavedFileContents={exportMeasurementsAsCSV}
+        onDelete={() => {
+          setMeasurements([{...initialState}]);
+          setDataIndex(0);
+        }}
+        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar label={t('h20Screen:measurementNumber') + ':'}>
@@ -207,7 +265,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
             // Subtract for 0-based indexing.
             setScrubberIndex(parseInt(selectedItem) - 1);
           }}
-          selectionToText={_selection => (scrubberIndex + 1).toString() }
+          selectionToText={_selection => (scrubberIndex + 1).toString()}
           rowTextForSelection={selection => selection}
         />
         <NumberInputBar

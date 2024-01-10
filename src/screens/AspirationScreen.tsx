@@ -307,7 +307,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={() => exportMeasurementsAsCSV()}
+        getSavedFileContents={exportMeasurementsAsCSV}
         onDelete={() => {
           setMeasurements([{...emptyMeasurement}]);
           setDataIndex(0);
