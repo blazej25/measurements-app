@@ -5,9 +5,11 @@ export const pl = {
     flows: 'Przepływy',
     dust: 'Pyły',
     H2O: 'H2O 14790',
+    H2OShort: 'H2O',
     home: 'Strona główna',
     measurements: 'Pomiary',
     gasAnalyzerCheck: 'Sprawdzenie analizatora gazu',
+    gasAnalyzerCheckShort: 'Gaz',
     settings: 'Ustawienia',
     utilities: 'Pomocnicze',
     equipmentBase: 'Baza sprzętu',
@@ -86,7 +88,7 @@ export const pl = {
     utilities: 'Pomocnicze',
     measurementDuration: 'Czas trwania pomiaru',
     breakTime: 'Przerwa między pomiarami',
-    startingHour: 'Czas rozpoczęcia pierwszego pomiaru',
+    startingHour: 'Czas rozpoczęcia pomiarów',
   },
   fileSaving: {
     howToSave: 'Wybierz sposób zapisu pliku',
@@ -97,5 +99,25 @@ export const pl = {
     createANewFile: 'Utwórz nowy plik',
     fileSavedSuccessfully: 'Plik zapisany pomyślnie!',
     error: 'Wystąpił błąd podczas zapisu pliku, spróbuj ponownie.',
+  },
+  deleteButton: {
+    areYouSure: 'Czy na pewno chcesz usunąć wszystkie dane na tym ekranie?',
+    yes: 'Tak',
+    no: 'Nie',
+  },
+  helpModal: {
+    header: 'Pomoc',
+    loadExplanation:
+      'Załaduj dane - wczytuje dane z pliku CSV do aktualnego ekranu. Wgrywany plik musi znajdować się w folderze Downloads i być utworzony przez tę aplikację.',
+    deleteExplanation: 'Kosz - usuń dane zebrane w aktualnym ekranie.',
+    saveExplanation:
+      'Zapisz zmiany - zapisuje dane z aktualnego ekranu (nie ze wszystkich).',
+    helpExplanation: 'Pytajnik - wyświetla ten ekran.',
+    settingsExplanation: 'Ustawienia - dostosowanie języka aplikacji.',
+    measurementPreviousExplanation:
+      'Wstecz - załaduj poprzedni pomiar na ekranie.',
+    measurementSaveExplanation:
+      'Zapisz - zapisuje wprowadzone dane w pamięci aplikacji (nie tworzy pliku).',
+    measurementNextExplanation: 'Naprzód - załaduj następny pomiar na ekranie.',
   },
 };

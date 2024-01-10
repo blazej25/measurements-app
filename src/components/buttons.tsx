@@ -12,18 +12,25 @@ import {styles} from '../styles/common-styles';
 export const NavigationButton = ({
   navigation,
   destinationScreen,
+  destinationScreenShortLabelName,
 }: {
   navigation: any;
   destinationScreen: string;
+  destinationScreenShortLabelName?: string;
 }) => {
   const {t} = useTranslation();
+
+  // When the name of the screen is long we need to use a short label so that
+  // the navigation buttons fit at the bottom of the screen.
+  const labelName = destinationScreenShortLabelName
+    ? destinationScreenShortLabelName
+    : destinationScreen;
+
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate(destinationScreen)}
       style={styles.roundedButton1}>
-      <Text style={styles.buttonText1}>
-        {t(`userInterface:${destinationScreen}`)}
-      </Text>
+      <Text style={styles.buttonText1}>{t(`userInterface:${labelName}`)}</Text>
     </TouchableOpacity>
   );
 };

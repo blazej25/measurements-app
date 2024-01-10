@@ -24,8 +24,8 @@ import {
   styles,
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { FilePicker } from '../components/FilePicker';
-import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
 
 interface Measurement {
   id: number;
@@ -115,6 +115,11 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
   return (
     <View style={styles.mainContainer}>
+      <LoadDeleteSaveGroup
+        getSavedFileContents={() => 'test'}
+        onDelete = {() => {}}
+        fileContentsHandler={(contents: Object) => {}}
+      />
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -282,10 +287,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <SaveAndLoadGroup
-        getSavedFileContents={() => 'test'}
-        fileContentsHandler={(contents: Object) => {}}
-      />
+      <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
 };

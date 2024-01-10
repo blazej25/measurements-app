@@ -5,9 +5,11 @@ export const en = {
     flows: 'Flows',
     dust: 'Dust',
     H2O: 'H2O 14790',
+    H2OShort: 'H2O',
     home: 'Home',
     measurements: 'Measurements',
     gasAnalyzerCheck: 'Gas Analyzer Check',
+    gasAnalyzerCheckShort: 'Gas',
     utilities: 'Utilities',
     settings: 'Settings',
     equipmentBase: 'Equipment Base',
@@ -53,7 +55,7 @@ export const en = {
     initialVolume: 'Initial Volume',
     sampleId: 'Sample ID number',
     compoundType: 'Sample Type',
-    loadFromStorage: 'Load Data',
+    loadFromStorage: 'Load From File',
     saveChanges: 'Save Changes',
   },
   h20Screen: {
@@ -77,7 +79,7 @@ export const en = {
     staticPressure: 'Static Pressure',
     temperature: 'Temperature',
     angle: 'Angle',
-    axisNumber: 'Number of Axes',
+    axisNumber: 'Axis Number',
     pointOnAxis: 'Point on the Axis',
   },
   utilitiesScreen: {
@@ -95,5 +97,27 @@ export const en = {
     createANewFile: 'Create a new file',
     fileSavedSuccessfully: 'File saved successfully!',
     error: 'There was an error when saving the file, please try again.',
+  },
+  deleteButton: {
+    areYouSure: 'Are you sure you want to delete all data in this screen?',
+    yes: 'Yes',
+    no: 'No',
+  },
+  helpModal: {
+    header: 'Help',
+    loadExplanation:
+      'Load from file - loads CSV data into the current screen, the loaded file needs to be located in the Downloads directory and created by this app.',
+    deleteExplanation:
+      'Trash - delete all data collected in the current screen.',
+    saveExplanation:
+      'Save changes - saves all data present in the current screen.',
+    helpExplanation: 'Help - show this screen.',
+    settingsExplanation: 'Settings - change application language',
+    measurementPreviousExplanation:
+      'Previous - load the previous measurement present in the current screen.',
+    measurementSaveExplanation:
+      "Save - save the data entered in the current screen into app's memory (doesn't create a new file)",
+    measurementNextExplanation:
+      'Next - load the next measurement present in the current screen.',
   },
 };

@@ -4,7 +4,7 @@ import {ScrollView, Text, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
-import {defaultGap, styles} from '../styles/common-styles';
+import {colors, styles} from '../styles/common-styles';
 import {
   DateTimeSelectorGroup,
   NumberInputBar,
@@ -14,11 +14,11 @@ import {
 } from '../components/input-bars';
 import {
   CommonMeasurementData,
-  Person,
   PipeCrossSectionType,
   crossSectionTypeFrom,
 } from '../model';
-import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
   const empty_data: CommonMeasurementData = {
@@ -36,36 +36,21 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
 
   return (
     <View style={styles.mainContainer}>
+      <LoadDeleteSaveGroup
+        getSavedFileContents={() => 'test'}
+        onDelete={() => {}}
+        fileContentsHandler={(contents: Object) => {}}
+      />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
-        <LanguagePanel navigation={navigation} />
         <WelcomeHeader />
         <CommonDataInput data={measurementData} setter={setMeasurementData} />
         <UtilitiesNavigation navigation={navigation} />
       </ScrollView>
-      <SaveAndLoadGroup
-        getSavedFileContents={() => 'test'}
-        fileContentsHandler={(contents: Object) => {}}
-      />
+      <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
 };
 
-const LanguagePanel = ({navigation}: {navigation: any}) => {
-  return (
-    <View
-      style={{
-        alignItems: 'flex-end',
-        justifyContent: 'flex-start',
-        marginTop: 5,
-        marginRight: 5,
-      }}>
-      <NavigationButton
-        navigation={navigation}
-        destinationScreen={Screens.language}
-      />
-    </View>
-  );
-};
 
 const WelcomeHeader = () => {
   const {t} = useTranslation();
@@ -76,7 +61,7 @@ const WelcomeHeader = () => {
         alignItems: 'center',
         marginBottom: 15,
       }}>
-      <Text style={{fontSize: 22, fontWeight: 'bold', color: 'black'}}>
+      <Text style={{fontSize: 22, fontWeight: 'bold', color: colors.buttonBlue}}>
         {t('userInterface:welcome')}
       </Text>
     </View>

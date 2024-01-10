@@ -1,14 +1,5 @@
 import React, {useState} from 'react';
-import {
-  Button,
-  ScrollView,
-  StyleProp,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
-import {NavigationButton} from '../components/buttons';
+import {ScrollView, TouchableOpacity, View} from 'react-native';
 import {CommonDataSchema, Screens} from '../constants';
 import {
   DateTimeSelectorGroup,
@@ -17,16 +8,10 @@ import {
   StartEndBar,
 } from '../components/input-bars';
 import {useTranslation} from 'react-i18next';
-import {
-  colors,
-  defaultBorderRadius,
-  defaultGap,
-  defaultPadding,
-  styles,
-} from '../styles/common-styles';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {FilePicker} from '../components/FilePicker';
-import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
+import {styles} from '../styles/common-styles';
+import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
+import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
+import {ButtonIcon} from '../components/ButtonIcon';
 
 interface SingleMeasurement {
   startingHour: Date;
@@ -52,63 +37,66 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
 
   return (
     <View style={styles.mainContainer}>
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'flex-start',
-          gap: defaultGap,
-        }}>
-        <Text> {t('utilitiesScreen:utilities')} </Text>
-        <DateTimeSelectorGroup
-          date={date}
-          setDate={date => {
-            setDate(date);
+      <LoadDeleteSaveGroup
+        getSavedFileContents={() => ''}
+        onDelete={() => {}}
+        fileContentsHandler={() => {}}
+      />
+      <DateTimeSelectorGroup
+        date={date}
+        setDate={date => {
+          setDate(date);
+        }}
+        dateLabel={t(`commonDataForm:${CommonDataSchema.date}`) + ':'}
+        timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
+      />
+      <NumberInputBar
+        placeholder="60"
+        valueUnit="min"
+        value={measurementDuration.toString()}
+        onChangeText={text => {
+          text == ''
+            ? setMeasurementDuration(0)
+            : setMeasurementDuration(parseInt(text));
+        }}
+        label={t('utilitiesScreen:measurementDuration') + ':'}
+      />
+      <NumberInputBar
+        placeholder="15"
+        valueUnit="min"
+        value={breakTime.toString()}
+        onChangeText={text => {
+          text == '' ? setBreakTime(0) : setBreakTime(parseInt(text));
+        }}
+        label={t('utilitiesScreen:breakTime') + ':'}
+      />
+      <TimeSelector
+        timeLabel={t('utilitiesScreen:startingHour') + ':'}
+        date={startingHour}
+        setDate={date => {
+          setStartingHour(date);
+          /* If the user changes the starting hour, then we need to flush the list of measurement logs
+           * because the new starting time makes all of the current measurement logs incorrect.
+           * In case of other setters (break time, measurement duration), we don't flush the list
+           * as those settings could have changed throu
+           */
+          setTimes([]);
+        }}
+      />
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <TouchableOpacity
+          onPress={() => {
+            if (times.length !== 0) {
+              // We need to use slice as mutating state constants in react is discouraged.
+              // The reason we do this is that if we just mutate the state, the react
+              // library has no idea that the object has changed and therefore
+              // no rerender of the ui will get triggered and the screen won't update.
+              setTimes(times.slice(0, times.length - 1));
+            }
           }}
-          dateLabel={t(`commonDataForm:${CommonDataSchema.date}`) + ':'}
-          timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
-        />
-        <NumberInputBar
-          placeholder="60"
-          valueUnit="min"
-          value={measurementDuration.toString()}
-          onChangeText={text => {
-            text == ''
-              ? setMeasurementDuration(0)
-              : setMeasurementDuration(parseInt(text));
-          }}
-          label={t('utilitiesScreen:measurementDuration') + ':'}
-        />
-        <NumberInputBar
-          placeholder="15"
-          valueUnit="min"
-          value={breakTime.toString()}
-          onChangeText={text => {
-            text == '' ? setBreakTime(0) : setBreakTime(parseInt(text));
-          }}
-          label={t('utilitiesScreen:breakTime') + ':'}
-        />
-        <TimeSelector
-          timeLabel={t('utilitiesScreen:startingHour') + ':'}
-          date={startingHour}
-          setDate={date => {
-            setStartingHour(date);
-            /* If the user changes the starting hour, then we need to flush the list of measurement logs
-             * because the new starting time makes all of the current measurement logs incorrect.
-             * In case of other setters (break time, measurement duration), we don't flush the list
-             * as those settings could have changed throu
-             */
-            setTimes([]);
-          }}
-        />
-        {times.map((x: SingleMeasurement) => {
-          return (
-            <StartEndBar
-              key={x.key}
-              start={x.startingHour}
-              end={x.endingHour}
-            />
-          );
-        })}
+          style={styles.secondaryNavigationButton}>
+          <ButtonIcon materialIconName="minus" />
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             var newTimes = times;
@@ -134,47 +122,27 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
             }
             setTimes(newTimes);
           }}
-          style={buttonStyle}>
+          style={styles.secondaryNavigationButton}>
           <ButtonIcon materialIconName="plus" />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            if (times.length !== 0) {
-              // We need to use slice as mutating state constants in react is discouraged.
-              // The reason we do this is that if we just mutate the state, the react
-              // library has no idea that the object has changed and therefore
-              // no rerender of the ui will get triggered and the screen won't update.
-              setTimes(times.slice(0, times.length - 1));
-            }
-          }}
-          style={buttonStyle}>
-          <ButtonIcon materialIconName="minus" />
-        </TouchableOpacity>
+      </View>
+      <ScrollView
+        contentContainerStyle={{
+          ...styles.defaultScrollView,
+          margin: 5,
+          marginHorizontal: 35,
+        }}>
+        {times.map((x: SingleMeasurement) => {
+          return (
+            <StartEndBar
+              key={x.key}
+              start={x.startingHour}
+              end={x.endingHour}
+            />
+          );
+        })}
       </ScrollView>
-      <SaveAndLoadGroup
-        getSavedFileContents={() => 'test'}
-        fileContentsHandler={(contents: Object) => {}}
-      />
+      <HelpAndSettingsGroup navigation={navigation} />
     </View>
-  );
-};
-
-const buttonStyle: StyleProp<ViewStyle> = {
-  borderRadius: defaultBorderRadius,
-  flexDirection: 'row',
-  margin: defaultGap,
-  paddingHorizontal: defaultPadding,
-  backgroundColor: colors.buttonBlue,
-  height: 40,
-};
-
-const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
-  return (
-    <Icon
-      name={materialIconName}
-      style={{marginTop: 10}}
-      size={20}
-      color={colors.buttonBlue}
-    />
   );
 };
