@@ -100,4 +100,9 @@ export const pl = {
     fileSavedSuccessfully: 'Plik zapisany pomyślnie!',
     error: 'Wystąpił błąd podczas zapisu pliku, spróbuj ponownie.',
   },
+  deleteButton: {
+    areYouSure: 'Czy na pewno chcesz usunąć wszystkie dane na tym ekranie?',
+    yes: 'Tak',
+    no: 'Nie',
+  },
 };

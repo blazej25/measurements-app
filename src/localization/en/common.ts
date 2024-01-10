@@ -98,4 +98,9 @@ export const en = {
     fileSavedSuccessfully: 'File saved successfully!',
     error: 'There was an error when saving the file, please try again.',
   },
+  deleteButton: {
+    areYouSure: 'Are you sure you want to delete all data in this screen?',
+    yes: 'Yes',
+    no: 'No',
+  },
 };
