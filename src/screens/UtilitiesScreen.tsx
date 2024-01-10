@@ -1,14 +1,11 @@
 import React, {useState} from 'react';
 import {
-  Button,
   ScrollView,
   StyleProp,
-  Text,
   TouchableOpacity,
   View,
   ViewStyle,
 } from 'react-native';
-import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
 import {
   DateTimeSelectorGroup,
@@ -25,8 +22,9 @@ import {
   styles,
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {FilePicker} from '../components/FilePicker';
-import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
+import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
+import { ButtonIcon } from '../components/ButtonIcon';
 
 interface SingleMeasurement {
   startingHour: Date;
@@ -52,13 +50,12 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
 
   return (
     <View style={styles.mainContainer}>
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'flex-start',
-          gap: defaultGap,
-        }}>
-        <Text> {t('utilitiesScreen:utilities')} </Text>
+      <LoadDeleteSaveGroup
+        getSavedFileContents={() => ''}
+        onDelete={() => {}}
+        fileContentsHandler={() => {}}
+      />
+      <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DateTimeSelectorGroup
           date={date}
           setDate={date => {
@@ -109,73 +106,54 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
             />
           );
         })}
-        <TouchableOpacity
-          onPress={() => {
-            var newTimes = times;
-            if (times.length == 0) {
-              const firstTime: SingleMeasurement = {
-                startingHour: startingHour,
-                endingHour: toNewTime(startingHour, measurementDuration),
-                key: 0,
-              };
-              newTimes = [firstTime];
-            } else {
-              const mostRecent = times[times.length - 1];
-              const newStartTime = toNewTime(mostRecent.endingHour, breakTime);
-              const newEndTime = toNewTime(newStartTime, measurementDuration);
-              const newKey = mostRecent.key + 1;
-              newTimes = times.concat([
-                {
-                  startingHour: newStartTime,
-                  endingHour: newEndTime,
-                  key: newKey,
-                },
-              ]);
-            }
-            setTimes(newTimes);
-          }}
-          style={buttonStyle}>
-          <ButtonIcon materialIconName="plus" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            if (times.length !== 0) {
-              // We need to use slice as mutating state constants in react is discouraged.
-              // The reason we do this is that if we just mutate the state, the react
-              // library has no idea that the object has changed and therefore
-              // no rerender of the ui will get triggered and the screen won't update.
-              setTimes(times.slice(0, times.length - 1));
-            }
-          }}
-          style={buttonStyle}>
-          <ButtonIcon materialIconName="minus" />
-        </TouchableOpacity>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <TouchableOpacity
+            onPress={() => {
+              var newTimes = times;
+              if (times.length == 0) {
+                const firstTime: SingleMeasurement = {
+                  startingHour: startingHour,
+                  endingHour: toNewTime(startingHour, measurementDuration),
+                  key: 0,
+                };
+                newTimes = [firstTime];
+              } else {
+                const mostRecent = times[times.length - 1];
+                const newStartTime = toNewTime(
+                  mostRecent.endingHour,
+                  breakTime,
+                );
+                const newEndTime = toNewTime(newStartTime, measurementDuration);
+                const newKey = mostRecent.key + 1;
+                newTimes = times.concat([
+                  {
+                    startingHour: newStartTime,
+                    endingHour: newEndTime,
+                    key: newKey,
+                  },
+                ]);
+              }
+              setTimes(newTimes);
+            }}
+            style={styles.secondaryNavigationButton}>
+            <ButtonIcon materialIconName="plus" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              if (times.length !== 0) {
+                // We need to use slice as mutating state constants in react is discouraged.
+                // The reason we do this is that if we just mutate the state, the react
+                // library has no idea that the object has changed and therefore
+                // no rerender of the ui will get triggered and the screen won't update.
+                setTimes(times.slice(0, times.length - 1));
+              }
+            }}
+            style={styles.secondaryNavigationButton}>
+            <ButtonIcon materialIconName="minus" />
+          </TouchableOpacity>
+        </View>
       </ScrollView>
-      <LoadDeleteSaveGroup
-        getSavedFileContents={() => 'test'}
-        onDelete={() => {}}
-        fileContentsHandler={(contents: Object) => {}}
-      />
+      <HelpAndSettingsGroup navigation={navigation} />
     </View>
-  );
-};
-
-const buttonStyle: StyleProp<ViewStyle> = {
-  borderRadius: defaultBorderRadius,
-  flexDirection: 'row',
-  margin: defaultGap,
-  paddingHorizontal: defaultPadding,
-  backgroundColor: colors.buttonBlue,
-  height: 40,
-};
-
-const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
-  return (
-    <Icon
-      name={materialIconName}
-      style={{marginTop: 10}}
-      size={20}
-      color={colors.buttonBlue}
-    />
   );
 };
