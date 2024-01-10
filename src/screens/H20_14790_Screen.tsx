@@ -24,8 +24,9 @@ import {
   styles,
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
-import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
+import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
+import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
+import {ButtonIcon} from '../components/ButtonIcon';
 
 interface Measurement {
   id: number;
@@ -37,17 +38,6 @@ interface Measurement {
   aspiratedGases: string;
 }
 
-const ButtonIcon = ({materialIconName}: {materialIconName: string}) => {
-  return (
-    <Icon
-      name={materialIconName}
-      style={{marginTop: 10}}
-      size={20}
-      color={colors.buttonBlue}
-    />
-  );
-};
-
 export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   const [measurements, setMeasurements]: [
     measurements: Measurement[],
@@ -57,8 +47,8 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   const initialState: Measurement = {
     id: 0,
     date: new Date(),
-    afterMass: ['', '', ''],
     initialMass: ['', '', ''],
+    afterMass: ['', '', ''],
     leakTightnessTest: '',
     aspiratorFlow: '',
     aspiratedGases: '',
@@ -66,36 +56,14 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
   const [dataIndex, setDataIndex] = useState(0);
   const [scrubberIndex, setScrubberIndex] = useState(0);
-  const [currentMeasurement, setCurrentMeasurement] =
-    useState(initialState);
-
-  const loadMeasurement = (measurement: Measurement) => {
-    setCurrentMeasurement(measurement);
-  };
-
-  const storeCurrentValuesAsMeasurement = () => {
-    const newMeasurement: Measurement = {
-      id: currentMeasurement.id,
-      date: currentMeasurement.date,
-      afterMass: currentMeasurement.afterMass,
-      initialMass: currentMeasurement.initialMass,
-      leakTightnessTest: currentMeasurement.leakTightnessTest,
-      aspiratorFlow: currentMeasurement.aspiratorFlow,
-      aspiratedGases: currentMeasurement.aspiratedGases,
-    };
-    return newMeasurement;
-  };
-
-  // Function for erasing the current input values
-  const eraseCurrentValues = () => {
-    setCurrentMeasurement(initialState);
-  };
+  const [currentMeasurement, setCurrentMeasurement] = useState(initialState);
 
   // Derived state used for displaying the curren scrubber masses.
   const afterMassDisplayValue = useMemo(
     () => currentMeasurement.afterMass[scrubberIndex],
     [currentMeasurement, scrubberIndex],
   );
+
   // useMemo makes a derived state out of some other state. In the case below the derived state
   // is the currently showing mass value depending on the number of the 'płuczka' that is currently showing.
   // syntax of use memo: useMemo(() => <expression-for-the-derived-state>, [state arguments from which the target state is derived]);
@@ -104,65 +72,92 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     [currentMeasurement, scrubberIndex],
   );
 
-  const measurementNavigationButtonStyle: StyleProp<ViewStyle> = {
-    borderRadius: defaultBorderRadius,
-    flexDirection: 'row',
-    margin: defaultGap,
-    paddingHorizontal: defaultPadding,
-    backgroundColor: 'white',
-    height: 40,
+  const updateField = (field: Partial<Measurement>) => {
+    setCurrentMeasurement({...currentMeasurement, ...field});
   };
 
+  /* State transitions for the navigation button component */
+
+  const setPreviousMeasurement = () => {
+    if (dataIndex == 0) {
+      return;
+    }
+    setCurrentMeasurement(measurements[dataIndex - 1]);
+    setDataIndex(dataIndex - 1);
+  };
+
+  const saveCurrentMeasurement = () => {
+    setMeasurements(measurements.concat({...currentMeasurement}));
+    setDataIndex(dataIndex + 1);
+    setCurrentMeasurement(initialState);
+    setScrubberIndex(0);
+  };
+
+  const saveModifiedMeasurement = () => {
+    // Update the currently selected measurement with the new values.
+    const newMeasurements = measurements.map(measurement => {
+      return measurement.id == dataIndex
+        ? {...currentMeasurement}
+        : measurement;
+    });
+    setMeasurements(newMeasurements);
+  };
+
+  const setNextMeasurement = () => {
+    // Here if the dataIndex is within the measurements array, it means
+    // that we are viewing an already-saved measurement and so we want
+    // to load that measurement. Otherwise, if dataIndex
+    // is equal to measurements.length, it means that we are adding a
+    // new measurement and so no measurement exists that can be loaded.
+    if (dataIndex < measurements.length - 1) {
+      setCurrentMeasurement(measurements[dataIndex + 1]);
+    }
+
+    if (dataIndex < measurements.length) {
+      setDataIndex(dataIndex + 1);
+    }
+    // We erase the current values only if the user transitions from viewing the
+    // last saved measurement to adding the new one.
+    if (dataIndex + 1 == measurements.length) {
+      setCurrentMeasurement(initialState);
+    }
+  };
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         getSavedFileContents={() => 'test'}
-        onDelete = {() => {}}
+        onDelete={() => {}}
         fileContentsHandler={(contents: Object) => {}}
       />
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'flex-start',
-          gap: defaultGap,
-        }}>
+      <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar label={t('h20Screen:measurementNumber') + ':'}>
           <Text style={styles.dataSelectorText}>{dataIndex + 1}</Text>
         </DataBar>
         <TimeSelector
           timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
           date={currentMeasurement.date}
-          setDate={date => {
-            setCurrentMeasurement({...currentMeasurement, date: date});
-          }}
+          setDate={date => updateField({date: date})}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="l"
           // Value parameter controlls what is displayed in the component
           value={currentMeasurement.leakTightnessTest}
-          onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, leakTightnessTest: text});
-          }}
-        label={t('h20Screen:leakTightnessTest') + ':'}
+          onChangeText={text => updateField({leakTightnessTest: text})}
+          label={t('h20Screen:leakTightnessTest') + ':'}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="m3/h"
           value={currentMeasurement.aspiratorFlow}
-          onChangeText={(text) => {
-            setCurrentMeasurement({...currentMeasurement, aspiratorFlow: text});
-          }}
-          // TODO
+          onChangeText={text => updateField({aspiratorFlow: text})}
           label={t('h20Screen:aspiratorFlow') + ':'}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="m3"
           value={currentMeasurement.aspiratedGases}
-          onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, aspiratedGases : text})
-         }}
+          onChangeText={text => updateField({aspiratedGases: text})}
           label={t('h20Screen:aspiratedVolume') + ':'}
         />
         <SelectorBar
@@ -179,11 +174,10 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           placeholder="0"
           valueUnit="g"
           onChangeText={text => {
-            const newInitialMass =
-              currentMeasurement.initialMass.map((mass, index) =>
-                index == scrubberIndex ? text : mass,
-              );
-            setCurrentMeasurement({...currentMeasurement, initialMass: newInitialMass});
+            const newInitialMass = currentMeasurement.initialMass.map(
+              (mass, index) => (index == scrubberIndex ? text : mass),
+            );
+            updateField({initialMass: newInitialMass});
           }}
           value={initialMassShowingValue}
           label={t('h20Screen:initialMass') + ':'}
@@ -193,33 +187,17 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           valueUnit="g"
           value={afterMassDisplayValue}
           onChangeText={text => {
-            let newAfterMass =
-              currentMeasurement.afterMass.map((mass, index) =>
-                index == scrubberIndex ? text : mass,
-              );
-            setCurrentMeasurement({...currentMeasurement, afterMass: newAfterMass});
+            const newAfterMass = currentMeasurement.afterMass.map(
+              (mass, index) => (index == scrubberIndex ? text : mass),
+            );
+            updateField({afterMass: newAfterMass});
           }}
           label={t('h20Screen:massAfterMeasurement') + ':'}
         />
-        <View
-          // This is the main button component
-          style={{
-            borderRadius: largeBorderRadius,
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            backgroundColor: colors.secondaryBlue,
-            padding: defaultPadding,
-            alignSelf: 'center',
-            gap: defaultGap,
-          }}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={measurementNavigationButtonStyle}
-            onPress={() => {
-              if (dataIndex > 0) {
-                loadMeasurement(measurements[dataIndex - 1]);
-                setDataIndex(dataIndex - 1);
-              }
-            }}>
+            style={styles.navigationButton}
+            onPress={setPreviousMeasurement}>
             <ButtonIcon materialIconName="arrow-left-circle" />
           </TouchableOpacity>
           {
@@ -231,58 +209,21 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
             // previously captured measurement.
             dataIndex == measurements.length ? (
               <TouchableOpacity
-                style={measurementNavigationButtonStyle}
-                onPress={
-                  // Here save the current state as the new saved measurement.
-                  () => {
-                    setMeasurements(
-                      measurements.concat(storeCurrentValuesAsMeasurement()),
-                    );
-                    setDataIndex(dataIndex + 1);
-                    eraseCurrentValues();
-                    // Restore the 'numer płuczki' to 1.
-                    setScrubberIndex(0);
-                  }
-                }>
+                style={styles.navigationButton}
+                onPress={saveCurrentMeasurement}>
                 <ButtonIcon materialIconName="plus" />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
-                style={measurementNavigationButtonStyle}
-                onPress={() => {
-                  // Update the currently selected measurement with the new values.
-                  const newMeasurements = measurements.map(measurement => {
-                    return measurement.id == dataIndex
-                      ? storeCurrentValuesAsMeasurement()
-                      : measurement;
-                  });
-                  setMeasurements(newMeasurements);
-                }}>
+                style={styles.navigationButton}
+                onPress={saveModifiedMeasurement}>
                 <ButtonIcon materialIconName="content-save" />
               </TouchableOpacity>
             )
           }
           <TouchableOpacity
-            style={measurementNavigationButtonStyle}
-            onPress={() => {
-              // Here if the dataIndex is within the measurements array, it means
-              // that we are viewing an already-saved measurement and so we want
-              // to load that measurement. Otherwise, if dataIndex
-              // is equal to measurements.length, it means that we are adding a
-              // new measurement and so no measurement exists that can be loaded.
-              if (dataIndex < measurements.length - 1) {
-                loadMeasurement(measurements[dataIndex + 1]);
-              }
-
-              if (dataIndex < measurements.length) {
-                setDataIndex(dataIndex + 1);
-              }
-              // We erase the current values only if the user transitions from viewing the
-              // last saved measurement to adding the new one.
-              if (dataIndex + 1 == measurements.length) {
-                eraseCurrentValues();
-              }
-            }}>
+            style={styles.navigationButton}
+            onPress={setNextMeasurement}>
             <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
         </View>
