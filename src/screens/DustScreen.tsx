@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { DustMeasurementDataSchema } from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
 
 interface DustMeasurementData {
   selectedEndDiameter: string;
@@ -78,6 +79,7 @@ export const DustScreen = ({ navigation }: { navigation: any }) => {
         numberOfMeasurements={numberOfMeasurements}
       />
       </ScrollView>
+      <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
 };

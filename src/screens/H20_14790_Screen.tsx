@@ -25,6 +25,7 @@ import {
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
 
 interface Measurement {
   id: number;
@@ -286,6 +287,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
 };

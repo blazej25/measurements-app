@@ -13,6 +13,7 @@ import FileSystemService from '../services/FileSystemService';
 import {ButtonIcon} from '../components/ButtonIcon';
 import {jsonToCSV, readString} from 'react-native-csv';
 import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
 
 interface AspirationMeasurement {
   id: number;
@@ -422,6 +423,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
 };

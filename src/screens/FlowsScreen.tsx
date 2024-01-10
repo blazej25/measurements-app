@@ -4,6 +4,7 @@ import { NumberInputBar, SelectorBar } from '../components/input-bars';
 import { defaultGap, styles } from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
 import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
 
 
 interface SingleFlowMeasurement {
@@ -322,6 +323,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           }
         />
       </ScrollView>
+      <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
 };
