@@ -9,12 +9,14 @@
 
 # Tasklist
 
+## Future Features
+- [ ] Add proper duration selector to replace number inputs in the UtilitiesScreen
+
 ## To Do
 
 - [ ] Requirements analysis for the GasAnalyzerCheckScreen
   - need to input loads of data column-wise per compound
   - the equipment should be loaded from the eqipment base (low priority feature)
-- [ ] Add proper duration selector to replace number inputs in the UtilitiesScreen
 - [ ] investigate number inputs being weird with 0s
 - [ ] fix utilities screen
 - [ ] adapt csv functionality for other screens
