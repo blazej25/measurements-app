@@ -63,7 +63,9 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
   const [dataIndex, setDataIndex] = useState(0);
   const [scrubberIndex, setScrubberIndex] = useState(0);
-  const [currentMeasurement, setCurrentMeasurement] = useState({...initialState});
+  const [currentMeasurement, setCurrentMeasurement] = useState({
+    ...initialState,
+  });
 
   // Derived state used for displaying the curren scrubber masses.
   const afterMassDisplayValue = useMemo(
@@ -93,11 +95,11 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     setDataIndex(dataIndex - 1);
   };
 
-  const saveCurrentMeasurement = () => {
+  const addNewMeasurement = () => {
     const newMeasurements = measurements.concat({...currentMeasurement});
     setMeasurements(newMeasurements);
     setDataIndex(dataIndex + 1);
-    setCurrentMeasurement({...initialState, id: newMeasurements.length});
+    setCurrentMeasurement({...initialState, id: currentMeasurement.id + 1});
     setScrubberIndex(0);
 
     // The modifications are saved to the internal storage.
@@ -129,17 +131,19 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     // to load that measurement. Otherwise, if dataIndex
     // is equal to measurements.length, it means that we are adding a
     // new measurement and so no measurement exists that can be loaded.
+    console.log(currentMeasurement);
     if (dataIndex < measurements.length - 1) {
       setCurrentMeasurement(measurements[dataIndex + 1]);
     }
 
-    if (dataIndex < measurements.length) {
-      setDataIndex(dataIndex + 1);
-    }
     // We erase the current values only if the user transitions from viewing the
     // last saved measurement to adding the new one.
-    if (dataIndex + 1 == measurements.length) {
-      setCurrentMeasurement({...initialState});
+    if (dataIndex == measurements.length - 1) {
+      setCurrentMeasurement({...initialState, id: measurements.length});
+    }
+
+    if (dataIndex < measurements.length) {
+      setDataIndex(dataIndex + 1);
     }
   };
 
@@ -209,7 +213,25 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     console.log(JSON.stringify(csvRows, null, 2));
     const newMeasurements: Measurement[] = [];
     for (const row of csvRows) {
-
+      const initialMass = [
+        row['Masa początkowa płuczka 1'],
+        row['Masa początkowa płuczka 2'],
+        row['Masa początkowa płuczka 3'],
+      ];
+      const afterMass = [
+        row['Masa końcowa płuczka 1'],
+        row['Masa końcowa płuczka 2'],
+        row['Masa końcowa płuczka 3'],
+      ];
+      newMeasurements.push({
+        id: parseInt(row['Numer pomiaru']) - 1,
+        date: new Date(row['Godzina przyjazdu']),
+        afterMass: afterMass,
+        initialMass: initialMass,
+        leakTightnessTest: row['Próba szczelności'],
+        aspiratorFlow: row['Przepływ przez aspirator'],
+        aspiratedGases: row['Objętość zaaspirowana'],
+      });
     }
     setMeasurements([...newMeasurements]);
     setDataIndex(0);
@@ -308,7 +330,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
             dataIndex == measurements.length ? (
               <TouchableOpacity
                 style={styles.navigationButton}
-                onPress={saveCurrentMeasurement}>
+                onPress={addNewMeasurement}>
                 <ButtonIcon materialIconName="plus" />
               </TouchableOpacity>
             ) : (

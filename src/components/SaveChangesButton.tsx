@@ -71,6 +71,7 @@ const OverwriteExistingFileButton = ({
     <TouchableOpacity
       style={styles.actionButton}
       onPress={() => {
+        setModalVisible(false);
         DocumentPicker.pickSingle({mode: 'import', copyTo: 'documentDirectory'})
           .then((response: any) => {
             console.log(response);
@@ -81,7 +82,6 @@ const OverwriteExistingFileButton = ({
               t('fileSaving:fileSavedSuccessfully'),
               t('fileSaving:error'),
             );
-            setModalVisible(false);
           })
           .catch((error: any) => {
             console.log(error);
