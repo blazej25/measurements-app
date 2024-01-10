@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import {
   NumberInputBar,
   SelectorBar,
@@ -8,16 +8,12 @@ import {
 } from '../components/input-bars';
 import {
   colors,
-  defaultBorderRadius,
-  defaultGap,
-  defaultPadding,
   styles,
 } from '../styles/common-styles';
 import { useTranslation } from 'react-i18next';
 import { DustMeasurementDataSchema } from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { FilePicker } from '../components/FilePicker';
-import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
 
 interface DustMeasurementData {
   selectedEndDiameter: string;
@@ -55,6 +51,11 @@ export const DustScreen = ({ navigation }: { navigation: any }) => {
 
   return (
     <View style={styles.mainContainer}>
+      <LoadDeleteSaveGroup
+        getSavedFileContents={() => 'test'}
+        onDelete={() => {}}
+        fileContentsHandler={(contents: Object) => {}}
+      />
       <ScrollView
         contentContainerStyle={styles.defaultScrollView}>
       <NumberInputBar
@@ -77,10 +78,6 @@ export const DustScreen = ({ navigation }: { navigation: any }) => {
         numberOfMeasurements={numberOfMeasurements}
       />
       </ScrollView>
-      <SaveAndLoadGroup
-        getSavedFileContents={() => 'test'}
-        fileContentsHandler={(contents: Object) => {}}
-      />
     </View>
   );
 };

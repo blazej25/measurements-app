@@ -44,6 +44,16 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     height: 40,
   },
+  secondaryNavigationButton: {
+    borderRadius: defaultBorderRadius,
+    flexDirection: 'row',
+    margin: defaultGap,
+    paddingHorizontal: defaultPadding,
+    alignItems: 'center',
+    height: 40,
+    alignSelf: 'center',
+    backgroundColor: colors.secondaryBlue,
+  },
   actionButton: {
     flexDirection: 'row',
     backgroundColor: colors.secondaryBlue,
@@ -60,7 +70,6 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     alignSelf: 'center',
     margin: defaultGap,
-    marginLeft: defaultPadding,
     color: colors.buttonBlue,
   },
   uiPromptText: {

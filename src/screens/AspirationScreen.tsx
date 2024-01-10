@@ -11,8 +11,8 @@ import {styles} from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
 import {ButtonIcon} from '../components/ButtonIcon';
-import {SaveAndLoadGroup} from '../components/SaveAndLoadGroup';
 import {jsonToCSV, readString} from 'react-native-csv';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
 
 interface AspirationMeasurement {
   id: number;
@@ -296,6 +296,15 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   };
   return (
     <View style={styles.mainContainer}>
+      <LoadDeleteSaveGroup
+        getSavedFileContents={() => exportMeasurementsAsCSV()}
+        onDelete={() => {
+            setMeasurements([{...emptyMeasurement}]);
+            setDataIndex(0);
+            setCurrentCompoundData({...initialState});
+          }}
+        fileContentsHandler={restoreStateFromCSV}
+      />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar
           label={
@@ -412,21 +421,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
             <ButtonIcon materialIconName="arrow-right-circle" />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
-        // TODO: figure out how to handle deletion of everything properly.
-          style={{...styles.navigationButton, alignSelf: 'center'}}
-          onPress={() => {
-            setMeasurements([{...emptyMeasurement}]);
-            setDataIndex(0);
-            setCurrentCompoundData({...initialState});
-          }}>
-          <ButtonIcon materialIconName="delete" />
-        </TouchableOpacity>
       </ScrollView>
-      <SaveAndLoadGroup
-        getSavedFileContents={() => exportMeasurementsAsCSV()}
-        fileContentsHandler={restoreStateFromCSV}
-      />
     </View>
   );
 };

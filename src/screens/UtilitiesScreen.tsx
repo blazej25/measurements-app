@@ -26,7 +26,7 @@ import {
 } from '../styles/common-styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FilePicker} from '../components/FilePicker';
-import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
 
 interface SingleMeasurement {
   startingHour: Date;
@@ -151,8 +151,9 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
           <ButtonIcon materialIconName="minus" />
         </TouchableOpacity>
       </ScrollView>
-      <SaveAndLoadGroup
+      <LoadDeleteSaveGroup
         getSavedFileContents={() => 'test'}
+        onDelete={() => {}}
         fileContentsHandler={(contents: Object) => {}}
       />
     </View>

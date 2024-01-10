@@ -32,15 +32,21 @@ export const MenuBar = () => {
       />
       <NavigationButton
         navigation={navigation}
-        destinationScreen={Screens.aspiration}
-      />
-      <NavigationButton
-        navigation={navigation}
         destinationScreen={Screens.H2O}
+        destinationScreenShortLabelName="H2OShort"
       />
       <NavigationButton
         navigation={navigation}
         destinationScreen={Screens.dust}
+      />
+      <NavigationButton
+        navigation={navigation}
+        destinationScreen={Screens.gasAnalyzerCheck}
+        destinationScreenShortLabelName="gasAnalyzerCheckShort"
+      />
+      <NavigationButton
+        navigation={navigation}
+        destinationScreen={Screens.aspiration}
       />
     </View>
   );

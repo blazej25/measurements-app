@@ -1,13 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { Button, ScrollView, Text, View } from 'react-native';
-import { NavigationButton } from '../components/buttons';
-import { Screens } from '../constants';
-import { TextInput } from 'react-native';
 import { NumberInputBar, SelectorBar } from '../components/input-bars';
 import { defaultGap, styles } from '../styles/common-styles';
 import {useTranslation} from 'react-i18next';
-import { FilePicker } from '../components/FilePicker';
-import { SaveAndLoadGroup } from '../components/SaveAndLoadGroup';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
 
 
 interface SingleFlowMeasurement {
@@ -77,6 +73,11 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
 
   return (
     <View style={styles.mainContainer}>
+      <LoadDeleteSaveGroup
+        getSavedFileContents={() => 'test'}
+        onDelete={() => {}}
+        fileContentsHandler={(contents: Object) => {}}
+      />
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -321,10 +322,6 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           }
         />
       </ScrollView>
-      <SaveAndLoadGroup
-        getSavedFileContents={() => 'test'}
-        fileContentsHandler={(contents: Object) => {}}
-      />
     </View>
   );
 };
