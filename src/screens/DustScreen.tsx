@@ -1,4 +1,10 @@
-import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {
   NumberInputBar,
@@ -13,8 +19,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import {ButtonIcon} from '../components/ButtonIcon';
+import FileSystemService from '../services/FileSystemService';
 
-interface DustMeasurementData {
+interface DustMeasurement {
   id: number;
   selectedEndDiameter: string;
   measurementStartTime: Date;
@@ -24,7 +31,7 @@ interface DustMeasurementData {
   water: string;
 }
 
-const initialData: DustMeasurementData = {
+const initialData: DustMeasurement = {
   id: 0,
   selectedEndDiameter: '',
   measurementStartTime: new Date(),
@@ -34,8 +41,11 @@ const initialData: DustMeasurementData = {
   water: '',
 };
 
+const INTERNAL_STORAGE_FILE_NAME = 'dust.txt';
+
 export const DustScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
+  const fileSystemService = new FileSystemService();
 
   /* State variables */
 
@@ -59,7 +69,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   );
 
   /* Logic for UI state transitions */
-  const updateField = (field: Partial<DustMeasurementData>) => {
+  const updateField = (field: Partial<DustMeasurement>) => {
     setCurrentMeasurement({...currentMeasurement, ...field});
   };
 
@@ -69,19 +79,30 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     if (newMeasurements.length == numberOfMeasurements) {
       // Don't allow adding measurements past the specified number
       setSavedMeasurements(newMeasurements);
+      persistStateInInternalStorage(newMeasurements);
       return;
     }
 
     const newMeasurement = {...initialData, id: currentMeasurement.id + 1};
-    setSavedMeasurements(newMeasurements.concat([newMeasurement]));
+    newMeasurements = newMeasurements.concat([newMeasurement]);
+    setSavedMeasurements(newMeasurements);
+    persistStateInInternalStorage(newMeasurements);
     setMeasurementIndex(measurementIndex + 1);
     setCurrentMeasurement(newMeasurement);
   };
 
   const saveModifications = () => {
-    let newSavedMesurements = [...savedMeasurements];
-    newSavedMesurements[measurementIndex] = {...currentMeasurement};
-    setSavedMeasurements(newSavedMesurements);
+    let newMeasurements = [...savedMeasurements];
+    newMeasurements[measurementIndex] = {...currentMeasurement};
+    setSavedMeasurements(newMeasurements);
+    persistStateInInternalStorage(newMeasurements);
+  };
+
+  const persistStateInInternalStorage = (state: DustMeasurement[]) => {
+    fileSystemService.saveObjectToInternalStorage(
+      state,
+      INTERNAL_STORAGE_FILE_NAME,
+    );
   };
 
   const showingLastMeasurement = () =>
@@ -95,6 +116,37 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     setMeasurementIndex(0);
     setNumberOfMeasurements(1);
   };
+
+  /* Logic for persisting state in the internal storage. */
+  // See H20_14790_Screen for comments on how this works.
+  const loadMeasurements = () => {
+    fileSystemService
+      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .then(loadedMeasurements => {
+        restoreStateFrom(loadedMeasurements);
+      });
+  };
+
+  const restoreStateFrom = (loadedMeasurements: Object) => {
+    var measurements = loadedMeasurements as DustMeasurement[];
+    measurements = parseDates(measurements);
+    const lastMeasurementIndex = measurements.length - 1;
+    setMeasurementIndex(lastMeasurementIndex);
+    setSavedMeasurements(measurements);
+    setNumberOfMeasurements(measurements.length);
+    setCurrentMeasurement(measurements[lastMeasurementIndex]);
+  };
+
+  const parseDates = (measurements: DustMeasurement[]) => {
+    for (var measurement of [...measurements]) {
+      measurement.measurementStartTime = new Date(
+        measurement.measurementStartTime,
+      );
+    }
+    return measurements;
+  };
+
+  useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
@@ -180,8 +232,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
               style={{...styles.actionButton, justifyContent: 'center'}}
               onPress={addNewMeasurement}>
               <Text style={styles.actionButtonText}>
-              {t(`dustScreen:addMeasurement`)}
-
+                {t(`dustScreen:addMeasurement`)}
               </Text>
               <ButtonIcon materialIconName={'plus'} />
             </TouchableOpacity>
@@ -189,7 +240,9 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
             <TouchableOpacity
               style={{...styles.actionButton, justifyContent: 'center'}}
               onPress={saveModifications}>
-              <Text style={styles.actionButtonText}> Zapisz pomiar </Text>
+              <Text style={styles.actionButtonText}>
+                {t(`dustScreen:saveMeasurement`)}
+              </Text>
               <ButtonIcon materialIconName={'content-save-edit'} />
             </TouchableOpacity>
           )}
