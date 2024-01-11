@@ -44,6 +44,8 @@ export const pl = {
     aspiratedVolume: 'Objętość zaaspirowana',
     filterType: 'Filtr',
     water: 'Woda',
+    saveMeasurement: 'Zapisz pomiar',
+    addMeasurement: 'Dodaj pomiar',
   },
   aspirationScreen: {
     date: 'Data',

@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
-import {ScrollView, TouchableOpacity, View} from 'react-native';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {
   NumberInputBar,
   SelectorBar,
@@ -12,8 +12,10 @@ import {DustMeasurementDataSchema} from '../constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
+import {ButtonIcon} from '../components/ButtonIcon';
 
 interface DustMeasurementData {
+  id: number;
   selectedEndDiameter: string;
   measurementStartTime: Date;
   aspirationTime: string;
@@ -23,6 +25,7 @@ interface DustMeasurementData {
 }
 
 const initialData: DustMeasurementData = {
+  id: 0,
   selectedEndDiameter: '',
   measurementStartTime: new Date(),
   aspirationTime: '',
@@ -31,20 +34,19 @@ const initialData: DustMeasurementData = {
   water: '',
 };
 
-const NEW_MEASUREMENT = -1;
-
 export const DustScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
 
   /* State variables */
 
-  const [data, setData] = useState(initialData);
-  const [savedMeasurements, setSavedMeasurements]: [
-    DustMeasurementData[],
-    React.Dispatch<React.SetStateAction<DustMeasurementData[]>>,
-  ] = useState([] as DustMeasurementData[]);
-  const [measurementIndex, setMeasurementIndex] = useState(NEW_MEASUREMENT);
-  const [numberOfMeasurements, setNumberOfMeasurements] = useState(0);
+  const [currentMeasurement, setCurrentMeasurement] = useState({
+    ...initialData,
+  });
+  const [savedMeasurements, setSavedMeasurements] = useState([
+    {...initialData},
+  ]);
+  const [measurementIndex, setMeasurementIndex] = useState(0);
+  const [numberOfMeasurements, setNumberOfMeasurements] = useState(1);
 
   // Here we need to have the derived state so that the measurement number selector
   // has the correct set of strings to display and select from.
@@ -52,23 +54,53 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     () =>
       savedMeasurements
         .map(measurement => savedMeasurements.indexOf(measurement) + 1)
-        .map(index => index.toString())
-        .slice(0, numberOfMeasurements),
-    [savedMeasurements, numberOfMeasurements],
+        .map(index => index.toString()),
+    [savedMeasurements],
   );
 
   /* Logic for UI state transitions */
   const updateField = (field: Partial<DustMeasurementData>) => {
-    setData({...data, ...field});
+    setCurrentMeasurement({...currentMeasurement, ...field});
   };
 
-  const addingNewMeasurement = () => measurementIndex == NEW_MEASUREMENT;
+  const addNewMeasurement = () => {
+    let newMeasurements = [...savedMeasurements];
+    newMeasurements[measurementIndex] = {...currentMeasurement};
+    if (newMeasurements.length == numberOfMeasurements) {
+      // Don't allow adding measurements past the specified number
+      setSavedMeasurements(newMeasurements);
+      return;
+    }
+
+    const newMeasurement = {...initialData, id: currentMeasurement.id + 1};
+    setSavedMeasurements(newMeasurements.concat([newMeasurement]));
+    setMeasurementIndex(measurementIndex + 1);
+    setCurrentMeasurement(newMeasurement);
+  };
+
+  const saveModifications = () => {
+    let newSavedMesurements = [...savedMeasurements];
+    newSavedMesurements[measurementIndex] = {...currentMeasurement};
+    setSavedMeasurements(newSavedMesurements);
+  };
+
+  const showingLastMeasurement = () =>
+    measurementIndex == savedMeasurements.length - 1;
+
+  const isSpaceLeft = () => savedMeasurements.length < numberOfMeasurements;
+
+  const flushState = () => {
+    setSavedMeasurements([{...initialData}]);
+    setCurrentMeasurement({...initialData});
+    setMeasurementIndex(0);
+    setNumberOfMeasurements(1);
+  };
 
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         getSavedFileContents={() => 'test'}
-        onDelete={() => {}}
+        onDelete={flushState}
         fileContentsHandler={(contents: Object) => {}}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
@@ -85,7 +117,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
         <View style={{...styles.mainContainer, margin: 0}}>
           <NumberInputBar
             placeholder="0"
-            value={data.selectedEndDiameter}
+            value={currentMeasurement.selectedEndDiameter}
             label={
               t(`dustScreen:${DustMeasurementDataSchema.selectedEndDiameter}`) +
               ':'
@@ -98,12 +130,12 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
                 `dustScreen:${DustMeasurementDataSchema.measurementStartTime}`,
               ) + ':'
             }
-            date={data.measurementStartTime}
+            date={currentMeasurement.measurementStartTime}
             setDate={date => updateField({measurementStartTime: date})}
           />
           <NumberInputBar
             placeholder="0"
-            value={data.aspirationTime}
+            value={currentMeasurement.aspirationTime}
             valueUnit="min"
             onChangeText={text => updateField({aspirationTime: text})}
             label={
@@ -112,21 +144,21 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
           />
           <NumberInputBar
             placeholder="0"
-            value={data.aspiratedVolume}
+            value={currentMeasurement.aspiratedVolume}
             onChangeText={text => updateField({aspiratedVolume: text})}
             label={
               t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`) + ':'
             }
           />
           <TextInputBar
-            value={data.filterType}
+            value={currentMeasurement.filterType}
             label={
               t(`dustScreen:${DustMeasurementDataSchema.filterType}`) + ':'
             }
             onChangeText={text => updateField({filterType: text})}
           />
           <TextInputBar
-            value={data.water}
+            value={currentMeasurement.water}
             label={t(`dustScreen:${DustMeasurementDataSchema.water}`) + ':'}
             onChangeText={text => updateField({water: text})}
           />
@@ -138,40 +170,29 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
             selections={selections}
             onSelect={(_selectedItem: string, index: number) => {
               setMeasurementIndex(index);
-              setData(savedMeasurements[index]);
+              setCurrentMeasurement(savedMeasurements[index]);
             }}
-            // If we are adding a new measurement, the selector should display its
-            // number at the top.
-            selectionToText={selection =>
-              addingNewMeasurement()
-                ? savedMeasurements.length.toString()
-                : selection
-            }
+            selectionToText={_selection => (measurementIndex + 1).toString()}
             rowTextForSelection={selection => selection}
           />
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={() => {
-              if (savedMeasurements.length == numberOfMeasurements) {
-                return;
-              }
-              var newSavedMesurements = [...savedMeasurements];
-              if (addingNewMeasurement()) {
-                newSavedMesurements.push({...data});
-              } else {
-                newSavedMesurements[measurementIndex] = {...data};
-                setMeasurementIndex(NEW_MEASUREMENT);
-              }
-              setSavedMeasurements(newSavedMesurements);
-              setData(initialData);
-            }}>
-            <Icon
-              name={addingNewMeasurement() ? 'plus' : 'content-save-edit'}
-              style={styles.saveIcon}
-              size={20}
-              color={colors.buttonBlue}
-            />
-          </TouchableOpacity>
+          {showingLastMeasurement() && isSpaceLeft() ? (
+            <TouchableOpacity
+              style={{...styles.actionButton, justifyContent: 'center'}}
+              onPress={addNewMeasurement}>
+              <Text style={styles.actionButtonText}>
+              {t(`dustScreen:addMeasurement`)}
+
+              </Text>
+              <ButtonIcon materialIconName={'plus'} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={{...styles.actionButton, justifyContent: 'center'}}
+              onPress={saveModifications}>
+              <Text style={styles.actionButtonText}> Zapisz pomiar </Text>
+              <ButtonIcon materialIconName={'content-save-edit'} />
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
       <HelpAndSettingsGroup navigation={navigation} />
