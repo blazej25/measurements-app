@@ -131,7 +131,6 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     // to load that measurement. Otherwise, if dataIndex
     // is equal to measurements.length, it means that we are adding a
     // new measurement and so no measurement exists that can be loaded.
-    console.log(currentMeasurement);
     if (dataIndex < measurements.length - 1) {
       setCurrentMeasurement(measurements[dataIndex + 1]);
     }
