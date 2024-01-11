@@ -1,10 +1,4 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {
   NumberInputBar,
@@ -12,10 +6,10 @@ import {
   TextInputBar,
   TimeSelector,
 } from '../components/input-bars';
-import {colors, styles} from '../styles/common-styles';
+import {styles} from '../styles/common-styles';
+import {jsonToCSV, readString} from 'react-native-csv';
 import {useTranslation} from 'react-i18next';
 import {DustMeasurementDataSchema} from '../constants';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import {ButtonIcon} from '../components/ButtonIcon';
@@ -29,6 +23,16 @@ interface DustMeasurement {
   aspiratedVolume: string;
   filterType: string;
   water: string;
+}
+
+interface DustMeasurementCSVRow {
+  'Numer pomiaru': string;
+  'Dobrana końcówka': string;
+  'Godzina rozpoczęcia': string;
+  'Czas aspiracji': string;
+  'Objętość zaaspirowana': string;
+  Filtr: string;
+  Woda: string;
 }
 
 const initialData: DustMeasurement = {
@@ -146,14 +150,61 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     return measurements;
   };
 
+  /* Logic for saving and loading the file from external storage as CSV */
+
+  const exportMeasurementsAsCSV = () => {
+    const csvRows: DustMeasurementCSVRow[] = [];
+    for (const measurement of savedMeasurements) {
+      csvRows.push({
+        'Numer pomiaru': (measurement.id + 1).toString(),
+        'Dobrana końcówka': measurement.selectedEndDiameter,
+        'Godzina rozpoczęcia': measurement.measurementStartTime.toString(),
+        'Czas aspiracji': measurement.aspirationTime,
+        'Objętość zaaspirowana': measurement.aspiratedVolume,
+        Filtr: measurement.filterType,
+        Woda: measurement.water,
+      });
+    }
+    const csvString = jsonToCSV(csvRows);
+    console.log('Exporting a CSV file: ');
+    console.log(csvString);
+    return csvString;
+  };
+
+  const restoreStateFromCSV = (fileContents: string) => {
+    const csvRows: DustMeasurementCSVRow[] = readString(fileContents, {
+      header: true,
+    })['data'] as DustMeasurementCSVRow[];
+
+    console.log('Restoring state from a CSV file: ');
+    console.log(JSON.stringify(csvRows, null, 2));
+    const newMeasurements: DustMeasurement[] = [];
+    for (const row of csvRows) {
+      newMeasurements.push({
+        id: parseInt(row['Numer pomiaru']) - 1,
+        selectedEndDiameter: row['Dobrana końcówka'],
+        measurementStartTime: new Date(row['Godzina rozpoczęcia']),
+        aspirationTime: row['Czas aspiracji'],
+        aspiratedVolume: row['Objętość zaaspirowana'],
+        filterType: row['Filtr'],
+        water: row['Woda'],
+      });
+    }
+    setSavedMeasurements([...newMeasurements]);
+    const lastMeasurementIndex = newMeasurements.length - 1;
+    setMeasurementIndex(lastMeasurementIndex);
+    setNumberOfMeasurements(newMeasurements.length);
+    setCurrentMeasurement(newMeasurements[lastMeasurementIndex]);
+  };
+
   useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={() => 'test'}
+        getSavedFileContents={exportMeasurementsAsCSV}
         onDelete={flushState}
-        fileContentsHandler={(contents: Object) => {}}
+        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <NumberInputBar
@@ -191,7 +242,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
             valueUnit="min"
             onChangeText={text => updateField({aspirationTime: text})}
             label={
-              t(`dustScreen:${DustMeasurementDataSchema.aspiratedVolume}`) + ':'
+              t(`dustScreen:${DustMeasurementDataSchema.aspirationTime}`) + ':'
             }
           />
           <NumberInputBar
