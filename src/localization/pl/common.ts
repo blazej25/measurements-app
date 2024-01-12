@@ -98,6 +98,7 @@ export const pl = {
     enterNewName: 'Wprowadź nazwę nowego pliku',
     yourFileWillBeSaved: "Twój plik zostanie utworzony w katalogu 'Downloads'.",
     createFile: 'Zapisz plik',
+    fileName: 'Nazwa pliku',
     createANewFile: 'Utwórz nowy plik',
     fileSavedSuccessfully: 'Plik zapisany pomyślnie!',
     error: 'Wystąpił błąd podczas zapisu pliku, spróbuj ponownie.',

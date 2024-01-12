@@ -95,6 +95,7 @@ export const en = {
     overwrite: 'Overwrite an existing file',
     enterNewName: 'Please enter the name of the file to create.',
     yourFileWillBeSaved: 'Your file will be saved in the Downloads directory.',
+    fileName: 'File name',
     createFile: 'Create the file',
     createANewFile: 'Create a new file',
     fileSavedSuccessfully: 'File saved successfully!',

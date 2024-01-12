@@ -123,7 +123,7 @@ const CreateNewFileModal = ({
             {t('fileSaving:enterNewName')}
           </Text>
           <TextInputBar
-            label="File name:"
+            label={t('fileSaving:fileName')}
             onChangeText={text => setFileName(text)}
           />
           <Text style={styles.uiPromptText}>
