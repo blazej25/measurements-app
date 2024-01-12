@@ -153,7 +153,9 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     fileSystemService
       .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
-        restoreStateFrom(loadedMeasurements);
+        if (loadedMeasurements) {
+          restoreStateFrom(loadedMeasurements);
+        }
       });
   };
 
