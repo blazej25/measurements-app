@@ -59,7 +59,7 @@ class FileSystemService {
       })
       .catch(err => {
         console.log(err.message);
-        return {};
+        return null;
       });
   }
 

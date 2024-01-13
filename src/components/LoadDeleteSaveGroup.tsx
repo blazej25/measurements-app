@@ -2,9 +2,7 @@ import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {
-  defaultBorderRadius,
   defaultGap,
-  defaultPadding,
   styles,
 } from '../styles/common-styles';
 import {ButtonIcon} from './ButtonIcon';
