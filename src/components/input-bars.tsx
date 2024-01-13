@@ -597,3 +597,53 @@ export const StartEndBar = ({
     </TouchableOpacity>
   );
 };
+
+export const OutputBar = ({
+  label,
+  output,
+}: {
+  label: string;
+  output: string;
+}) => {
+  return (
+    <TouchableOpacity
+      activeOpacity={1.0}
+      style={{
+        borderRadius: largeBorderRadius,
+        flexDirection: 'row',
+        backgroundColor: colors.buttonBlue,
+        marginHorizontal: defaultGap,
+        justifyContent: 'space-between',
+      }}>
+      <Text
+        style={{
+          ...styles.buttonText1,
+          alignSelf: 'center',
+          margin: defaultGap,
+          marginLeft: defaultPadding,
+        }}>
+        {label}
+      </Text>
+      <TouchableOpacity
+      activeOpacity={1.0}
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          margin: defaultGap,
+          paddingHorizontal: defaultPadding,
+          backgroundColor: colors.secondaryBlue,
+          height: 40,
+        }}>
+        <Text
+          style={{
+            alignSelf: 'center',
+            margin: defaultGap,
+            marginLeft: defaultPadding,
+            color: 'black'
+          }}>
+          {output}
+        </Text>
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+};

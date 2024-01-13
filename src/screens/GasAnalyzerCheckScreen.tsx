@@ -1,11 +1,181 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Button, ScrollView, Text, View} from 'react-native';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
-import {NumberInputBar} from '../components/input-bars';
+import {NumberInputBar, SelectorBar, TimeSelector} from '../components/input-bars';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {styles} from '../styles/common-styles';
 
+interface SingleCompoundMeasurement {
+  compound: string,
+  concentration: string,
+  analiserRange: string,
+  readingBeforeAnalisatorZero: string, 
+  readingBeforeAnalisatorRange: string,
+  readingBeforeSystemZero: string, 
+  readingBeforeSystemRange: string,
+  readingAfterSystemZero: string, 
+  readingAfterSystemRange: string,
+  twoPCRangeBefore: string,
+  zeroEvaluationBefore: string,
+  rangeEvaluationBefore: string,
+  twoPCRangeAfter: string,
+  fivePCRangeAfter: string,
+  evaluationAfter: string,
+}
+
+const Compounds: string[] = [
+  'O2',
+  'CO2',
+  'SO2',
+  'NO',
+  'CO',
+  'C3H6',
+  'N2O',
+]
+
 export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
+  const [hourOfCheckBefore, setHourOfCheckBefore] = useState(new Date);
+  const [hourOfCheckAfter, setHourOfCheckAfter] = useState(new Date);
+
+  const initialState: SingleCompoundMeasurement = {
+    compound: Compounds[0],
+    concentration: '',
+    analiserRange: '',
+    readingBeforeAnalisatorZero: '',
+    readingBeforeAnalisatorRange: '',
+    readingBeforeSystemZero: '',
+    readingBeforeSystemRange: '',
+    readingAfterSystemZero: '',
+    readingAfterSystemRange: '',
+    twoPCRangeBefore: '',
+    twoPCRangeAfter: '',
+    fivePCRangeAfter: '',
+    zeroEvaluationBefore: '',
+    rangeEvaluationBefore: '',
+    evaluationAfter: ''
+  }
+
+  const [currentMeasurement, setCurrentMeasurement] = useState(initialState);
+
+  const [measurements, setMeasurements] = useState([initialState]);
+
+  const compoundExists = (measurement: SingleCompoundMeasurement) => {
+    const filtered = measurements.filter(
+      (item: SingleCompoundMeasurement) => measurement.compound === item.compound
+    );
+    return filtered.length > 0;
+  }
+
+  const saveCurrentCompound = (compound: string) => {
+    if (compoundExists(currentMeasurement)) {
+      const newCompound = measurements.filter(
+        (item: SingleCompoundMeasurement) =>
+          currentMeasurement.compound != item.compound
+      )
+      newCompound.push({...currentMeasurement});
+      setMeasurements(newCompound);
+    } else {
+      measurements.push({...currentMeasurement});
+      setMeasurements(measurements)
+    }
+  };
+
+  const changeCurrentCompound = (compound: string) => {
+    const newCompound = compound
+    const newMeasurement = {...currentMeasurement};
+    newMeasurement.compound = newCompound;
+
+    if (compoundExists(newMeasurement)) {
+      const loadedCompound = measurements.filter(
+        (item: SingleCompoundMeasurement) =>
+          newMeasurement.compound === item.compound
+      )[0];
+      setCurrentMeasurement({...loadedCompound});
+    } else {
+      setCurrentMeasurement({
+        ...initialState,
+        compound: newMeasurement.compound,
+      });
+    }
+  };
+
+  const processingInput = () => {
+    const fivePercent = parseInt(currentMeasurement.analiserRange) * 0.05;
+    const twoPercent = parseInt(currentMeasurement.analiserRange) * 0.02;
+    const beforeSystemZero = parseFloat(currentMeasurement.readingBeforeSystemZero);
+    const beforeSystemRange = parseFloat(currentMeasurement.readingBeforeSystemRange) - parseInt(currentMeasurement.concentration);
+    const afterSystemZero = parseFloat(currentMeasurement.readingAfterSystemZero);
+    const afterSystemRange = parseFloat(currentMeasurement.readingAfterSystemRange) - parseInt(currentMeasurement.concentration);
+
+    var evaluationZeroAfter = 0;
+    var evaluationRangeAfter = 0;
+
+    setCurrentMeasurement({
+      ...currentMeasurement, 
+      twoPCRangeBefore: twoPercent.toFixed(2),
+      twoPCRangeAfter: twoPercent.toFixed(2),
+      fivePCRangeAfter: fivePercent.toFixed(2),
+    });
+
+    if (beforeSystemZero < twoPercent) {
+      setCurrentMeasurement({
+        ...currentMeasurement,
+        zeroEvaluationBefore: 'OK',
+      })
+    } else {
+      setCurrentMeasurement({
+        ...currentMeasurement,
+        zeroEvaluationBefore: 'Adjustacja zera',
+      })
+    }
+
+    if (beforeSystemRange < twoPercent) {
+      setCurrentMeasurement({
+        ...currentMeasurement,
+        rangeEvaluationBefore: 'OK',
+      })
+    } else {
+      setCurrentMeasurement({
+        ...currentMeasurement,
+        rangeEvaluationBefore: 'Adjustacja zakresu',
+      })
+    }
+
+    switch (true) {
+      case twoPercent < afterSystemZero && afterSystemZero < fivePercent:
+        evaluationZeroAfter = 1;
+        break;
+      case afterSystemZero > fivePercent:
+        evaluationZeroAfter = 2;
+        break;
+      case twoPercent < afterSystemRange && afterSystemRange < fivePercent:
+        evaluationRangeAfter = 1;
+        break;
+      case afterSystemRange > fivePercent:
+        evaluationRangeAfter = 2;
+        break;
+    }
+
+    switch (evaluationZeroAfter + evaluationRangeAfter) {
+      case 0:
+        setCurrentMeasurement({
+          ...currentMeasurement,
+          evaluationAfter: 'OK',
+        })
+        break;
+      case 1 || 2:
+        setCurrentMeasurement({
+          ...currentMeasurement,
+          evaluationAfter: 'Korekta o dryft',
+        })
+      case 3:
+        setCurrentMeasurement({
+          ...currentMeasurement,
+          evaluationAfter: 'Odrzucenie pomiaru',
+        })
+    }
+  }
+
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
@@ -14,11 +184,87 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
         fileContentsHandler={(contents: Object) => {}}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
+        <SelectorBar 
+        label={'Gaz:'}
+        selections={Compounds} 
+        onSelect={(selectedItem: string, index: number) => {
+          saveCurrentCompound(selectedItem);
+          changeCurrentCompound(selectedItem);
+        }}        
+        />
+        <TimeSelector 
+        timeLabel='Godzina sprawdzenia przed:'
+        date={hourOfCheckBefore}
+        setDate={date => setHourOfCheckBefore(date)}
+        />
         <NumberInputBar
           placeholder="0"
-          value={''}
-          onChangeText={text => {}}
-          label={'Placeholder button'}
+          value={currentMeasurement.concentration}
+          onChangeText={text => {
+            setCurrentMeasurement({...currentMeasurement, concentration: text});
+          }}
+          label={'Stężenie butli:'}
+        />
+        <NumberInputBar
+          placeholder="0"
+          value={currentMeasurement.analiserRange}
+          onChangeText={text => {
+            setCurrentMeasurement({...currentMeasurement, analiserRange: text});
+          }}
+          label={'Zakres analizatora:'}
+        />
+        <NumberInputBar
+          placeholder="0"
+          value={currentMeasurement.readingBeforeAnalisatorZero}
+          onChangeText={text => {
+            setCurrentMeasurement({...currentMeasurement, readingBeforeAnalisatorZero: text});
+          }}
+          label={'Odczyt przed analizator zero:'}
+        />
+        <NumberInputBar
+          placeholder="0"
+          value={currentMeasurement.readingBeforeAnalisatorRange}
+          onChangeText={text => {
+            setCurrentMeasurement({...currentMeasurement, readingBeforeAnalisatorRange: text});
+          }}
+          label={'Odczyt przed analizator zakres:'}
+        />
+        <NumberInputBar
+          placeholder="0"
+          value={currentMeasurement.readingBeforeSystemZero}
+          onChangeText={text => {
+            setCurrentMeasurement({...currentMeasurement, readingBeforeSystemZero: text});
+          }}
+          label={'Odczyt przed układ zero:'}
+        />
+        <NumberInputBar
+          placeholder="0"
+          value={currentMeasurement.readingBeforeSystemRange}
+          onChangeText={text => {
+            setCurrentMeasurement({...currentMeasurement, readingBeforeSystemRange: text});
+          }}
+          label={'Odczyt przed układ zakres:'}
+        />
+        <TimeSelector 
+        timeLabel='Godzina sprawdzenia po:'
+        date={hourOfCheckAfter}
+        setDate={date => setHourOfCheckAfter(date)}
+        />
+        <NumberInputBar
+          placeholder="0"
+          value={currentMeasurement.readingAfterSystemZero}
+          onChangeText={text => {
+            setCurrentMeasurement({...currentMeasurement, readingAfterSystemZero: text});
+          }}
+          label={'Odczyt po układ zero:'}
+        />
+        <NumberInputBar
+          placeholder="0"
+          value={currentMeasurement.readingAfterSystemRange}
+          onChangeText={text => {
+            setCurrentMeasurement({...currentMeasurement, readingAfterSystemRange: text});
+          }}
+          label={'Odczyt po układ zakres:'}
         />
       </ScrollView>
       <HelpAndSettingsGroup navigation={navigation} />
