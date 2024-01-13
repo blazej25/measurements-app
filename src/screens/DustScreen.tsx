@@ -128,7 +128,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
       .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         if (loadedMeasurements) {
-        restoreStateFrom(loadedMeasurements);
+          restoreStateFrom(loadedMeasurements);
         }
       });
   };
