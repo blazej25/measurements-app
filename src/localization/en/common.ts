@@ -89,6 +89,8 @@ export const en = {
     measurementDuration: 'Measurement Duration',
     breakTime: 'Time Between Measurements',
     startingHour: 'First Measurement Start Time',
+    start: 'Start',
+    end: 'End',
   },
   fileSaving: {
     howToSave: 'How do you want to save the file?',

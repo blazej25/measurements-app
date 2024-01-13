@@ -4,12 +4,29 @@ import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {Screens} from '../constants';
 import {colors, defaultGap, styles} from '../styles/common-styles';
 import {ButtonIcon} from './ButtonIcon';
+import {NavigationButton} from './buttons';
 import {LoadDeleteSaveGroup} from './LoadDeleteSaveGroup';
 
-export const HelpAndSettingsGroup = ({navigation}: {navigation: any}) => {
+export const HelpAndSettingsGroup = ({
+  navigation,
+  isHome,
+}: {
+  navigation: any;
+  isHome?: boolean;
+}) => {
   return (
     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
       <HelpModal navigation={navigation} />
+      {!isHome ? (
+        <NavigationButton
+          navigation={navigation}
+          destinationScreen={Screens.home}
+          style={styles.secondaryNavigationButton}
+          textStyle={styles.uiPromptText}
+        />
+      ) : (
+        <></>
+      )}
       <SettingsPanel navigation={navigation} />
     </View>
   );
@@ -127,4 +144,4 @@ const SettingsPanel = ({navigation}: {navigation: any}) => {
 
 const Spacer = () => {
   return <View style={{height: 20}} />;
-}
+};

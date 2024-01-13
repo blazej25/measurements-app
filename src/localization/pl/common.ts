@@ -91,6 +91,8 @@ export const pl = {
     measurementDuration: 'Czas trwania pomiaru',
     breakTime: 'Przerwa między pomiarami',
     startingHour: 'Czas rozpoczęcia pomiarów',
+    start: 'Start',
+    end: 'Koniec',
   },
   fileSaving: {
     howToSave: 'Wybierz sposób zapisu pliku',
