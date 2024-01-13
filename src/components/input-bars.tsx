@@ -524,7 +524,7 @@ export const StartEndBar = ({
   start: Date;
   end: Date;
 }) => {
-  const t = useTranslation()
+  const {t} = useTranslation();
 
   return (
     <TouchableOpacity
@@ -543,7 +543,7 @@ export const StartEndBar = ({
           margin: defaultGap,
           marginLeft: defaultPadding,
         }}>
-        {'Start'}
+        {t('utilitiesScreen:start')}
       </Text>
       <TouchableOpacity
       activeOpacity={1.0}
@@ -572,7 +572,7 @@ export const StartEndBar = ({
           margin: defaultGap,
           marginLeft: defaultPadding,
         }}>
-        {'Koniec'}
+        {t('utilitiesScreen:end')}
       </Text>
       <TouchableOpacity
         activeOpacity={1.0}

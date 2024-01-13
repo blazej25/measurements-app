@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 
 import {useTranslation} from 'react-i18next';
@@ -17,10 +17,15 @@ import {
   PipeCrossSectionType,
   crossSectionTypeFrom,
 } from '../model';
-import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
-import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
+import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
+import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
+import FileSystemService from '../services/FileSystemService';
+
+const INTERNAL_STORAGE_FILE_NAME = 'home.txt';
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
+  const fileSystemService = new FileSystemService();
+
   const empty_data: CommonMeasurementData = {
     date: new Date(),
     measurementRequestor: '',
@@ -32,7 +37,34 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
   };
 
   const [measurementData, setMeasurementData] = useState(empty_data);
-  const {t} = useTranslation();
+
+  /* Logic for persisting state in the internal storage. */
+  // See H20_14790_Screen for comments on how this works.
+  const loadMeasurements = () => {
+    fileSystemService
+      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .then(loadedMeasurements => {
+        restoreStateFrom(loadedMeasurements);
+      });
+  };
+
+  const restoreStateFrom = (loadedMeasurements: Object) => {
+    var data = loadedMeasurements as CommonMeasurementData;
+
+    if (!data) {
+      return;
+    }
+
+    data.date = new Date(data.date);
+    data.pipeCrossSectionType =
+      data.pipeCrossSectionType === 'ROUND'
+        ? PipeCrossSectionType.ROUND
+        : PipeCrossSectionType.RECTANGULAR;
+
+    setMeasurementData(data);
+  };
+
+  useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
@@ -46,7 +78,7 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
         <CommonDataInput data={measurementData} setter={setMeasurementData} />
         <UtilitiesNavigation navigation={navigation} />
       </ScrollView>
-      <HelpAndSettingsGroup navigation={navigation} />
+      <HelpAndSettingsGroup navigation={navigation} isHome />
     </View>
   );
 };
@@ -61,7 +93,8 @@ const WelcomeHeader = () => {
         alignItems: 'center',
         marginBottom: 15,
       }}>
-      <Text style={{fontSize: 22, fontWeight: 'bold', color: colors.buttonBlue}}>
+      <Text
+        style={{fontSize: 22, fontWeight: 'bold', color: colors.buttonBlue}}>
         {t('userInterface:welcome')}
       </Text>
     </View>
@@ -75,13 +108,24 @@ const CommonDataInput = ({
   data: CommonMeasurementData;
   setter: React.Dispatch<React.SetStateAction<CommonMeasurementData>>;
 }) => {
+  const fileSystemService = new FileSystemService();
   const {t} = useTranslation();
 
+  const persistStateInInternalStorage = (state: CommonMeasurementData) => {
+    fileSystemService.saveObjectToInternalStorage(
+      state,
+      INTERNAL_STORAGE_FILE_NAME,
+    );
+  };
+
+
   const updateField = (field: any) => {
-    setter({
+    const newData = {
       ...data,
       ...field,
-    });
+    };
+    setter(newData);
+    persistStateInInternalStorage(newData);
   };
   return (
     <View>

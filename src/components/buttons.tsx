@@ -13,10 +13,14 @@ export const NavigationButton = ({
   navigation,
   destinationScreen,
   destinationScreenShortLabelName,
+  style,
+  textStyle,
 }: {
   navigation: any;
   destinationScreen: string;
   destinationScreenShortLabelName?: string;
+  style?: any;
+  textStyle?: any;
 }) => {
   const {t} = useTranslation();
 
@@ -29,8 +33,8 @@ export const NavigationButton = ({
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate(destinationScreen)}
-      style={styles.roundedButton1}>
-      <Text style={styles.buttonText1}>{t(`userInterface:${labelName}`)}</Text>
+      style={style ? style : styles.roundedButton1}>
+      <Text style={textStyle? textStyle: styles.buttonText1}>{t(`userInterface:${labelName}`)}</Text>
     </TouchableOpacity>
   );
 };

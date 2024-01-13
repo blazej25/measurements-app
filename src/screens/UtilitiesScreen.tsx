@@ -229,7 +229,7 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
         contentContainerStyle={{
           ...styles.defaultScrollView,
           margin: 5,
-          marginHorizontal: 45,
+          marginHorizontal: 35,
         }}>
         {times.map((x: SingleMeasurement) => {
           return (

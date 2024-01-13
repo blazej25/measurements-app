@@ -19,10 +19,11 @@
 - [ ] Adapt csv functionality for other screens
 - [ ] GasAnalyzerCheckSCreen: the equipment should be loaded from the eqipment base (low priority feature)
 - [ ] Add localization to the gas analyzer check screen
+- [ ] Add internal storage save for HomeScreen
+- [ ] Add csv support for utilities
+- [ ] Add csv support for flows
+- [ ] Add csv support for HomeScreen
 
-## Blazej actionable items
-
-- [ ] Add localization to StartEndBar
 
 ## In progress
 
@@ -44,3 +45,4 @@
 - [X] investigate permissions required (outcome: we can edit files provided that we were the ones who created the file)
 - [X] add csv generation capabilities and load from csv
 - [x] fix utilities screen
+- [x] Add localization to StartEndBar
