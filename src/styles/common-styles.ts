@@ -100,12 +100,4 @@ export const styles = StyleSheet.create({
     gap: defaultGap,
   },
   saveIcon: {marginTop: 10},
-  saveButton: {
-    borderRadius: defaultBorderRadius,
-    flexDirection: 'row',
-    margin: defaultGap,
-    paddingHorizontal: defaultPadding,
-    backgroundColor: colors.secondaryBlue,
-    height: 40,
-  },
 });
