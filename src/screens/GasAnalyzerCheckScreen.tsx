@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, ScrollView, Text, View} from 'react-native';
+import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import {NumberInputBar, SelectorBar, TimeSelector} from '../components/input-bars';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
@@ -100,80 +100,34 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   };
 
   const processingInput = () => {
-    const fivePercent = parseInt(currentMeasurement.analiserRange) * 0.05;
-    const twoPercent = parseInt(currentMeasurement.analiserRange) * 0.02;
-    const beforeSystemZero = parseFloat(currentMeasurement.readingBeforeSystemZero);
-    const beforeSystemRange = parseFloat(currentMeasurement.readingBeforeSystemRange) - parseInt(currentMeasurement.concentration);
-    const afterSystemZero = parseFloat(currentMeasurement.readingAfterSystemZero);
-    const afterSystemRange = parseFloat(currentMeasurement.readingAfterSystemRange) - parseInt(currentMeasurement.concentration);
+    const fivePercent = currentMeasurement.analiserRange === '' ? 0 : parseInt(currentMeasurement.analiserRange) * 0.05;
+    const twoPercent = currentMeasurement.analiserRange === '' ? 0 : parseInt(currentMeasurement.analiserRange) * 0.02;
+    const beforeSystemZero = currentMeasurement.readingBeforeSystemZero === '' ? 0 : parseFloat(currentMeasurement.readingBeforeSystemZero);
+    const beforeSystemRange = currentMeasurement.readingBeforeSystemRange === '' ? 0 : parseFloat(currentMeasurement.readingBeforeSystemRange);
+    const afterSystemZero = currentMeasurement.readingAfterSystemZero === '' ? 0 : parseFloat(currentMeasurement.readingAfterSystemZero);
+    const afterSystemRange = currentMeasurement.readingAfterSystemRange === '' ? 0 : parseFloat(currentMeasurement.readingAfterSystemRange);
 
     var evaluationZeroAfter = 0;
     var evaluationRangeAfter = 0;
 
     setCurrentMeasurement({
-      ...currentMeasurement, 
+      ...currentMeasurement,
       twoPCRangeBefore: twoPercent.toFixed(2),
       twoPCRangeAfter: twoPercent.toFixed(2),
       fivePCRangeAfter: fivePercent.toFixed(2),
+      zeroEvaluationBefore:
+        beforeSystemZero < twoPercent ? 'OK' : 'Adjustacja zera',
+      rangeEvaluationBefore:
+        beforeSystemRange < twoPercent ? 'OK' : 'Adjustacja zakresu',
+      evaluationAfter:
+        evaluationZeroAfter + evaluationRangeAfter === 0
+          ? 'OK'
+          : evaluationZeroAfter + evaluationRangeAfter === 1 || 2
+          ? 'Korekta o dryft'
+          : 'Odrzucenie pomiaru',
     });
 
-    if (beforeSystemZero < twoPercent) {
-      setCurrentMeasurement({
-        ...currentMeasurement,
-        zeroEvaluationBefore: 'OK',
-      })
-    } else {
-      setCurrentMeasurement({
-        ...currentMeasurement,
-        zeroEvaluationBefore: 'Adjustacja zera',
-      })
-    }
-
-    if (beforeSystemRange < twoPercent) {
-      setCurrentMeasurement({
-        ...currentMeasurement,
-        rangeEvaluationBefore: 'OK',
-      })
-    } else {
-      setCurrentMeasurement({
-        ...currentMeasurement,
-        rangeEvaluationBefore: 'Adjustacja zakresu',
-      })
-    }
-
-    switch (true) {
-      case twoPercent < afterSystemZero && afterSystemZero < fivePercent:
-        evaluationZeroAfter = 1;
-        break;
-      case afterSystemZero > fivePercent:
-        evaluationZeroAfter = 2;
-        break;
-      case twoPercent < afterSystemRange && afterSystemRange < fivePercent:
-        evaluationRangeAfter = 1;
-        break;
-      case afterSystemRange > fivePercent:
-        evaluationRangeAfter = 2;
-        break;
-    }
-
-    switch (evaluationZeroAfter + evaluationRangeAfter) {
-      case 0:
-        setCurrentMeasurement({
-          ...currentMeasurement,
-          evaluationAfter: 'OK',
-        })
-        break;
-      case 1 || 2:
-        setCurrentMeasurement({
-          ...currentMeasurement,
-          evaluationAfter: 'Korekta o dryft',
-        })
-      case 3:
-        setCurrentMeasurement({
-          ...currentMeasurement,
-          evaluationAfter: 'Odrzucenie pomiaru',
-        })
-    }
+    console.log(currentMeasurement);
   }
 
   return (
@@ -265,6 +219,13 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
             setCurrentMeasurement({...currentMeasurement, readingAfterSystemRange: text});
           }}
           label={'Odczyt po układ zakres:'}
+        />
+        <TouchableOpacity
+        style={styles.actionButton}
+        onPress={() => {
+          console.log(currentMeasurement)
+          processingInput()
+        }}
         />
       </ScrollView>
       <HelpAndSettingsGroup navigation={navigation} />
