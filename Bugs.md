@@ -15,20 +15,17 @@
 
 ## To Do
 
-- [ ] Investigate number inputs being weird with 0s
-- [ ] Adapt csv functionality for other screens
 - [ ] GasAnalyzerCheckSCreen: the equipment should be loaded from the eqipment base (low priority feature)
-- [ ] Add localization to the gas analyzer check screen
-- [ ] Add internal storage save for HomeScreen
-- [ ] Add csv support for utilities
-- [ ] Add csv support for flows
 - [ ] Add csv support for HomeScreen
+- [ ] Add csv support for GasAnalyzerCheckScreen
 
 
 ## In progress
 
-- [ ] Requirements analysis for the GasAnalyzerCheckScreen
-  - need to input loads of data column-wise per compound
+- [ ] Add data bars for gas analyzer check calculated values
+- [ ] Add localization to the gas analyzer check screen
+- [ ] Add csv support for flows
+- [ ] Add default file name suggestions when exporting measurements.
 
 ## Done
 
@@ -46,3 +43,8 @@
 - [X] add csv generation capabilities and load from csv
 - [x] fix utilities screen
 - [x] Add localization to StartEndBar
+- [x] Investigate number inputs being weird with 0s
+- [x] Requirements analysis for the GasAnalyzerCheckScreen
+  - need to input loads of data column-wise per compound
+- [x] Add internal storage save for HomeScreen
+- [x] Add csv support for utilities

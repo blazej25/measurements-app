@@ -641,7 +641,7 @@ export const OutputBar = ({
             marginLeft: defaultPadding,
             color: 'black'
           }}>
-          {output}
+          {output === '' ? 0 : output}
         </Text>
       </TouchableOpacity>
     </TouchableOpacity>

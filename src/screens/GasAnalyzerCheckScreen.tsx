@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
-import {NumberInputBar, SelectorBar, TimeSelector} from '../components/input-bars';
+import {NumberInputBar, OutputBar, SelectorBar, TimeSelector} from '../components/input-bars';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {styles} from '../styles/common-styles';
+import { useTranslation } from 'react-i18next';
+import FileSystemService from '../services/FileSystemService';
 
 interface SingleCompoundMeasurement {
   compound: string,
@@ -15,12 +17,17 @@ interface SingleCompoundMeasurement {
   readingBeforeSystemRange: string,
   readingAfterSystemZero: string, 
   readingAfterSystemRange: string,
-  twoPCRangeBefore: string,
+  twoPCRange: string,
   zeroEvaluationBefore: string,
   rangeEvaluationBefore: string,
-  twoPCRangeAfter: string,
-  fivePCRangeAfter: string,
+  fivePCRange: string,
   evaluationAfter: string,
+}
+
+interface AllData {
+  timeBefore: Date,
+  timeAfter: Date,
+  measurements: SingleCompoundMeasurement[],
 }
 
 const Compounds: string[] = [
@@ -33,11 +40,13 @@ const Compounds: string[] = [
   'N2O',
 ]
 
-export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
-  const [hourOfCheckBefore, setHourOfCheckBefore] = useState(new Date);
-  const [hourOfCheckAfter, setHourOfCheckAfter] = useState(new Date);
+const INTERNAL_STORAGE_FILE_NAME = 'GasAnalyzerCheck.txt'
 
-  const initialState: SingleCompoundMeasurement = {
+export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
+  const {t} = useTranslation();
+  const fileSystemService = new FileSystemService();
+
+  const emptyMeasurement: SingleCompoundMeasurement = {
     compound: Compounds[0],
     concentration: '',
     analiserRange: '',
@@ -47,17 +56,18 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
     readingBeforeSystemRange: '',
     readingAfterSystemZero: '',
     readingAfterSystemRange: '',
-    twoPCRangeBefore: '',
-    twoPCRangeAfter: '',
-    fivePCRangeAfter: '',
+    twoPCRange: '',
+    fivePCRange: '',
     zeroEvaluationBefore: '',
     rangeEvaluationBefore: '',
     evaluationAfter: ''
   }
 
-  const [currentMeasurement, setCurrentMeasurement] = useState(initialState);
+  const [currentMeasurement, setCurrentMeasurement] = useState(emptyMeasurement);
+  const [measurements, setMeasurements] = useState([emptyMeasurement]);
+  const [hourOfCheckBefore, setHourOfCheckBefore] = useState(new Date);
+  const [hourOfCheckAfter, setHourOfCheckAfter] = useState(new Date);
 
-  const [measurements, setMeasurements] = useState([initialState]);
 
   const compoundExists = (measurement: SingleCompoundMeasurement) => {
     const filtered = measurements.filter(
@@ -68,14 +78,16 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
 
   const saveCurrentCompound = (compound: string) => {
     if (compoundExists(currentMeasurement)) {
-      const newCompound = measurements.filter(
+      const newMeasurements = measurements.filter(
         (item: SingleCompoundMeasurement) =>
           currentMeasurement.compound != item.compound
       )
-      newCompound.push({...currentMeasurement});
-      setMeasurements(newCompound);
+      newMeasurements.push({...currentMeasurement});
+      setMeasurements(newMeasurements);
+      persistStateInInternalStorage(hourOfCheckAfter, hourOfCheckBefore, newMeasurements);
     } else {
       measurements.push({...currentMeasurement});
+      persistStateInInternalStorage(hourOfCheckAfter, hourOfCheckBefore, measurements);
       setMeasurements(measurements)
     }
   };
@@ -93,7 +105,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
       setCurrentMeasurement({...loadedCompound});
     } else {
       setCurrentMeasurement({
-        ...initialState,
+        ...emptyMeasurement,
         compound: newMeasurement.compound,
       });
     }
@@ -103,18 +115,33 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
     const fivePercent = currentMeasurement.analiserRange === '' ? 0 : parseInt(currentMeasurement.analiserRange) * 0.05;
     const twoPercent = currentMeasurement.analiserRange === '' ? 0 : parseInt(currentMeasurement.analiserRange) * 0.02;
     const beforeSystemZero = currentMeasurement.readingBeforeSystemZero === '' ? 0 : parseFloat(currentMeasurement.readingBeforeSystemZero);
-    const beforeSystemRange = currentMeasurement.readingBeforeSystemRange === '' ? 0 : parseFloat(currentMeasurement.readingBeforeSystemRange);
+    const beforeSystemRange = currentMeasurement.readingBeforeSystemRange === '' ? 0 : Math.abs(parseFloat(currentMeasurement.readingBeforeSystemRange) - parseInt(currentMeasurement.concentration));
     const afterSystemZero = currentMeasurement.readingAfterSystemZero === '' ? 0 : parseFloat(currentMeasurement.readingAfterSystemZero);
-    const afterSystemRange = currentMeasurement.readingAfterSystemRange === '' ? 0 : parseFloat(currentMeasurement.readingAfterSystemRange);
+    const afterSystemRange = currentMeasurement.readingAfterSystemRange === '' ? 0 : Math.abs(parseFloat(currentMeasurement.readingAfterSystemRange) - parseInt(currentMeasurement.concentration));
 
     var evaluationZeroAfter = 0;
     var evaluationRangeAfter = 0;
 
+    if (afterSystemZero < twoPercent) {
+      evaluationZeroAfter = 0;
+    } else if (afterSystemZero < fivePercent) {
+      evaluationZeroAfter = 1;
+    } else {
+      evaluationZeroAfter = 2;
+    }
+
+    if (afterSystemRange < twoPercent) {
+      evaluationRangeAfter = 0;
+    } else if (afterSystemRange < fivePercent) {
+      evaluationRangeAfter = 1;
+    } else {
+      evaluationRangeAfter = 2;
+    }
+
     setCurrentMeasurement({
       ...currentMeasurement,
-      twoPCRangeBefore: twoPercent.toFixed(2),
-      twoPCRangeAfter: twoPercent.toFixed(2),
-      fivePCRangeAfter: fivePercent.toFixed(2),
+      twoPCRange: twoPercent.toFixed(2),
+      fivePCRange: fivePercent.toFixed(2),
       zeroEvaluationBefore:
         beforeSystemZero < twoPercent ? 'OK' : 'Adjustacja zera',
       rangeEvaluationBefore:
@@ -129,6 +156,43 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
 
     console.log(currentMeasurement);
   }
+
+  const loadMeasurements = () => {
+    fileSystemService
+      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .then(loadedMeasurements => {
+        if (loadedMeasurements) {
+          restoreStateFrom(loadedMeasurements);
+        }
+      });
+  };
+
+  const restoreStateFrom = (loadedMeasurements: Object) => {
+    var data = loadedMeasurements as AllData;
+    // Extract times and measurements from all data
+    data = parseDates(data);
+
+    setHourOfCheckAfter(data.timeAfter);
+    setHourOfCheckBefore(data.timeBefore);
+    setMeasurements(data.measurements);
+  };
+
+  const parseDates = (data: AllData) => {
+    data.timeBefore = new Date(data.timeBefore);
+    data.timeAfter = new Date(data.timeAfter);
+    return data;
+  };
+
+  const persistStateInInternalStorage = (hourOfCheckAfter: Date, hourOfCheckBefore: Date, measurements: SingleCompoundMeasurement[]) => {
+    const allData: AllData = {timeAfter: hourOfCheckAfter, timeBefore: hourOfCheckBefore, measurements: measurements}
+
+    fileSystemService.saveObjectToInternalStorage(
+      allData,
+      INTERNAL_STORAGE_FILE_NAME,
+    );
+  };
+
+  useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
@@ -149,7 +213,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
         <TimeSelector 
         timeLabel='Godzina sprawdzenia przed:'
         date={hourOfCheckBefore}
-        setDate={date => setHourOfCheckBefore(date)}
+        setDate={date => {setHourOfCheckBefore(date); persistStateInInternalStorage(hourOfCheckAfter, date, measurements);}}
         />
         <NumberInputBar
           placeholder="0"
@@ -226,6 +290,26 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
           console.log(currentMeasurement)
           processingInput()
         }}
+        />
+        <OutputBar 
+        label={'2% zakresu:'}
+        output={currentMeasurement.twoPCRange}
+        />
+        <OutputBar 
+        label={'5% zakresu:'}
+        output={currentMeasurement.fivePCRange}
+        />
+        <OutputBar 
+        label={'Sprawdzenie zera przed:'}
+        output={currentMeasurement.zeroEvaluationBefore}
+        />
+        <OutputBar 
+        label={'Sprawdzenie zakresu przed:'}
+        output={currentMeasurement.rangeEvaluationBefore}
+        />
+        <OutputBar 
+        label={'Sprawdzenie pomiaru po:'}
+        output={currentMeasurement.evaluationAfter}
         />
       </ScrollView>
       <HelpAndSettingsGroup navigation={navigation} />
