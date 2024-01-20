@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView, TouchableOpacity, View} from 'react-native';
 import {CommonDataSchema, Screens} from '../constants';
+import {jsonToCSV, readString} from 'react-native-csv';
 import {
   DateTimeSelectorGroup,
   NumberInputBar,
@@ -28,7 +29,23 @@ interface InternalStorageState {
   times: SingleMeasurement[];
 }
 
+interface UtilitiesScreenCSVHeading {
+  Data: string;
+  'Godzina przyjazdu': string;
+  'Czas trwania pomiaru': string;
+  'Przerwa między pomiarami': string;
+  'Czas rozpoczęcia pomiarów': string;
+}
+
+interface MeasurementTimesCSVRow {
+  'Numer pomiaru': string;
+  Start: string;
+  Koniec: string;
+}
+
 const INTERNAL_STORAGE_FILE_NAME = 'utilities.txt';
+export const UTILITIES_SCREEN_CSV_HEADING = 'Pomocnicze\n';
+const CSV_SECTION_SEPARATOR = '\nPomiary:\n';
 
 export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
@@ -43,6 +60,16 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
   const [times, setTimes] = useState([] as SingleMeasurement[]);
 
   /* State manipulation functions */
+
+  const resetState = () => {
+    setDate(new Date());
+    setMeasurementDuration(0);
+    setBreakTime(0);
+    setStartingHour(new Date());
+    setTimes([]);
+
+    persistStateInInternalStorage(new Date(), 0, 0, new Date(), []);
+  };
 
   const toNewTime = (date: Date, time: number) => {
     const newTime = new Date();
@@ -80,7 +107,6 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
     setTimes(loadedTimes);
   };
 
-
   const persistStateInInternalStorage = (
     date: Date,
     measurementDuration: number,
@@ -102,14 +128,80 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
     );
   };
 
+  /* Logic for saving and loading the file from external storage as CSV */
+
+  const exportMeasurementsAsCSV = () => {
+    // First we store the heading with all global information.
+    const csvHeading: UtilitiesScreenCSVHeading = {
+      Data: date.toString(),
+      'Godzina przyjazdu': startingHour.toString(),
+      'Czas trwania pomiaru': measurementDuration.toString(),
+      'Przerwa między pomiarami': breakTime.toString(),
+      'Czas rozpoczęcia pomiarów': startingHour.toString(),
+    };
+
+    const csvHeaderPart = jsonToCSV([csvHeading]);
+    const timesCSVRows: MeasurementTimesCSVRow[] = [];
+    for (var i = 0; i < times.length; i++) {
+      timesCSVRows.push({
+        'Numer pomiaru': (i + 1).toString(),
+        Start: times[i].startingHour.toString(),
+        Koniec: times[i].endingHour.toString(),
+      });
+    }
+    const csvTimesPart = jsonToCSV(timesCSVRows);
+    const csvFileContents =
+      UTILITIES_SCREEN_CSV_HEADING +
+      csvHeaderPart +
+      CSV_SECTION_SEPARATOR +
+      csvTimesPart;
+
+    console.log('Exporting a CSV file: ');
+    console.log(csvFileContents);
+    return csvFileContents;
+  };
+
+  const restoreStateFromCSV = (fileContents: string) => {
+    // The state is stored in two parts of a csv file.
+    // The first one stores the information collected in the
+    // header of the utilities screen, whereas the second one
+    // stores the list of measurements that are displayed in the scrollable view.
+
+    console.log('Restoring state from a CSV file: ');
+    console.log(fileContents);
+    // First we remove the section header from the file.
+    fileContents = fileContents.replace(UTILITIES_SCREEN_CSV_HEADING, '');
+    const parts = fileContents.split(CSV_SECTION_SEPARATOR);
+    const header = readString(parts[0], {header: true})[
+      'data'
+    ][0] as UtilitiesScreenCSVHeading;
+    const times = readString(parts[1], {header: true})[
+      'data'
+    ] as MeasurementTimesCSVRow[];
+
+    setDate(new Date(header.Data));
+    setStartingHour(new Date(header['Czas rozpoczęcia pomiarów']));
+    setBreakTime(parseInt(header['Przerwa między pomiarami']));
+    setMeasurementDuration(parseInt(header['Czas trwania pomiaru']));
+
+    const newTimes = times.map((time, index) => {
+      return {
+        startingHour: new Date(time.Start),
+        endingHour: new Date(time.Koniec),
+        key: index,
+      };
+    });
+    setTimes(newTimes);
+  };
+
   useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={() => ''}
-        onDelete={() => {}}
-        fileContentsHandler={() => {}}
+        getSavedFileContents={exportMeasurementsAsCSV}
+        onDelete={resetState}
+        fileContentsHandler={restoreStateFromCSV}
       />
       <DateTimeSelectorGroup
         date={date}
