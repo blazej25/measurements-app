@@ -18,14 +18,12 @@
 - [ ] GasAnalyzerCheckSCreen: the equipment should be loaded from the eqipment base (low priority feature)
 - [ ] Add csv support for HomeScreen
 - [ ] Add csv support for GasAnalyzerCheckScreen
-
+- [ ] Fix json internal storage file loading for the gas screen
+- [ ] Add default file name suggestions when exporting measurements.
 
 ## In progress
 
-- [ ] Add data bars for gas analyzer check calculated values
 - [ ] Add localization to the gas analyzer check screen
-- [ ] Add csv support for flows
-- [ ] Add default file name suggestions when exporting measurements.
 
 ## Done
 
@@ -48,3 +46,5 @@
   - need to input loads of data column-wise per compound
 - [x] Add internal storage save for HomeScreen
 - [x] Add csv support for utilities
+- [x] Add csv support for flows
+- [x] Add data bars for gas analyzer check calculated values
