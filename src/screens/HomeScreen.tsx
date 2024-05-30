@@ -64,13 +64,17 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
     setMeasurementData(data);
   };
 
+  const resetState = () => {
+    setMeasurementData({...empty_data})
+  }
+
   useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         getSavedFileContents={() => 'test'}
-        onDelete={() => {}}
+        onDelete={resetState}
         fileContentsHandler={(contents: Object) => {}}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>

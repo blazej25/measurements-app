@@ -192,13 +192,20 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
     );
   };
 
+  const resetState = () => {
+    setCurrentMeasurement({...emptyMeasurement})
+    setMeasurements([{...emptyMeasurement}])
+    setHourOfCheckAfter(new Date)
+    setHourOfCheckBefore(new Date)
+  }
+
   useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         getSavedFileContents={() => 'test'}
-        onDelete={() => {}}
+        onDelete={resetState}
         fileContentsHandler={(contents: Object) => {}}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
