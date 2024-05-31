@@ -125,4 +125,11 @@ export const pl = {
       'Zapisz - zapisuje wprowadzone dane w pamięci aplikacji (nie tworzy pliku).',
     measurementNextExplanation: 'Naprzód - załaduj następny pomiar na ekranie.',
   },
+  gasAnalyzerCheckScreen: {
+    gas: 'Gaz',
+    timeBefore: 'Godzina sprawdzenia przed',
+    tankConcentration: 'Stężenie butli',
+    analyzerRange: 'Zakres analizatora',
+    
+  }
 };

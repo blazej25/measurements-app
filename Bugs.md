@@ -2,10 +2,12 @@
 
 ## To Do
 
+- [ ] Changing tabs shouldn't erase data.
+- [ ] Rework adding workers
+- [ ] Loading data doesn't work
+
 ## Bugs fixed
 
-- [X] Hour selection on AspirationScreen (turned out to be bad translation selection)
-- [X] Number of sample on AspirationScreen (bad usage of the updateState magic function with spread operators)
 
 # Tasklist
 
@@ -48,3 +50,5 @@
 - [x] Add csv support for utilities
 - [x] Add csv support for flows
 - [x] Add data bars for gas analyzer check calculated values
+- [X] Hour selection on AspirationScreen (turned out to be bad translation selection)
+- [X] Number of sample on AspirationScreen (bad usage of the updateState magic function with spread operators)

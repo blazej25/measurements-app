@@ -23,8 +23,35 @@ import FileSystemService from '../services/FileSystemService';
 
 const INTERNAL_STORAGE_FILE_NAME = 'home.txt';
 
+interface InformationCSVRow {
+  'Data': string,
+  'Zleceniodawca': string,
+  'Źródło emisji': string,
+  'Rodzaj przewodu': string,
+  'Temperatura': string,
+  'Ciśnienie': string
+}
+
+interface PersonnelCSVRow {
+  'Imię': string,
+  'Nazwisko': string
+}
+
 export const HomeScreen = ({navigation}: {navigation: any}) => {
   const fileSystemService = new FileSystemService();
+
+  /*
+  CSV
+  Pomiary <- CSV_HEADING
+  data, zleceniodawca, ..... (bez personelu)
+  ...
+  Personel
+  imię, nazwisko
+  Jan, Kowalsk
+  ...
+  */
+
+
 
   const empty_data: CommonMeasurementData = {
     date: new Date(),
@@ -66,7 +93,26 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
 
   const resetState = () => {
     setMeasurementData({...empty_data})
-  }
+  };
+  
+  const exportMeasurementsAsCSV = (newMeasurements: any) => {
+    const csvRows: InformationCSVRow[] = [];
+    for (const measurement of newMeasurements) {
+      csvRows.push({
+        'Data': measurement.date.toString(),
+        'Zleceniodawca': measurement.measurementRequestor,
+        'Źródło emisji': measurement.emissionSource,
+        'Rodzaj przewodu': measurement.pipeCrossSectionType ? 'ROUND' : 'RECTANGULAR',
+        'Temperatura': measurement,
+        'Ciśnienie': measurement
+      })
+    } 
+  };
+
+  const exportPersonnelAsCSV = () => {
+    const csvRows: PersonnelCSVRow[] = [];
+
+  };
 
   useEffect(loadMeasurements, []);
 

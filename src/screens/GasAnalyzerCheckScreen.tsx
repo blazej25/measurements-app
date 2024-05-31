@@ -4,6 +4,7 @@ import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import {NumberInputBar, OutputBar, SelectorBar, TimeSelector} from '../components/input-bars';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {styles} from '../styles/common-styles';
+import {jsonToCSV, readString} from 'react-native-csv';
 import { useTranslation } from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
 
@@ -30,6 +31,25 @@ interface AllData {
   measurements: SingleCompoundMeasurement[],
 }
 
+interface AnalyserCheckCSVRow {
+  'Godzina sprawdzenia przed': string,
+  'Godzina sprawdzenia po': string,
+  Związek: string, 
+  'Stężenie butli': string,
+  'Zakres analizatora': string, 
+  'Odczyt przed analizator zero': string,
+  'Odczyt przed analizator zakres': string,
+  'Odczyt przed system zero': string,
+  'Odczyt przed system zakres': string,
+  'Odczyt po system zero': string,
+  'Odczyt po system zakres': string,
+  '2% zakresu': string,
+  'Sprawdzenie zera przed': string,
+  'Sprawdzenie zakresu przed': string,
+  '5% zakresu': string,
+  'Sprawdzenie po': string
+}
+
 const Compounds: string[] = [
   'O2',
   'CO2',
@@ -41,6 +61,7 @@ const Compounds: string[] = [
 ]
 
 const INTERNAL_STORAGE_FILE_NAME = 'GasAnalyzerCheck.txt'
+const ANALYSER_SCREEN_CSV_HEADING = 'Sprawdzenie analizatora gazów\n'
 
 export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
@@ -76,7 +97,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
     return filtered.length > 0;
   }
 
-  const saveCurrentCompound = (compound: string) => {
+  const saveCurrentCompound = () => {
     if (compoundExists(currentMeasurement)) {
       const newMeasurements = measurements.filter(
         (item: SingleCompoundMeasurement) =>
@@ -192,6 +213,80 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
     );
   };
 
+  const exportMeasurementsAsCSV = (newMeasurements: any, hourBefore: Date, hourAfter: Date) => {
+    console.log('Exporting a CSV file: ');
+    const csvRows: AnalyserCheckCSVRow[] = [];
+    for (const measurement of newMeasurements) {
+      csvRows.push({
+        'Godzina sprawdzenia przed': hourBefore.toString(),
+        'Godzina sprawdzenia po': hourAfter.toString(),
+        Związek: measurement.compound, 
+        'Stężenie butli': measurement.concentration,
+        'Zakres analizatora': measurement.analiserRange, 
+        'Odczyt przed analizator zero': measurement.readingBeforeAnalisatorZero,
+        'Odczyt przed analizator zakres': measurement.readingBeforeAnalisatorRange,
+        'Odczyt przed system zero': measurement.readingBeforeSystemZero,
+        'Odczyt przed system zakres': measurement.readingBeforeSystemRange,
+        'Odczyt po system zero': measurement.readingAfterSystemZero,
+        'Odczyt po system zakres': measurement.readingAfterSystemRange,
+        '2% zakresu': measurement.twoPCRange,
+        'Sprawdzenie zera przed': measurement.zeroEvaluationBefore,
+        'Sprawdzenie zakresu przed': measurement.rangeEvaluationBefore,
+        '5% zakresu': measurement.fivePCRange,
+        'Sprawdzenie po': measurement.evaluationAfter
+      });
+    }
+
+    const csvFileContents = ANALYSER_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
+    console.log('Exporting a CSV file: ');
+    console.log(csvFileContents);
+    return csvFileContents;
+  };
+
+  const restoreStateFromCSV = (fileContents: string) => {
+    // The state is stored in two parts of a csv file.
+    // The first one stores the information collected in the
+    // header of the utilities screen, whereas the second one
+    // stores the list of measurements that are displayed in the scrollable view.
+
+    console.log('Restoring state from a CSV file: ');
+    console.log(fileContents);
+    // First we remove the section header from the file.
+    fileContents = fileContents.replace(ANALYSER_SCREEN_CSV_HEADING, '');
+
+    const rows = readString(fileContents, {header: true})[
+      'data'
+    ] as AnalyserCheckCSVRow[];
+
+    const newMeasurements: SingleCompoundMeasurement[] = [];
+
+    for (const row of rows) {
+      newMeasurements.push({
+        compound: row['Związek'],
+        concentration: row['Stężenie butli'],
+        analiserRange: row['Zakres analizatora'],
+        readingBeforeAnalisatorZero: row['Odczyt przed analizator zero'], 
+        readingBeforeAnalisatorRange: row['Odczyt przed analizator zakres'],
+        readingBeforeSystemZero: row['Odczyt przed system zero'], 
+        readingBeforeSystemRange: row['Odczyt przed system zakres'],
+        readingAfterSystemZero: row['Odczyt po system zero'], 
+        readingAfterSystemRange: row['Odczyt po system zakres'],
+        twoPCRange: row['2% zakresu'],
+        zeroEvaluationBefore: row['Sprawdzenie zera przed'],
+        rangeEvaluationBefore: row['Sprawdzenie zakresu przed'],
+        fivePCRange: row['5% zakresu'],
+        evaluationAfter: row['Sprawdzenie po'],
+      });
+    }
+    
+    setHourOfCheckBefore(new Date(rows[0]['Godzina sprawdzenia przed']))
+    setHourOfCheckAfter(new Date(rows[0]['Godzina sprawdzenia po']))
+    setCurrentMeasurement(newMeasurements[newMeasurements.length - 1]);
+    setMeasurements(newMeasurements);
+    persistStateInInternalStorage(new Date(rows[0]['Godzina sprawdzenia po']), new Date(rows[0]['Godzina sprawdzenia przed']), newMeasurements);
+    console.log(newMeasurements[newMeasurements.length - 1]);
+  }
+
   const resetState = () => {
     setCurrentMeasurement({...emptyMeasurement})
     setMeasurements([{...emptyMeasurement}])
@@ -204,16 +299,18 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={() => 'test'}
+        getSavedFileContents={() => {
+          saveCurrentCompound();
+          return exportMeasurementsAsCSV(measurements, hourOfCheckBefore, hourOfCheckAfter)}}
         onDelete={resetState}
-        fileContentsHandler={(contents: Object) => {}}
+        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <SelectorBar 
         label={'Gaz:'}
         selections={Compounds} 
         onSelect={(selectedItem: string, index: number) => {
-          saveCurrentCompound(selectedItem);
+          saveCurrentCompound();
           changeCurrentCompound(selectedItem);
         }}        
         />
