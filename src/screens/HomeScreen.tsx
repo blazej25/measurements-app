@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView, Text, View} from 'react-native';
-
+import {jsonToCSV, readString} from 'react-native-csv';
 import {useTranslation} from 'react-i18next';
 import {NavigationButton} from '../components/buttons';
 import {CommonDataSchema, Screens} from '../constants';
@@ -14,6 +14,7 @@ import {
 } from '../components/input-bars';
 import {
   CommonMeasurementData,
+  Person,
   PipeCrossSectionType,
   crossSectionTypeFrom,
 } from '../model';
@@ -22,6 +23,8 @@ import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import FileSystemService from '../services/FileSystemService';
 
 const INTERNAL_STORAGE_FILE_NAME = 'home.txt';
+const HOME_SCREEN_CSV_HEADING = 'Strona główna\n'
+const PERSONNEL_CSV_HEADING = 'Personel\n'
 
 interface InformationCSVRow {
   'Data': string,
@@ -39,19 +42,6 @@ interface PersonnelCSVRow {
 
 export const HomeScreen = ({navigation}: {navigation: any}) => {
   const fileSystemService = new FileSystemService();
-
-  /*
-  CSV
-  Pomiary <- CSV_HEADING
-  data, zleceniodawca, ..... (bez personelu)
-  ...
-  Personel
-  imię, nazwisko
-  Jan, Kowalsk
-  ...
-  */
-
-
 
   const empty_data: CommonMeasurementData = {
     date: new Date(),
@@ -95,33 +85,98 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
     setMeasurementData({...empty_data})
   };
   
-  const exportMeasurementsAsCSV = (newMeasurements: any) => {
+  const exportMeasurementsAsCSV = (newMeasurements: CommonMeasurementData[]) => {
     const csvRows: InformationCSVRow[] = [];
     for (const measurement of newMeasurements) {
       csvRows.push({
         'Data': measurement.date.toString(),
         'Zleceniodawca': measurement.measurementRequestor,
         'Źródło emisji': measurement.emissionSource,
-        'Rodzaj przewodu': measurement.pipeCrossSectionType ? 'ROUND' : 'RECTANGULAR',
-        'Temperatura': measurement,
-        'Ciśnienie': measurement
+        'Rodzaj przewodu': measurement.pipeCrossSectionType == PipeCrossSectionType.ROUND ? 'Okrągły' : 'Prostokątny',
+        'Temperatura': measurement.temperature,
+        'Ciśnienie': measurement.pressure
       })
     } 
+
+    const csvFileContents = HOME_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
+    console.log('Exporting a CSV file: ');
+    console.log(csvFileContents);
+    return csvFileContents;
   };
 
-  const exportPersonnelAsCSV = () => {
+  const exportPersonnelAsCSV = (personnel: Person[]) => {
     const csvRows: PersonnelCSVRow[] = [];
+    for (const person of personnel) {
+      csvRows.push({
+        'Imię': person.name,
+        'Nazwisko': person.surname
+      })
+    };
 
-  };
+    const csvFileContents = PERSONNEL_CSV_HEADING + jsonToCSV(csvRows);
+    console.log(csvFileContents);
+    return csvFileContents;
+  }
+
+  const restoreStateFromCSV = (fileContents: string) => {
+    // The state is stored in two parts of a csv file.
+    // The first part contains the general common data whereas the
+    // second one contains the list of personnel that carried out the
+    // measurement.
+
+    console.log('Restoring state from a CSV file: ');
+    console.log(fileContents);
+    // First we remove the section header from the file.
+    let [data, personnel] = fileContents.split(PERSONNEL_CSV_HEADING);
+
+    const [_, measurementData] = data.split(HOME_SCREEN_CSV_HEADING);
+    const rows = readString(measurementData, {header: true})[
+      'data'
+    ] as InformationCSVRow[];
+    
+    const mapPipeCrossSectionType = (type: string) => {
+      return type === 'Okrągły'
+        ? PipeCrossSectionType.ROUND
+        : PipeCrossSectionType.RECTANGULAR;
+    }
+
+    const personnelRows = readString(personnel, {header: true})[
+      'data'
+    ] as PersonnelCSVRow[];
+
+
+    const personnelData: Person[] = []
+    for (const person of personnelRows) {
+      personnelData.push({name: person['Imię'], surname: person['Nazwisko']});
+    }
+
+
+    const restoredData: CommonMeasurementData = {
+      date: new Date(rows[0]['Data']),
+      measurementRequestor: rows[0]['Zleceniodawca'],
+      emissionSource: rows[0]['Źródło emisji'],
+      pipeCrossSectionType: mapPipeCrossSectionType(rows[0]['Rodzaj przewodu']),
+      staffResponsibleForMeasurement: personnelData,
+      temperature: rows[0]['Temperatura'],
+      pressure: rows[0]['Ciśnienie'],
+    }
+
+    setMeasurementData(restoredData);
+  }
 
   useEffect(loadMeasurements, []);
 
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={() => 'test'}
+        getSavedFileContents={() => {
+          const data = exportMeasurementsAsCSV([measurementData]);
+          const personnelData = exportPersonnelAsCSV(measurementData.staffResponsibleForMeasurement)
+
+          return data + '\n' + personnelData
+        }}
         onDelete={resetState}
-        fileContentsHandler={(contents: Object) => {}}
+        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <WelcomeHeader />
