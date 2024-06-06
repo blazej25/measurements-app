@@ -8,7 +8,7 @@ import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import FileSystemService from '../services/FileSystemService';
 
-interface SingleFlowMeasurement {
+export interface SingleFlowMeasurement {
   dynamicPressure: string[];
   staticPressure: string;
   temperature: string;
@@ -47,7 +47,7 @@ const initialState: SingleFlowMeasurement = {
   pointOnAxis: 0,
 };
 
-const INTERNAL_STORAGE_FILE_NAME = 'flows.txt';
+export const FLOWS_INTERNAL_STORAGE_FILE_NAME = 'flows.txt';
 export const FLOWS_SCREEN_CSV_HEADING = 'Przepływy\n';
 
 export const FlowsScreen = ({navigation}: {navigation: any}) => {
@@ -116,7 +116,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
   // See H20_14790_Screen for comments on how this works.
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .loadJSONFromInternalStorage(FLOWS_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         restoreStateFrom(loadedMeasurements);
       });
@@ -159,7 +159,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
   const persistStateInInternalStorage = (state: SingleFlowMeasurement[]) => {
     fileSystemService.saveObjectToInternalStorage(
       state,
-      INTERNAL_STORAGE_FILE_NAME,
+      FLOWS_INTERNAL_STORAGE_FILE_NAME,
     );
   };
 

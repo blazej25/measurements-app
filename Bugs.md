@@ -17,9 +17,8 @@
 
 ## To Do
 
-- [ ] GasAnalyzerCheckSCreen: the equipment should be loaded from the eqipment base (low priority feature)
-- [ ] Add csv support for HomeScreen
-- [ ] Add csv support for GasAnalyzerCheckScreen
+- [ ] manually investigate correctness of all screens (gas analyzer check screen)
+- [ ] GasAnalyzerCheckSCreen: the equipment should be loaded from the eqipment base (low priority feature) (Extra Feature)
 - [ ] Fix json internal storage file loading for the gas screen
 - [ ] Add default file name suggestions when exporting measurements.
 
@@ -29,6 +28,8 @@
 
 ## Done
 
+- [x] Add csv support for HomeScreen
+- [x] Add csv support for GasAnalyzerCheckScreen
 - [X] UtilitiesScreen
 - [X] HomeScreen (input capabilties - no file load/store)
 - [X] H20Screen (input capabilties - no file load/store)

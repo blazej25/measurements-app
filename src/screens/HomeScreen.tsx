@@ -22,9 +22,9 @@ import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import FileSystemService from '../services/FileSystemService';
 
-const INTERNAL_STORAGE_FILE_NAME = 'home.txt';
-const HOME_SCREEN_CSV_HEADING = 'Strona główna\n'
-const PERSONNEL_CSV_HEADING = 'Personel\n'
+export const HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME = 'home.txt';
+export const HOME_SCREEN_CSV_HEADING = 'Strona główna\n'
+export const PERSONNEL_CSV_HEADING = 'Personel\n'
 
 interface InformationCSVRow {
   'Data': string,
@@ -59,7 +59,7 @@ export const HomeScreen = ({navigation}: {navigation: any}) => {
   // See H20_14790_Screen for comments on how this works.
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .loadJSONFromInternalStorage(HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         restoreStateFrom(loadedMeasurements);
       });
@@ -219,7 +219,7 @@ const CommonDataInput = ({
   const persistStateInInternalStorage = (state: CommonMeasurementData) => {
     fileSystemService.saveObjectToInternalStorage(
       state,
-      INTERNAL_STORAGE_FILE_NAME,
+      HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME,
     );
   };
 

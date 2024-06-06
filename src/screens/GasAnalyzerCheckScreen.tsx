@@ -7,6 +7,7 @@ import {styles} from '../styles/common-styles';
 import {jsonToCSV, readString} from 'react-native-csv';
 import { useTranslation } from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
+import { NavigationButton } from '../components/buttons';
 
 interface SingleCompoundMeasurement {
   compound: string,
@@ -191,6 +192,8 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   const restoreStateFrom = (loadedMeasurements: Object) => {
     var data = loadedMeasurements as AllData;
     // Extract times and measurements from all data
+    console.log("Restoring state from local storage...");
+    console.log(JSON.stringify(loadedMeasurements, undefined, 2));
     data = parseDates(data);
 
     setHourOfCheckAfter(data.timeAfter);
@@ -207,6 +210,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   const persistStateInInternalStorage = (hourOfCheckAfter: Date, hourOfCheckBefore: Date, measurements: SingleCompoundMeasurement[]) => {
     const allData: AllData = {timeAfter: hourOfCheckAfter, timeBefore: hourOfCheckBefore, measurements: measurements}
 
+    console.log(JSON.stringify(allData, undefined, 2));
     fileSystemService.saveObjectToInternalStorage(
       allData,
       INTERNAL_STORAGE_FILE_NAME,
@@ -293,6 +297,19 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
     setHourOfCheckAfter(new Date)
     setHourOfCheckBefore(new Date)
   }
+            /* 
+
+                /_/
+                  \
+                    \
+                    OOOOO--/
+                    /\  /\
+
+                żyrafa
+
+            
+              */
+
 
   useEffect(loadMeasurements, []);
 
@@ -388,13 +405,19 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
           }}
           label={'Odczyt po układ zakres:'}
         />
-        <TouchableOpacity
-        style={styles.actionButton}
-        onPress={() => {
-          console.log(currentMeasurement)
-          processingInput()
-        }}
-        />
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            marginTop: 5,
+          }}>
+          <TouchableOpacity
+          style = {styles.roundedButton1}
+          onPress = {() => processingInput()}
+          >
+            <Text style={styles.buttonText1}>Przetwórz dane</Text>
+          </TouchableOpacity>
+        </View>
         <OutputBar 
         label={'2% zakresu:'}
         output={currentMeasurement.twoPCRange}
