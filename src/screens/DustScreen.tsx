@@ -15,7 +15,7 @@ import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 import {ButtonIcon} from '../components/ButtonIcon';
 import FileSystemService from '../services/FileSystemService';
 
-interface DustMeasurement {
+export interface DustMeasurement {
   id: number;
   selectedEndDiameter: string;
   measurementStartTime: Date;
@@ -45,8 +45,7 @@ const initialData: DustMeasurement = {
   water: '',
 };
 
-const INTERNAL_STORAGE_FILE_NAME = 'dust.txt';
-
+export const DUST_INTERNAL_STORAGE_FILE_NAME = 'dust.txt';
 export const DustScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
   const fileSystemService = new FileSystemService();
@@ -105,7 +104,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   const persistStateInInternalStorage = (state: DustMeasurement[]) => {
     fileSystemService.saveObjectToInternalStorage(
       state,
-      INTERNAL_STORAGE_FILE_NAME,
+      DUST_INTERNAL_STORAGE_FILE_NAME,
     );
   };
 
@@ -125,7 +124,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   // See H20_14790_Screen for comments on how this works.
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .loadJSONFromInternalStorage(DUST_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         if (loadedMeasurements) {
           restoreStateFrom(loadedMeasurements);
@@ -154,24 +153,6 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
 
   /* Logic for saving and loading the file from external storage as CSV */
 
-  const exportMeasurementsAsCSV = () => {
-    const csvRows: DustMeasurementCSVRow[] = [];
-    for (const measurement of savedMeasurements) {
-      csvRows.push({
-        'Numer pomiaru': (measurement.id + 1).toString(),
-        'Dobrana końcówka': measurement.selectedEndDiameter,
-        'Godzina rozpoczęcia': measurement.measurementStartTime.toString(),
-        'Czas aspiracji': measurement.aspirationTime,
-        'Objętość zaaspirowana': measurement.aspiratedVolume,
-        Filtr: measurement.filterType,
-        Woda: measurement.water,
-      });
-    }
-    const csvString = jsonToCSV(csvRows);
-    console.log('Exporting a CSV file: ');
-    console.log(csvString);
-    return csvString;
-  };
 
   const restoreStateFromCSV = (fileContents: string) => {
     const csvRows: DustMeasurementCSVRow[] = readString(fileContents, {
@@ -204,7 +185,6 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={exportMeasurementsAsCSV}
         onDelete={flushState}
         fileContentsHandler={restoreStateFromCSV}
       />
@@ -304,4 +284,25 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
       <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
+};
+
+export const exportMeasurementsAsCSV = (savedMeasurements: DustMeasurement[]) => {
+  console.log('Start Dust CSV')
+  const csvRows: DustMeasurementCSVRow[] = [];
+  for (const measurement of savedMeasurements) {
+    csvRows.push({
+      'Numer pomiaru': (measurement.id + 1).toString(),
+      'Dobrana końcówka': measurement.selectedEndDiameter,
+      'Godzina rozpoczęcia': measurement.measurementStartTime.toString(),
+      'Czas aspiracji': measurement.aspirationTime,
+      'Objętość zaaspirowana': measurement.aspiratedVolume,
+      Filtr: measurement.filterType,
+      Woda: measurement.water,
+    });
+  }
+  const csvString = jsonToCSV(csvRows);
+  console.log('Exporting a CSV file: ');
+  console.log(csvString);
+  console.log('End dust CSV');
+  return csvString;
 };

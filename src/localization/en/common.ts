@@ -125,4 +125,23 @@ export const en = {
     measurementNextExplanation:
       'Next - load the next measurement present in the current screen.',
   },
+  gasAnalyzerScreen: {
+    compound: 'Compound',
+    timeBefore: 'Hour of check before',
+    timeAfter: 'Hour of check after',
+    tankConcentration: 'Tank concentration',
+    analyzerRange: 'Analyzer range',
+    readingBeforeAnalyzerZero: 'Reading before analyzer zero', 
+    readingBeforeAnalyzerRange: 'Reading before analyzer range',
+    readingBeforeSystemZero: 'Reading before system zero', 
+    readingBeforeSystemRange: 'Reading before system range',
+    readingAfterSystemZero: 'Reading after system zero', 
+    readingAfterSystemRange: 'Reading after system range',
+    twoPCRange: '2% of range',
+    zeroEvaluationBefore: 'Evaluation of zero before',
+    rangeEvaluationBefore: 'Evaluation of range before',
+    fivePCRange: '5% of range',
+    evaluationAfter: 'Evaluation after',
+    processData: 'Process data'
+  }
 };

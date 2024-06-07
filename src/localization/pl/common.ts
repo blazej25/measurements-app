@@ -125,11 +125,23 @@ export const pl = {
       'Zapisz - zapisuje wprowadzone dane w pamięci aplikacji (nie tworzy pliku).',
     measurementNextExplanation: 'Naprzód - załaduj następny pomiar na ekranie.',
   },
-  gasAnalyzerCheckScreen: {
-    gas: 'Gaz',
+  gasAnalyzerScreen: {
+    compound: 'Związek',
     timeBefore: 'Godzina sprawdzenia przed',
+    timeAfter: 'Godzina sprawdzenia po',
     tankConcentration: 'Stężenie butli',
     analyzerRange: 'Zakres analizatora',
-    
+    readingBeforeAnalyzerZero: 'Odczyt przed analizator zero', 
+    readingBeforeAnalyzerRange: 'Odczyt przed analizator zakres',
+    readingBeforeSystemZero: 'Odczyt przed system zero', 
+    readingBeforeSystemRange: 'Odczyt przed system zakres',
+    readingAfterSystemZero: 'Odczyt po system zero', 
+    readingAfterSystemRange: 'Odczyt po system zakres',
+    twoPCRange: '2% zakresu',
+    zeroEvaluationBefore: 'Sprawdzenie zera przed',
+    rangeEvaluationBefore: 'Sprawdzenie zakresu przed',
+    fivePCRange: '5% zakresu',
+    evaluationAfter: 'Sprawdzenie po',
+    processData: 'Przetwórz dane'
   }
 };

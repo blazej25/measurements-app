@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useTransition } from 'react';
-import {Button, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
-import {NumberInputBar, OutputBar, SelectorBar, TimeSelector} from '../components/input-bars';
-import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
-import {styles} from '../styles/common-styles';
-import {jsonToCSV, readString} from 'react-native-csv';
+import { Button, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
+import { NumberInputBar, OutputBar, SelectorBar, TimeSelector } from '../components/input-bars';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { styles } from '../styles/common-styles';
+import { jsonToCSV, readString } from 'react-native-csv';
 import { useTranslation } from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
 import { NavigationButton } from '../components/buttons';
@@ -12,12 +12,12 @@ import { NavigationButton } from '../components/buttons';
 interface SingleCompoundMeasurement {
   compound: string,
   concentration: string,
-  analiserRange: string,
-  readingBeforeAnalisatorZero: string, 
-  readingBeforeAnalisatorRange: string,
-  readingBeforeSystemZero: string, 
+  analyzerRange: string,
+  readingBeforeAnalyzerZero: string,
+  readingBeforeAnalyzerRange: string,
+  readingBeforeSystemZero: string,
   readingBeforeSystemRange: string,
-  readingAfterSystemZero: string, 
+  readingAfterSystemZero: string,
   readingAfterSystemRange: string,
   twoPCRange: string,
   zeroEvaluationBefore: string,
@@ -26,7 +26,7 @@ interface SingleCompoundMeasurement {
   evaluationAfter: string,
 }
 
-interface AllData {
+export interface GasAnalyzerCheckData {
   timeBefore: Date,
   timeAfter: Date,
   measurements: SingleCompoundMeasurement[],
@@ -35,9 +35,9 @@ interface AllData {
 interface AnalyserCheckCSVRow {
   'Godzina sprawdzenia przed': string,
   'Godzina sprawdzenia po': string,
-  Związek: string, 
+  Związek: string,
   'Stężenie butli': string,
-  'Zakres analizatora': string, 
+  'Zakres analizatora': string,
   'Odczyt przed analizator zero': string,
   'Odczyt przed analizator zakres': string,
   'Odczyt przed system zero': string,
@@ -61,19 +61,19 @@ const Compounds: string[] = [
   'N2O',
 ]
 
-const INTERNAL_STORAGE_FILE_NAME = 'GasAnalyzerCheck.txt'
-const ANALYSER_SCREEN_CSV_HEADING = 'Sprawdzenie analizatora gazów\n'
+export const GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME = 'GasAnalyzerCheck.txt'
+export const ANALYSER_SCREEN_CSV_HEADING = 'Sprawdzenie analizatora gazów\n'
 
-export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
-  const {t} = useTranslation();
+export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   const fileSystemService = new FileSystemService();
 
   const emptyMeasurement: SingleCompoundMeasurement = {
     compound: Compounds[0],
     concentration: '',
-    analiserRange: '',
-    readingBeforeAnalisatorZero: '',
-    readingBeforeAnalisatorRange: '',
+    analyzerRange: '',
+    readingBeforeAnalyzerZero: '',
+    readingBeforeAnalyzerRange: '',
     readingBeforeSystemZero: '',
     readingBeforeSystemRange: '',
     readingAfterSystemZero: '',
@@ -104,11 +104,11 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
         (item: SingleCompoundMeasurement) =>
           currentMeasurement.compound != item.compound
       )
-      newMeasurements.push({...currentMeasurement});
+      newMeasurements.push({ ...currentMeasurement });
       setMeasurements(newMeasurements);
       persistStateInInternalStorage(hourOfCheckAfter, hourOfCheckBefore, newMeasurements);
     } else {
-      measurements.push({...currentMeasurement});
+      measurements.push({ ...currentMeasurement });
       persistStateInInternalStorage(hourOfCheckAfter, hourOfCheckBefore, measurements);
       setMeasurements(measurements)
     }
@@ -116,7 +116,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
 
   const changeCurrentCompound = (compound: string) => {
     const newCompound = compound
-    const newMeasurement = {...currentMeasurement};
+    const newMeasurement = { ...currentMeasurement };
     newMeasurement.compound = newCompound;
 
     if (compoundExists(newMeasurement)) {
@@ -124,7 +124,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
         (item: SingleCompoundMeasurement) =>
           newMeasurement.compound === item.compound
       )[0];
-      setCurrentMeasurement({...loadedCompound});
+      setCurrentMeasurement({ ...loadedCompound });
     } else {
       setCurrentMeasurement({
         ...emptyMeasurement,
@@ -134,8 +134,8 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   };
 
   const processingInput = () => {
-    const fivePercent = currentMeasurement.analiserRange === '' ? 0 : parseInt(currentMeasurement.analiserRange) * 0.05;
-    const twoPercent = currentMeasurement.analiserRange === '' ? 0 : parseInt(currentMeasurement.analiserRange) * 0.02;
+    const fivePercent = currentMeasurement.analyzerRange === '' ? 0 : parseInt(currentMeasurement.analyzerRange) * 0.05;
+    const twoPercent = currentMeasurement.analyzerRange === '' ? 0 : parseInt(currentMeasurement.analyzerRange) * 0.02;
     const beforeSystemZero = currentMeasurement.readingBeforeSystemZero === '' ? 0 : parseFloat(currentMeasurement.readingBeforeSystemZero);
     const beforeSystemRange = currentMeasurement.readingBeforeSystemRange === '' ? 0 : Math.abs(parseFloat(currentMeasurement.readingBeforeSystemRange) - parseInt(currentMeasurement.concentration));
     const afterSystemZero = currentMeasurement.readingAfterSystemZero === '' ? 0 : parseFloat(currentMeasurement.readingAfterSystemZero);
@@ -172,8 +172,8 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
         evaluationZeroAfter + evaluationRangeAfter === 0
           ? 'OK'
           : evaluationZeroAfter + evaluationRangeAfter === 1 || 2
-          ? 'Korekta o dryft'
-          : 'Odrzucenie pomiaru',
+            ? 'Korekta o dryft'
+            : 'Odrzucenie pomiaru',
     });
 
     console.log(currentMeasurement);
@@ -181,7 +181,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
 
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .loadJSONFromInternalStorage(GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         if (loadedMeasurements) {
           restoreStateFrom(loadedMeasurements);
@@ -190,7 +190,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   };
 
   const restoreStateFrom = (loadedMeasurements: Object) => {
-    var data = loadedMeasurements as AllData;
+    var data = loadedMeasurements as GasAnalyzerCheckData;
     // Extract times and measurements from all data
     console.log("Restoring state from local storage...");
     console.log(JSON.stringify(loadedMeasurements, undefined, 2));
@@ -201,51 +201,22 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
     setMeasurements(data.measurements);
   };
 
-  const parseDates = (data: AllData) => {
+  const parseDates = (data: GasAnalyzerCheckData) => {
     data.timeBefore = new Date(data.timeBefore);
     data.timeAfter = new Date(data.timeAfter);
     return data;
   };
 
   const persistStateInInternalStorage = (hourOfCheckAfter: Date, hourOfCheckBefore: Date, measurements: SingleCompoundMeasurement[]) => {
-    const allData: AllData = {timeAfter: hourOfCheckAfter, timeBefore: hourOfCheckBefore, measurements: measurements}
+    const allData: GasAnalyzerCheckData = { timeAfter: hourOfCheckAfter, timeBefore: hourOfCheckBefore, measurements: measurements }
 
     console.log(JSON.stringify(allData, undefined, 2));
     fileSystemService.saveObjectToInternalStorage(
       allData,
-      INTERNAL_STORAGE_FILE_NAME,
+      GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME,
     );
   };
 
-  const exportMeasurementsAsCSV = (newMeasurements: any, hourBefore: Date, hourAfter: Date) => {
-    console.log('Exporting a CSV file: ');
-    const csvRows: AnalyserCheckCSVRow[] = [];
-    for (const measurement of newMeasurements) {
-      csvRows.push({
-        'Godzina sprawdzenia przed': hourBefore.toString(),
-        'Godzina sprawdzenia po': hourAfter.toString(),
-        Związek: measurement.compound, 
-        'Stężenie butli': measurement.concentration,
-        'Zakres analizatora': measurement.analiserRange, 
-        'Odczyt przed analizator zero': measurement.readingBeforeAnalisatorZero,
-        'Odczyt przed analizator zakres': measurement.readingBeforeAnalisatorRange,
-        'Odczyt przed system zero': measurement.readingBeforeSystemZero,
-        'Odczyt przed system zakres': measurement.readingBeforeSystemRange,
-        'Odczyt po system zero': measurement.readingAfterSystemZero,
-        'Odczyt po system zakres': measurement.readingAfterSystemRange,
-        '2% zakresu': measurement.twoPCRange,
-        'Sprawdzenie zera przed': measurement.zeroEvaluationBefore,
-        'Sprawdzenie zakresu przed': measurement.rangeEvaluationBefore,
-        '5% zakresu': measurement.fivePCRange,
-        'Sprawdzenie po': measurement.evaluationAfter
-      });
-    }
-
-    const csvFileContents = ANALYSER_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
-    console.log('Exporting a CSV file: ');
-    console.log(csvFileContents);
-    return csvFileContents;
-  };
 
   const restoreStateFromCSV = (fileContents: string) => {
     // The state is stored in two parts of a csv file.
@@ -258,7 +229,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
     // First we remove the section header from the file.
     fileContents = fileContents.replace(ANALYSER_SCREEN_CSV_HEADING, '');
 
-    const rows = readString(fileContents, {header: true})[
+    const rows = readString(fileContents, { header: true })[
       'data'
     ] as AnalyserCheckCSVRow[];
 
@@ -268,12 +239,12 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
       newMeasurements.push({
         compound: row['Związek'],
         concentration: row['Stężenie butli'],
-        analiserRange: row['Zakres analizatora'],
-        readingBeforeAnalisatorZero: row['Odczyt przed analizator zero'], 
-        readingBeforeAnalisatorRange: row['Odczyt przed analizator zakres'],
-        readingBeforeSystemZero: row['Odczyt przed system zero'], 
+        analyzerRange: row['Zakres analizatora'],
+        readingBeforeAnalyzerZero: row['Odczyt przed analizator zero'],
+        readingBeforeAnalyzerRange: row['Odczyt przed analizator zakres'],
+        readingBeforeSystemZero: row['Odczyt przed system zero'],
         readingBeforeSystemRange: row['Odczyt przed system zakres'],
-        readingAfterSystemZero: row['Odczyt po system zero'], 
+        readingAfterSystemZero: row['Odczyt po system zero'],
         readingAfterSystemRange: row['Odczyt po system zakres'],
         twoPCRange: row['2% zakresu'],
         zeroEvaluationBefore: row['Sprawdzenie zera przed'],
@@ -282,7 +253,7 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
         evaluationAfter: row['Sprawdzenie po'],
       });
     }
-    
+
     setHourOfCheckBefore(new Date(rows[0]['Godzina sprawdzenia przed']))
     setHourOfCheckAfter(new Date(rows[0]['Godzina sprawdzenia po']))
     setCurrentMeasurement(newMeasurements[newMeasurements.length - 1]);
@@ -292,23 +263,23 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   }
 
   const resetState = () => {
-    setCurrentMeasurement({...emptyMeasurement})
-    setMeasurements([{...emptyMeasurement}])
+    setCurrentMeasurement({ ...emptyMeasurement })
+    setMeasurements([{ ...emptyMeasurement }])
     setHourOfCheckAfter(new Date)
     setHourOfCheckBefore(new Date)
   }
-            /* 
+  /* 
 
-                /_/
-                  \
-                    \
-                    OOOOO--/
-                    /\  /\
+      /_/
+        \
+          \
+          OOOOO--/
+          /\  /\
 
-                żyrafa
+      żyrafa
 
-            
-              */
+  
+    */
 
 
   useEffect(loadMeasurements, []);
@@ -316,94 +287,91 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={() => {
-          saveCurrentCompound();
-          return exportMeasurementsAsCSV(measurements, hourOfCheckBefore, hourOfCheckAfter)}}
         onDelete={resetState}
         fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
-        <SelectorBar 
-        label={'Gaz:'}
-        selections={Compounds} 
-        onSelect={(selectedItem: string, index: number) => {
-          saveCurrentCompound();
-          changeCurrentCompound(selectedItem);
-        }}        
+        <SelectorBar
+          label={t('gasAnalyzerScreen:compound')}
+          selections={Compounds}
+          onSelect={(selectedItem: string, index: number) => {
+            saveCurrentCompound();
+            changeCurrentCompound(selectedItem);
+          }}
         />
-        <TimeSelector 
-        timeLabel='Godzina sprawdzenia przed:'
-        date={hourOfCheckBefore}
-        setDate={date => {setHourOfCheckBefore(date); persistStateInInternalStorage(hourOfCheckAfter, date, measurements);}}
+        <TimeSelector
+          timeLabel={t('gasAnalyzerScreen:timeBefore')}
+          date={hourOfCheckBefore}
+          setDate={date => { setHourOfCheckBefore(date); persistStateInInternalStorage(hourOfCheckAfter, date, measurements); }}
         />
         <NumberInputBar
           placeholder="0"
           value={currentMeasurement.concentration}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, concentration: text});
+            setCurrentMeasurement({ ...currentMeasurement, concentration: text });
           }}
-          label={'Stężenie butli:'}
+          label={t('gasAnalyzerScreen:tankConcentration')}
         />
         <NumberInputBar
           placeholder="0"
-          value={currentMeasurement.analiserRange}
+          value={currentMeasurement.analyzerRange}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, analiserRange: text});
+            setCurrentMeasurement({ ...currentMeasurement, analyzerRange: text });
           }}
-          label={'Zakres analizatora:'}
+          label={t('gasAnalyzerScreen:analyzerRange')}
         />
         <NumberInputBar
           placeholder="0"
-          value={currentMeasurement.readingBeforeAnalisatorZero}
+          value={currentMeasurement.readingBeforeAnalyzerZero}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, readingBeforeAnalisatorZero: text});
+            setCurrentMeasurement({ ...currentMeasurement, readingBeforeAnalyzerZero: text });
           }}
-          label={'Odczyt przed analizator zero:'}
+          label={t('gasAnalyzerScreen:readingBeforeAnalyzerZero')}
         />
         <NumberInputBar
           placeholder="0"
-          value={currentMeasurement.readingBeforeAnalisatorRange}
+          value={currentMeasurement.readingBeforeAnalyzerRange}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, readingBeforeAnalisatorRange: text});
+            setCurrentMeasurement({ ...currentMeasurement, readingBeforeAnalyzerRange: text });
           }}
-          label={'Odczyt przed analizator zakres:'}
+          label={t('gasAnalyzerScreen:readingBeforeAnalyzerRange')}
         />
         <NumberInputBar
           placeholder="0"
           value={currentMeasurement.readingBeforeSystemZero}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, readingBeforeSystemZero: text});
+            setCurrentMeasurement({ ...currentMeasurement, readingBeforeSystemZero: text });
           }}
-          label={'Odczyt przed układ zero:'}
+          label={t('gasAnalyzerScreen:readingBeforeSystemZero')}
         />
         <NumberInputBar
           placeholder="0"
           value={currentMeasurement.readingBeforeSystemRange}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, readingBeforeSystemRange: text});
+            setCurrentMeasurement({ ...currentMeasurement, readingBeforeSystemRange: text });
           }}
-          label={'Odczyt przed układ zakres:'}
+          label={t('gasAnalyzerScreen:readingBeforeSystemRange')}
         />
-        <TimeSelector 
-        timeLabel='Godzina sprawdzenia po:'
-        date={hourOfCheckAfter}
-        setDate={date => setHourOfCheckAfter(date)}
+        <TimeSelector
+          timeLabel={t('gasAnalyzerScreen:timeAfter')}
+          date={hourOfCheckAfter}
+          setDate={date => setHourOfCheckAfter(date)}
         />
         <NumberInputBar
           placeholder="0"
           value={currentMeasurement.readingAfterSystemZero}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, readingAfterSystemZero: text});
+            setCurrentMeasurement({ ...currentMeasurement, readingAfterSystemZero: text });
           }}
-          label={'Odczyt po układ zero:'}
+          label={t('gasAnalyzerScreen:readingAfterSystemZero')}
         />
         <NumberInputBar
           placeholder="0"
           value={currentMeasurement.readingAfterSystemRange}
           onChangeText={text => {
-            setCurrentMeasurement({...currentMeasurement, readingAfterSystemRange: text});
+            setCurrentMeasurement({ ...currentMeasurement, readingAfterSystemRange: text });
           }}
-          label={'Odczyt po układ zakres:'}
+          label={t('gasAnalyzerScreen:readingAfterSystemRange')}
         />
         <View
           style={{
@@ -412,34 +380,65 @@ export const GasAnalyzerScreen = ({navigation}: {navigation: any}) => {
             marginTop: 5,
           }}>
           <TouchableOpacity
-          style = {styles.roundedButton1}
-          onPress = {() => processingInput()}
+            style={styles.roundedButton1}
+            onPress={() => processingInput()}
           >
-            <Text style={styles.buttonText1}>Przetwórz dane</Text>
+            <Text style={styles.buttonText1}>{t('gasAnalyzerScreen:processData')}</Text>
           </TouchableOpacity>
         </View>
-        <OutputBar 
-        label={'2% zakresu:'}
-        output={currentMeasurement.twoPCRange}
+        <OutputBar
+          label={t('gasAnalyzerScreen:twoPCRange')}
+          output={currentMeasurement.twoPCRange}
         />
-        <OutputBar 
-        label={'5% zakresu:'}
-        output={currentMeasurement.fivePCRange}
+        <OutputBar
+          label={t('gasAnalyzerScreen:fivePCRange')}
+          output={currentMeasurement.fivePCRange}
         />
-        <OutputBar 
-        label={'Sprawdzenie zera przed:'}
-        output={currentMeasurement.zeroEvaluationBefore}
+        <OutputBar
+          label={t('gasAnalyzerScreen:zeroEvaluationBefore')}
+          output={currentMeasurement.zeroEvaluationBefore}
         />
-        <OutputBar 
-        label={'Sprawdzenie zakresu przed:'}
-        output={currentMeasurement.rangeEvaluationBefore}
+        <OutputBar
+          label={t('gasAnalyzerScreen:rangeEvaluationBefore')}
+          output={currentMeasurement.rangeEvaluationBefore}
         />
-        <OutputBar 
-        label={'Sprawdzenie pomiaru po:'}
-        output={currentMeasurement.evaluationAfter}
+        <OutputBar
+          label={t('gasAnalyzerScreen:evaluationAfter')}
+          output={currentMeasurement.evaluationAfter}
         />
       </ScrollView>
       <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
+};
+
+export const exportMeasurementsAsCSV = (newMeasurements: SingleCompoundMeasurement[], hourBefore: Date, hourAfter: Date) => {
+  console.log('Start gas CSV');
+  const csvRows: AnalyserCheckCSVRow[] = [];
+  for (const measurement of newMeasurements) {
+    csvRows.push({
+      'Godzina sprawdzenia przed': hourBefore.toString(),
+      'Godzina sprawdzenia po': hourAfter.toString(),
+      Związek: measurement.compound,
+      'Stężenie butli': measurement.concentration,
+      'Zakres analizatora': measurement.analyzerRange,
+      'Odczyt przed analizator zero': measurement.readingBeforeAnalyzerZero,
+      'Odczyt przed analizator zakres': measurement.readingBeforeAnalyzerRange,
+      'Odczyt przed system zero': measurement.readingBeforeSystemZero,
+      'Odczyt przed system zakres': measurement.readingBeforeSystemRange,
+      'Odczyt po system zero': measurement.readingAfterSystemZero,
+      'Odczyt po system zakres': measurement.readingAfterSystemRange,
+      '2% zakresu': measurement.twoPCRange,
+      'Sprawdzenie zera przed': measurement.zeroEvaluationBefore,
+      'Sprawdzenie zakresu przed': measurement.rangeEvaluationBefore,
+      '5% zakresu': measurement.fivePCRange,
+      'Sprawdzenie po': measurement.evaluationAfter
+    });
+  }
+
+  const csvFileContents = ANALYSER_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
+  console.log('Exporting a CSV file: ');
+  console.log(csvFileContents);
+  console.log('End gas CSV');
+  return csvFileContents;
 };

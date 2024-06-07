@@ -10,11 +10,9 @@ import {FilePicker} from './FilePicker';
 import {SaveChangesButton} from './SaveChangesButton';
 
 export const LoadDeleteSaveGroup = ({
-  getSavedFileContents,
   fileContentsHandler,
   onDelete,
 }: {
-  getSavedFileContents: () => string;
   fileContentsHandler: (contents: string) => void;
   onDelete: () => void;
 }) => {
@@ -27,7 +25,6 @@ export const LoadDeleteSaveGroup = ({
       />
       <DeleteDataModal onDelete={onDelete} />
       <SaveChangesButton
-        getSavedFileContents={getSavedFileContents}
         label={t('aspirationScreen:saveChanges')}
       />
     </View>

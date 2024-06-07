@@ -15,12 +15,12 @@ import {jsonToCSV, readString} from 'react-native-csv';
 import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
 import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
 
-interface AspirationMeasurement {
+export interface AspirationMeasurement {
   id: number;
   compounds: {[compound: string]: MeasurementPerCompound};
 }
 
-interface MeasurementPerCompound {
+export interface MeasurementPerCompound {
   compoundName: string;
   date: Date;
   leakTightnessTest: string;
@@ -51,7 +51,7 @@ const TESTED_COMPOUNDS: string[] = [
   'PB',
 ];
 
-const INTERNAL_STORAGE_FILE_NAME = 'aspiration-measurements.txt';
+export const ASPIRATION_INTERNAL_STORAGE_FILE_NAME = 'aspiration-measurements.txt';
 
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // Initialise services
@@ -160,7 +160,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     // The modifications are saved to the internal storage.
     fileSystemService.saveObjectToInternalStorage(
       newMeasurements,
-      INTERNAL_STORAGE_FILE_NAME,
+      ASPIRATION_INTERNAL_STORAGE_FILE_NAME,
     );
   };
 
@@ -190,7 +190,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
 
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .loadJSONFromInternalStorage(ASPIRATION_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         if (loadedMeasurements) {
           restoreStateFrom(loadedMeasurements);
@@ -229,28 +229,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
 
   /* Logic for saving and loading the file from external storage as CSV */
 
-  const exportMeasurementsAsCSV = () => {
-    const csvRows: AspirationMeasurementCSVRow[] = [];
-    for (const measurement of measurements) {
-      for (const compound of TESTED_COMPOUNDS) {
-        const compoundData = measurement.compounds[compound];
-        csvRows.push({
-          'Numer pomiaru': (measurement.id + 1).toString(),
-          'Rodzaj związku': compoundData.compoundName,
-          Data: compoundData.date,
-          'Próba szczelności - przepływ': compoundData.leakTightnessTest,
-          'Przepływ przez aspirator': compoundData.aspiratorFlow,
-          'Objętość zaaspirowana': compoundData.aspiratedVolume,
-          'Objętość początkowa roztworu': compoundData.initialVolume,
-          'Numer identyfikacyjny próbki': compoundData.sampleId.toString(),
-        });
-      }
-    }
-    const csvString = jsonToCSV(csvRows);
-    console.log('Exporting a CSV file: ');
-    console.log(csvString);
-    return csvString;
-  };
 
   const restoreStateFromCSV = (fileContents: string) => {
     const csvRows: AspirationMeasurementCSVRow[] = readString(fileContents, {
@@ -309,7 +287,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={exportMeasurementsAsCSV}
         onDelete={() => {
           setMeasurements([{...emptyMeasurement}]);
           setDataIndex(0);
@@ -427,4 +404,29 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
       <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
+};
+
+export const exportMeasurementsAsCSV = (measurements: AspirationMeasurement[]) => {
+  console.log('Start Aspiration CSV');
+  const csvRows: AspirationMeasurementCSVRow[] = [];
+  for (const measurement of measurements) {
+    for (const compound of TESTED_COMPOUNDS) {
+      const compoundData = measurement.compounds[compound];
+      csvRows.push({
+        'Numer pomiaru': (measurement.id + 1).toString(),
+        'Rodzaj związku': compoundData.compoundName,
+        Data: compoundData.date,
+        'Próba szczelności - przepływ': compoundData.leakTightnessTest,
+        'Przepływ przez aspirator': compoundData.aspiratorFlow,
+        'Objętość zaaspirowana': compoundData.aspiratedVolume,
+        'Objętość początkowa roztworu': compoundData.initialVolume,
+        'Numer identyfikacyjny próbki': compoundData.sampleId.toString(),
+      });
+    }
+  }
+  const csvString = jsonToCSV(csvRows);
+  console.log('Exporting a CSV file: ');
+  console.log(csvString);
+  console.log('End Aspiration CSV');
+  return csvString;
 };

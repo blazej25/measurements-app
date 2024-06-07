@@ -1,24 +1,23 @@
-import React, {useState} from 'react';
-import {Modal, Text, TouchableOpacity, View} from 'react-native';
+import React, { useState } from 'react';
+import { Modal, Text, TouchableOpacity, View } from 'react-native';
 import {
   defaultGap,
   styles,
 } from '../styles/common-styles';
 import FileSystemService from '../services/FileSystemService';
 import DocumentPicker from 'react-native-document-picker';
-import {ButtonIcon} from './ButtonIcon';
-import {TextInputBar} from './input-bars';
-import {useTranslation} from 'react-i18next';
+import { ButtonIcon } from './ButtonIcon';
+import { TextInputBar } from './input-bars';
+import { useTranslation } from 'react-i18next';
+import GlobalSaveService from '../services/GlobalSaveService';
 
 export const SaveChangesButton = ({
-  getSavedFileContents,
   label,
 }: {
-  getSavedFileContents: () => string;
   label: string;
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -37,11 +36,9 @@ export const SaveChangesButton = ({
           }}>
           <Text style={styles.uiPromptText}>{t('fileSaving:howToSave')}</Text>
           <CreateNewFileModal
-            getSavedFileContents={getSavedFileContents}
             setOuterModalVisible={setModalVisible}
           />
           <OverwriteExistingFileButton
-            getSavedFileContents={getSavedFileContents}
             setModalVisible={setModalVisible}
           />
         </View>
@@ -59,29 +56,30 @@ export const SaveChangesButton = ({
 };
 
 const OverwriteExistingFileButton = ({
-  getSavedFileContents,
   setModalVisible,
 }: {
-  getSavedFileContents: () => string;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const fileSystemService = new FileSystemService();
   return (
     <TouchableOpacity
       style={styles.actionButton}
       onPress={() => {
         setModalVisible(false);
-        DocumentPicker.pickSingle({mode: 'import', copyTo: 'documentDirectory'})
+        DocumentPicker.pickSingle({ mode: 'import', copyTo: 'documentDirectory' })
           .then((response: any) => {
             console.log(response);
             const fileName = response['name'];
-            fileSystemService.saveToExternalStorageAlert(
-              getSavedFileContents(),
-              fileName,
-              t('fileSaving:fileSavedSuccessfully'),
-              t('fileSaving:error'),
-            );
+            const globalSaveService = new GlobalSaveService();
+            globalSaveService.getGlobalSaveCSVContents().then(data => {
+              fileSystemService.saveToExternalStorageAlert(
+                data,
+                fileName,
+                t('fileSaving:fileSavedSuccessfully'),
+                t('fileSaving:error'),
+              );
+            })
           })
           .catch((error: any) => {
             console.log(error);
@@ -94,13 +92,11 @@ const OverwriteExistingFileButton = ({
 };
 
 const CreateNewFileModal = ({
-  getSavedFileContents,
   setOuterModalVisible,
 }: {
-  getSavedFileContents: () => string;
   setOuterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const fileSystemService = new FileSystemService();
   const [modalVisible, setModalVisible] = useState(false);
   const [fileName, setFileName] = useState('');
@@ -132,14 +128,18 @@ const CreateNewFileModal = ({
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => {
-              fileSystemService.saveToExternalStorageAlert(
-                getSavedFileContents(),
-                fileName,
-                t('fileSaving:fileSavedSuccessfully'),
-                t('fileSaving:error'),
-              );
-              setModalVisible(false);
-              setOuterModalVisible(false);
+              const globalSaveService = new GlobalSaveService();
+              globalSaveService.getGlobalSaveCSVContents().then(data => {
+                // fileSystemService.saveToExternalStorageAlert(
+                //   data,
+                //   fileName,
+                //   t('fileSaving:fileSavedSuccessfully'),
+                //   t('fileSaving:error'),
+                // );
+                console.log(data);
+                setModalVisible(false);
+                setOuterModalVisible(false);
+              })
             }}>
             <Text style={styles.actionButtonText}>
               {t('fileSaving:createFile')}

@@ -1,11 +1,11 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {ScrollView, View} from 'react-native';
-import {NumberInputBar, SelectorBar} from '../components/input-bars';
-import {jsonToCSV, readString} from 'react-native-csv';
-import {defaultGap, styles} from '../styles/common-styles';
-import {useTranslation} from 'react-i18next';
-import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
-import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import { NumberInputBar, SelectorBar } from '../components/input-bars';
+import { jsonToCSV, readString } from 'react-native-csv';
+import { defaultGap, styles } from '../styles/common-styles';
+import { useTranslation } from 'react-i18next';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
 import FileSystemService from '../services/FileSystemService';
 
 export interface SingleFlowMeasurement {
@@ -50,8 +50,8 @@ const initialState: SingleFlowMeasurement = {
 export const FLOWS_INTERNAL_STORAGE_FILE_NAME = 'flows.txt';
 export const FLOWS_SCREEN_CSV_HEADING = 'Przepływy\n';
 
-export const FlowsScreen = ({navigation}: {navigation: any}) => {
-  const {t} = useTranslation();
+export const FlowsScreen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   const fileSystemService = new FileSystemService();
 
   // We represent numerical values as strings so that they can be entered using
@@ -68,7 +68,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
   });
 
   // Stores all measurements for the axes and points on those axes.
-  const [measurements, setMeasurements] = useState([{...initialState}]);
+  const [measurements, setMeasurements] = useState([{ ...initialState }]);
 
   const resetState = () => {
     setNumberOfSpigots(1);
@@ -76,8 +76,8 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
     setPipeDimensions(['', '']);
     setPipeDiameter('');
     setMode(roundMode);
-    setCurrentMeasurement({...initialState});
-    setMeasurements([{...initialState}]);
+    setCurrentMeasurement({ ...initialState });
+    setMeasurements([{ ...initialState }]);
   };
 
   const updateSingleFlowMeasurement = (field: any) => {
@@ -171,14 +171,14 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
   ) => {
     const newState = mode
       ? {
-          ...initialState,
-          pipeWidth: width,
-          pipeHeight: height,
-        }
+        ...initialState,
+        pipeWidth: width,
+        pipeHeight: height,
+      }
       : {
-          ...initialState,
-          pipeDiameter: diameter,
-        };
+        ...initialState,
+        pipeDiameter: diameter,
+      };
 
     setMeasurements([newState]);
     setCurrentMeasurement(newState);
@@ -194,13 +194,13 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           currentMeasurement.axisNumber != item.axisNumber ||
           currentMeasurement.pointOnAxis != item.pointOnAxis,
       );
-      newMeasurements.push({...currentMeasurement});
+      newMeasurements.push({ ...currentMeasurement });
       setMeasurements(newMeasurements);
       persistStateInInternalStorage(newMeasurements);
       // Return the new list of measurements for composing in other functions.
       return newMeasurements;
     } else {
-      measurements.push({...currentMeasurement});
+      measurements.push({ ...currentMeasurement });
       setMeasurements(measurements);
       persistStateInInternalStorage(measurements);
       // Return the new list of measurements for composing in other functions.
@@ -215,59 +215,26 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           newMeasurement.axisNumber === item.axisNumber &&
           newMeasurement.pointOnAxis === item.pointOnAxis,
       )[0];
-      setCurrentMeasurement({...loadedMeasurement});
+      setCurrentMeasurement({ ...loadedMeasurement });
     } else {
       // Here we are adding an empty measurement.
       // if we are in rectangular mode, TODO: improve engineering here.
       const newState = mode
         ? {
-            ...initialState,
-            axisNumber: newMeasurement.axisNumber,
-            pointOnAxis: newMeasurement.pointOnAxis,
-            pipeWidth: pipeDimensions[1],
-            pipeHeight: pipeDimensions[0],
-          }
+          ...initialState,
+          axisNumber: newMeasurement.axisNumber,
+          pointOnAxis: newMeasurement.pointOnAxis,
+          pipeWidth: pipeDimensions[1],
+          pipeHeight: pipeDimensions[0],
+        }
         : {
-            ...initialState,
-            axisNumber: newMeasurement.axisNumber,
-            pointOnAxis: newMeasurement.pointOnAxis,
-            pipeDiameter: pipeDiameter,
-          };
+          ...initialState,
+          axisNumber: newMeasurement.axisNumber,
+          pointOnAxis: newMeasurement.pointOnAxis,
+          pipeDiameter: pipeDiameter,
+        };
       setCurrentMeasurement(newState);
     }
-  };
-
-  /* Logic for saving and loading the file from external storage as CSV */
-
-  const exportMeasurementsAsCSV = () => {
-    // First we store the heading with all global information.
-    const newMeasurements = saveCurrentMeasurement()
-    console.log('Exporting a CSV file: ');
-    const csvRows: FlowMeasurementCSVRow[] = [];
-    for (const measurement of newMeasurements) {
-      csvRows.push({
-        'Przekrój przewodu': mode ? 'Prostokątny' : 'Okrągły',
-        'Wysokość przewodu': pipeDimensions[0],
-        'Szerokość przewodu': pipeDimensions[1],
-        'Średnica przewodu': pipeDiameter,
-        'Ilość osi pomiarowych': numberOfSpigots.toString(),
-        'Ilość punktów na osi': numberOfPoints.toString(),
-        'Numer osi': measurement.axisNumber.toString(),
-        'Punkt na osi': measurement.pointOnAxis.toString(),
-        'Ciśnienie dynamiczne 1': measurement.dynamicPressure[0],
-        'Ciśnienie dynamiczne 2': measurement.dynamicPressure[1],
-        'Ciśnienie dynamiczne 3': measurement.dynamicPressure[2],
-        'Ciśnienie dynamiczne 4': measurement.dynamicPressure[3],
-        'Ciśnienie statyczne': measurement.staticPressure,
-        Temperatura: measurement.temperature,
-        Kąt: measurement.angle,
-      });
-    }
-
-    const csvFileContents = FLOWS_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
-    console.log('Exporting a CSV file: ');
-    console.log(csvFileContents);
-    return csvFileContents;
   };
 
   const restoreStateFromCSV = (fileContents: string) => {
@@ -281,7 +248,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
     // First we remove the section header from the file.
     fileContents = fileContents.replace(FLOWS_SCREEN_CSV_HEADING, '');
 
-    const rows = readString(fileContents, {header: true})[
+    const rows = readString(fileContents, { header: true })[
       'data'
     ] as FlowMeasurementCSVRow[];
     const newMeasurements: SingleFlowMeasurement[] = [];
@@ -336,7 +303,6 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={exportMeasurementsAsCSV}
         onDelete={resetState}
         fileContentsHandler={restoreStateFromCSV}
       />
@@ -441,8 +407,8 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
         <SelectorBar
           label={t(`flowsScreen:axisNumber`) + ':'}
           selections={selectionsSpigots}
-          rowTextForSelection = {(selection: string) => selection }
-          selectionToText = {(_selection: string) => (currentMeasurement.axisNumber + 1).toString() }
+          rowTextForSelection={(selection: string) => selection}
+          selectionToText={(_selection: string) => (currentMeasurement.axisNumber + 1).toString()}
           onSelect={(_selectedItem: string, index: number) => {
             const newAxisNumber = index;
 
@@ -451,7 +417,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
             // Currrently the measurement only gets saved when the selector is
             // used to change the selection in the grid
             saveCurrentMeasurement();
-            const newMeasurement = {...currentMeasurement};
+            const newMeasurement = { ...currentMeasurement };
             newMeasurement.axisNumber = newAxisNumber;
             loadNewMeasurement(newMeasurement);
           }}
@@ -459,13 +425,13 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
         <SelectorBar
           label={t(`flowsScreen:pointOnAxis`) + ':'}
           selections={selectionsPoints}
-          rowTextForSelection = {(selection: string) => selection }
-          selectionToText = {(_selection: string) => (currentMeasurement.pointOnAxis + 1).toString() }
+          rowTextForSelection={(selection: string) => selection}
+          selectionToText={(_selection: string) => (currentMeasurement.pointOnAxis + 1).toString()}
           onSelect={(_selectedItem: string, index: number) => {
             const newPointOnAxis = index;
 
             saveCurrentMeasurement();
-            const newMeasurement = {...currentMeasurement};
+            const newMeasurement = { ...currentMeasurement };
             newMeasurement.pointOnAxis = newPointOnAxis;
             loadNewMeasurement(newMeasurement);
           }}
@@ -480,7 +446,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
             const value3 = currentMeasurement.dynamicPressure[3];
             const newValue = [value0, value1, value2, value3];
 
-            updateSingleFlowMeasurement({dynamicPressure: newValue});
+            updateSingleFlowMeasurement({ dynamicPressure: newValue });
           }}
           label={t(`flowsScreen:dynamicPressure`) + ' 1:'}
         />
@@ -494,7 +460,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
             const value3 = currentMeasurement.dynamicPressure[3];
             const newValue = [value0, value1, value2, value3];
 
-            updateSingleFlowMeasurement({dynamicPressure: newValue});
+            updateSingleFlowMeasurement({ dynamicPressure: newValue });
           }}
           label={t(`flowsScreen:dynamicPressure`) + ' 2:'}
         />
@@ -508,7 +474,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
             const value3 = currentMeasurement.dynamicPressure[3];
             const newValue = [value0, value1, value2, value3];
 
-            updateSingleFlowMeasurement({dynamicPressure: newValue});
+            updateSingleFlowMeasurement({ dynamicPressure: newValue });
           }}
           label={t(`flowsScreen:dynamicPressure`) + ' 3:'}
         />
@@ -522,7 +488,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
             const value3 = text;
             const newValue = [value0, value1, value2, value3];
 
-            updateSingleFlowMeasurement({dynamicPressure: newValue});
+            updateSingleFlowMeasurement({ dynamicPressure: newValue });
           }}
           label={t(`flowsScreen:dynamicPressure`) + ' 4:'}
         />
@@ -530,7 +496,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           placeholder=""
           value={currentMeasurement.temperature}
           onChangeText={text => {
-            updateSingleFlowMeasurement({temperature: text});
+            updateSingleFlowMeasurement({ temperature: text });
           }}
           label={t(`flowsScreen:temperature`) + ':'}
         />
@@ -538,7 +504,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           placeholder=""
           value={currentMeasurement.angle}
           onChangeText={text => {
-            updateSingleFlowMeasurement({angle: text});
+            updateSingleFlowMeasurement({ angle: text });
           }}
           label={t(`flowsScreen:angle`) + ':'}
         />
@@ -546,4 +512,50 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
       <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
+};
+
+/* Logic for saving and loading the file from external storage as CSV */
+export const exportMeasurementsAsCSV = (newMeasurements: SingleFlowMeasurement[]) => {
+  // First we store the heading with all global information.
+
+  const firstMeasurement = newMeasurements[0];
+  var mode = false;
+  if (firstMeasurement.pipeDiameter) {
+  } else {
+    mode = true;
+  }
+
+  // figure out the number of axes and points on each axis by taking the
+  // maximum over incoming values.
+  const axisNumber =
+    Math.max(...newMeasurements.map(entry => entry.axisNumber)) + 1;
+  const pointsOnEachAxis =
+    Math.max(...newMeasurements.map(entry => entry.pointOnAxis)) + 1;
+
+  console.log('Exporting a CSV file: ');
+  const csvRows: FlowMeasurementCSVRow[] = [];
+  for (const measurement of newMeasurements) {
+    csvRows.push({
+      'Przekrój przewodu': mode ? 'Prostokątny' : 'Okrągły',
+      'Wysokość przewodu': measurement.pipeHeight ? measurement.pipeHeight : "0",
+      'Szerokość przewodu': measurement.pipeWidth ? measurement.pipeWidth : "0",
+      'Średnica przewodu': measurement.pipeDiameter ? measurement.pipeDiameter : "0",
+      'Ilość osi pomiarowych': axisNumber.toString(),
+      'Ilość punktów na osi': pointsOnEachAxis.toString(),
+      'Numer osi': measurement.axisNumber.toString(),
+      'Punkt na osi': measurement.pointOnAxis.toString(),
+      'Ciśnienie dynamiczne 1': measurement.dynamicPressure[0],
+      'Ciśnienie dynamiczne 2': measurement.dynamicPressure[1],
+      'Ciśnienie dynamiczne 3': measurement.dynamicPressure[2],
+      'Ciśnienie dynamiczne 4': measurement.dynamicPressure[3],
+      'Ciśnienie statyczne': measurement.staticPressure,
+      Temperatura: measurement.temperature,
+      Kąt: measurement.angle,
+    });
+  }
+
+  const csvFileContents = FLOWS_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
+  console.log('Exporting a CSV file: ');
+  console.log(csvFileContents);
+  return csvFileContents;
 };

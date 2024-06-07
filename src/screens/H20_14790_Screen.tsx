@@ -15,7 +15,7 @@ import {ButtonIcon} from '../components/ButtonIcon';
 import FileSystemService from '../services/FileSystemService';
 import {useTranslation} from 'react-i18next';
 
-interface Measurement {
+export interface H2OMeasurement {
   id: number;
   date: Date;
   afterMass: string[];
@@ -39,7 +39,7 @@ interface MeasurementCSVRow {
   'Masa końcowa płuczka 3': string;
 }
 
-const INTERNAL_STORAGE_FILE_NAME = 'h2o-14790.txt';
+export const H2O_INTERNAL_STORAGE_FILE_NAME = 'h2o-14790.txt';
 
 export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
@@ -47,11 +47,11 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
   /* State variables */
   const [measurements, setMeasurements]: [
-    measurements: Measurement[],
+    measurements: H2OMeasurement[],
     setMeasurements: any,
   ] = useState([]);
 
-  const initialState: Measurement = {
+  const initialState: H2OMeasurement = {
     id: 0,
     date: new Date(),
     initialMass: ['', '', ''],
@@ -81,7 +81,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     [currentMeasurement, scrubberIndex],
   );
 
-  const updateField = (field: Partial<Measurement>) => {
+  const updateField = (field: Partial<H2OMeasurement>) => {
     setCurrentMeasurement({...currentMeasurement, ...field});
   };
 
@@ -105,7 +105,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     // The modifications are saved to the internal storage.
     fileSystemService.saveObjectToInternalStorage(
       newMeasurements,
-      INTERNAL_STORAGE_FILE_NAME,
+      H2O_INTERNAL_STORAGE_FILE_NAME,
     );
   };
 
@@ -121,7 +121,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     // The modifications are saved to the internal storage.
     fileSystemService.saveObjectToInternalStorage(
       newMeasurements,
-      INTERNAL_STORAGE_FILE_NAME,
+      H2O_INTERNAL_STORAGE_FILE_NAME,
     );
   };
 
@@ -151,7 +151,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .loadJSONFromInternalStorage(H2O_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         if (loadedMeasurements) {
           restoreStateFrom(loadedMeasurements);
@@ -160,7 +160,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   };
 
   const restoreStateFrom = (loadedMeasurements: Object) => {
-    var measurements = loadedMeasurements as Measurement[];
+    var measurements = loadedMeasurements as H2OMeasurement[];
     // Call to pare dates replaces all date fields with the actual Typescript
     // date object so that it can be manipulated correctly by the UI.
     measurements = parseDates(measurements);
@@ -173,7 +173,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
   // Ensures that the dates are parsed correctly after loading the saved
   // JSON object with the measurements
-  const parseDates = (measurements: Measurement[]) => {
+  const parseDates = (measurements: H2OMeasurement[]) => {
     for (var measurement of [...measurements]) {
       measurement.date = new Date(measurement.date);
     }
@@ -182,29 +182,6 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
   /* Logic for saving and loading the file from external storage as CSV */
 
-  const exportMeasurementsAsCSV = () => {
-    const csvRows: MeasurementCSVRow[] = [];
-    for (const measurement of measurements) {
-      csvRows.push({
-        'Numer pomiaru': (measurement.id + 1).toString(),
-        'Godzina przyjazdu': measurement.date.toString(),
-        'Próba szczelności': measurement.leakTightnessTest,
-        'Przepływ przez aspirator': measurement.aspiratorFlow,
-        'Objętość zaaspirowana': measurement.aspiratedGases,
-        'Masa początkowa płuczka 1': measurement.initialMass[0],
-        'Masa końcowa płuczka 1': measurement.afterMass[0],
-        'Masa początkowa płuczka 2': measurement.initialMass[1],
-        'Masa końcowa płuczka 2': measurement.afterMass[1],
-        'Masa początkowa płuczka 3': measurement.initialMass[2],
-        'Masa końcowa płuczka 3': measurement.afterMass[2],
-      });
-    }
-    const csvString = jsonToCSV(csvRows);
-    console.log('Exporting a CSV file: ');
-    console.log(csvString);
-    return csvString;
-  };
-
   const restoreStateFromCSV = (fileContents: string) => {
     const csvRows: MeasurementCSVRow[] = readString(fileContents, {
       header: true,
@@ -212,7 +189,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
 
     console.log('Restoring state from a CSV file: ');
     console.log(JSON.stringify(csvRows, null, 2));
-    const newMeasurements: Measurement[] = [];
+    const newMeasurements: H2OMeasurement[] = [];
     for (const row of csvRows) {
       const initialMass = [
         row['Masa początkowa płuczka 1'],
@@ -243,7 +220,6 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={exportMeasurementsAsCSV}
         onDelete={() => {
           setMeasurements([{...initialState}]);
           setDataIndex(0);
@@ -352,4 +328,28 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
       <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
+};
+
+export const exportMeasurementsAsCSV = (measurements: H2OMeasurement[]) => {
+  console.log("Generating CSV contents for H2O Screen...")
+  const csvRows: MeasurementCSVRow[] = [];
+  for (const measurement of measurements) {
+    csvRows.push({
+      'Numer pomiaru': (measurement.id + 1).toString(),
+      'Godzina przyjazdu': measurement.date.toString(),
+      'Próba szczelności': measurement.leakTightnessTest,
+      'Przepływ przez aspirator': measurement.aspiratorFlow,
+      'Objętość zaaspirowana': measurement.aspiratedGases,
+      'Masa początkowa płuczka 1': measurement.initialMass[0],
+      'Masa końcowa płuczka 1': measurement.afterMass[0],
+      'Masa początkowa płuczka 2': measurement.initialMass[1],
+      'Masa końcowa płuczka 2': measurement.afterMass[1],
+      'Masa początkowa płuczka 3': measurement.initialMass[2],
+      'Masa końcowa płuczka 3': measurement.afterMass[2],
+    });
+  }
+  const csvString = jsonToCSV(csvRows);
+  console.log(csvString);
+  console.log("CSV contents for H2O Screen created successfully...")
+  return csvString;
 };

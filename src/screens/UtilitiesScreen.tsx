@@ -21,7 +21,7 @@ interface SingleMeasurement {
   key: number;
 }
 
-interface InternalStorageState {
+export interface UtilitiesInternalStorageState {
   date: string;
   measurementDuration: string;
   breakTime: string;
@@ -43,7 +43,7 @@ interface MeasurementTimesCSVRow {
   Koniec: string;
 }
 
-const INTERNAL_STORAGE_FILE_NAME = 'utilities.txt';
+export const UTILITIES_INTERNAL_STORAGE_FILE_NAME = 'utilities.txt';
 export const UTILITIES_SCREEN_CSV_HEADING = 'Pomocnicze\n';
 const CSV_SECTION_SEPARATOR = '\nPomiary:\n';
 
@@ -81,7 +81,7 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
   // See H20_14790_Screen for comments on how this works.
   const loadMeasurements = () => {
     fileSystemService
-      .loadJSONFromInternalStorage(INTERNAL_STORAGE_FILE_NAME)
+      .loadJSONFromInternalStorage(UTILITIES_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         if (loadedMeasurements) {
           restoreStateFrom(loadedMeasurements);
@@ -90,7 +90,7 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
   };
 
   const restoreStateFrom = (loadedMeasurements: Object) => {
-    var state = loadedMeasurements as InternalStorageState;
+    var state = loadedMeasurements as UtilitiesInternalStorageState;
 
     setDate(new Date(state.date));
     setMeasurementDuration(parseInt(state.measurementDuration));
@@ -114,7 +114,7 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
     startingHour: Date,
     times: SingleMeasurement[],
   ) => {
-    const state: InternalStorageState = {
+    const state: UtilitiesInternalStorageState = {
       date: date.toString(),
       measurementDuration: measurementDuration.toString(),
       breakTime: breakTime.toString(),
@@ -124,42 +124,11 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
 
     fileSystemService.saveObjectToInternalStorage(
       state,
-      INTERNAL_STORAGE_FILE_NAME,
+      UTILITIES_INTERNAL_STORAGE_FILE_NAME,
     );
   };
 
   /* Logic for saving and loading the file from external storage as CSV */
-
-  const exportMeasurementsAsCSV = () => {
-    // First we store the heading with all global information.
-    const csvHeading: UtilitiesScreenCSVHeading = {
-      Data: date.toString(),
-      'Godzina przyjazdu': startingHour.toString(),
-      'Czas trwania pomiaru': measurementDuration.toString(),
-      'Przerwa między pomiarami': breakTime.toString(),
-      'Czas rozpoczęcia pomiarów': startingHour.toString(),
-    };
-
-    const csvHeaderPart = jsonToCSV([csvHeading]);
-    const timesCSVRows: MeasurementTimesCSVRow[] = [];
-    for (var i = 0; i < times.length; i++) {
-      timesCSVRows.push({
-        'Numer pomiaru': (i + 1).toString(),
-        Start: times[i].startingHour.toString(),
-        Koniec: times[i].endingHour.toString(),
-      });
-    }
-    const csvTimesPart = jsonToCSV(timesCSVRows);
-    const csvFileContents =
-      UTILITIES_SCREEN_CSV_HEADING +
-      csvHeaderPart +
-      CSV_SECTION_SEPARATOR +
-      csvTimesPart;
-
-    console.log('Exporting a CSV file: ');
-    console.log(csvFileContents);
-    return csvFileContents;
-  };
 
   const restoreStateFromCSV = (fileContents: string) => {
     // The state is stored in two parts of a csv file.
@@ -199,7 +168,6 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
   return (
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
-        getSavedFileContents={exportMeasurementsAsCSV}
         onDelete={resetState}
         fileContentsHandler={restoreStateFromCSV}
       />
@@ -336,4 +304,36 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
       <HelpAndSettingsGroup navigation={navigation} />
     </View>
   );
+};
+
+export const exportMeasurementsAsCSV = (data: UtilitiesInternalStorageState) => {
+  // First we store the heading with all global information.
+  console.log("Generating CSV contents for Utilities Screen...")
+  const csvHeading: UtilitiesScreenCSVHeading = {
+    Data: data.date.toString(),
+    'Godzina przyjazdu': data.startingHour.toString(),
+    'Czas trwania pomiaru': data.measurementDuration.toString(),
+    'Przerwa między pomiarami': data.breakTime.toString(),
+    'Czas rozpoczęcia pomiarów': data.startingHour.toString(),
+  };
+
+    const csvHeaderPart = jsonToCSV([csvHeading]);
+    const timesCSVRows: MeasurementTimesCSVRow[] = [];
+    for (var i = 0; i < data.times.length; i++) {
+      timesCSVRows.push({
+        'Numer pomiaru': (i + 1).toString(),
+        Start: data.times[i].startingHour.toString(),
+        Koniec: data.times[i].endingHour.toString(),
+      });
+    }
+    const csvTimesPart = jsonToCSV(timesCSVRows);
+    const csvFileContents =
+      UTILITIES_SCREEN_CSV_HEADING +
+      csvHeaderPart +
+      CSV_SECTION_SEPARATOR +
+      csvTimesPart;
+
+    console.log(csvFileContents);
+    console.log("CSV contents for Utilities Screen created successfully...")
+    return csvFileContents;
 };

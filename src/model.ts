@@ -17,7 +17,7 @@ export type Person = {
   surname: string;
 };
 
-export type CommonMeasurementData = {
+export type HomeScreenInformationData = {
   date: Date;
   measurementRequestor: string;
   emissionSource: string;
