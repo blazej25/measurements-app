@@ -130,12 +130,12 @@ const CreateNewFileModal = ({
             onPress={() => {
               const globalSaveService = new GlobalSaveService();
               globalSaveService.getGlobalSaveCSVContents().then(data => {
-                // fileSystemService.saveToExternalStorageAlert(
-                //   data,
-                //   fileName,
-                //   t('fileSaving:fileSavedSuccessfully'),
-                //   t('fileSaving:error'),
-                // );
+                fileSystemService.saveToExternalStorageAlert(
+                  data,
+                  fileName,
+                  t('fileSaving:fileSavedSuccessfully'),
+                  t('fileSaving:error'),
+                );
                 console.log(data);
                 setModalVisible(false);
                 setOuterModalVisible(false);

@@ -10,17 +10,14 @@ import {FilePicker} from './FilePicker';
 import {SaveChangesButton} from './SaveChangesButton';
 
 export const LoadDeleteSaveGroup = ({
-  fileContentsHandler,
   onDelete,
 }: {
-  fileContentsHandler: (contents: string) => void;
   onDelete: () => void;
 }) => {
   const {t} = useTranslation();
   return (
     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
       <FilePicker
-        fileContentsProcessor={fileContentsHandler}
         label={t('aspirationScreen:loadFromStorage')}
       />
       <DeleteDataModal onDelete={onDelete} />

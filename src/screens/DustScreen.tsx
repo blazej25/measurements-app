@@ -46,6 +46,7 @@ const initialData: DustMeasurement = {
 };
 
 export const DUST_INTERNAL_STORAGE_FILE_NAME = 'dust.txt';
+export const DUST_SCREEN_CSV_HEADING = 'Pyły\n'
 export const DustScreen = ({navigation}: {navigation: any}) => {
   const {t} = useTranslation();
   const fileSystemService = new FileSystemService();
@@ -154,31 +155,6 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   /* Logic for saving and loading the file from external storage as CSV */
 
 
-  const restoreStateFromCSV = (fileContents: string) => {
-    const csvRows: DustMeasurementCSVRow[] = readString(fileContents, {
-      header: true,
-    })['data'] as DustMeasurementCSVRow[];
-
-    console.log('Restoring state from a CSV file: ');
-    console.log(JSON.stringify(csvRows, null, 2));
-    const newMeasurements: DustMeasurement[] = [];
-    for (const row of csvRows) {
-      newMeasurements.push({
-        id: parseInt(row['Numer pomiaru']) - 1,
-        selectedEndDiameter: row['Dobrana końcówka'],
-        measurementStartTime: new Date(row['Godzina rozpoczęcia']),
-        aspirationTime: row['Czas aspiracji'],
-        aspiratedVolume: row['Objętość zaaspirowana'],
-        filterType: row['Filtr'],
-        water: row['Woda'],
-      });
-    }
-    setSavedMeasurements([...newMeasurements]);
-    const lastMeasurementIndex = newMeasurements.length - 1;
-    setMeasurementIndex(lastMeasurementIndex);
-    setNumberOfMeasurements(newMeasurements.length);
-    setCurrentMeasurement(newMeasurements[lastMeasurementIndex]);
-  };
 
   useEffect(loadMeasurements, []);
 
@@ -186,7 +162,6 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={flushState}
-        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <NumberInputBar
@@ -300,9 +275,32 @@ export const exportMeasurementsAsCSV = (savedMeasurements: DustMeasurement[]) =>
       Woda: measurement.water,
     });
   }
-  const csvString = jsonToCSV(csvRows);
+  const csvString = DUST_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
   console.log('Exporting a CSV file: ');
   console.log(csvString);
   console.log('End dust CSV');
   return csvString;
+};
+
+export const restoreStateFromCSV = (fileContents: string) => {
+  const csvRows: DustMeasurementCSVRow[] = readString(fileContents, {
+    header: true,
+  })['data'] as DustMeasurementCSVRow[];
+
+  console.log('Restoring state from a CSV file: ');
+  console.log(JSON.stringify(csvRows, null, 2));
+  const newMeasurements: DustMeasurement[] = [];
+  for (const row of csvRows) {
+    newMeasurements.push({
+      id: parseInt(row['Numer pomiaru']) - 1,
+      selectedEndDiameter: row['Dobrana końcówka'],
+      measurementStartTime: new Date(row['Godzina rozpoczęcia']),
+      aspirationTime: row['Czas aspiracji'],
+      aspiratedVolume: row['Objętość zaaspirowana'],
+      filterType: row['Filtr'],
+      water: row['Woda'],
+    });
+  }
+
+  return newMeasurements
 };

@@ -51,7 +51,18 @@ const TESTED_COMPOUNDS: string[] = [
   'PB',
 ];
 
+const initialState: MeasurementPerCompound = {
+  compoundName: TESTED_COMPOUNDS[0],
+  date: new Date(),
+  leakTightnessTest: '',
+  aspiratorFlow: '',
+  aspiratedVolume: '',
+  initialVolume: '',
+  sampleId: 0,
+};
+
 export const ASPIRATION_INTERNAL_STORAGE_FILE_NAME = 'aspiration-measurements.txt';
+export const ASPIRATION_SCREEN_CSV_HEADING = 'Aspiracja\n';
 
 export const AspirationScreen = ({navigation}: {navigation: any}) => {
   // Initialise services
@@ -59,15 +70,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   const fileSystemService = new FileSystemService();
 
   /* State variables */
-  const initialState: MeasurementPerCompound = {
-    compoundName: TESTED_COMPOUNDS[0],
-    date: new Date(),
-    leakTightnessTest: '',
-    aspiratorFlow: '',
-    aspiratedVolume: '',
-    initialVolume: '',
-    sampleId: 0,
-  };
 
   const emptyMeasurement: AspirationMeasurement = {
     id: 0,
@@ -292,7 +294,6 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           setDataIndex(0);
           setCurrentCompoundData({...initialState});
         }}
-        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar
@@ -424,9 +425,58 @@ export const exportMeasurementsAsCSV = (measurements: AspirationMeasurement[]) =
       });
     }
   }
-  const csvString = jsonToCSV(csvRows);
+  const csvString = ASPIRATION_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
   console.log('Exporting a CSV file: ');
   console.log(csvString);
   console.log('End Aspiration CSV');
   return csvString;
+};
+
+export const restoreStateFromCSV = (fileContents: string) => {
+  const csvRows: AspirationMeasurementCSVRow[] = readString(fileContents, {
+    header: true,
+  })['data'] as AspirationMeasurementCSVRow[];
+
+  console.log('Restoring state from a CSV file: ');
+  console.log(JSON.stringify(csvRows, null, 2));
+  const newMeasurements: AspirationMeasurement[] = [];
+  for (const row of csvRows) {
+    if (row['Numer pomiaru'] == undefined) {
+      continue;
+    }
+
+    const measurementNumber = parseInt(row['Numer pomiaru']);
+    if (
+      newMeasurements.length == 0 ||
+      newMeasurements[newMeasurements.length - 1].id != measurementNumber - 1
+    ) {
+      const newData: AspirationMeasurement = {
+        id: measurementNumber - 1,
+        compounds: {},
+      };
+      for (const compound of TESTED_COMPOUNDS) {
+        newData.compounds[compound] = {
+          ...initialState,
+          compoundName: compound,
+        };
+      }
+      newMeasurements.push(newData);
+    }
+
+    if (newMeasurements.length >= measurementNumber) {
+      newMeasurements[measurementNumber - 1].compounds[
+        row['Rodzaj związku']
+      ] = {
+        compoundName: row['Rodzaj związku'],
+        date: new Date(row['Data']),
+        leakTightnessTest: row['Próba szczelności - przepływ'],
+        aspiratorFlow: row['Przepływ przez aspirator'],
+        aspiratedVolume: row['Objętość zaaspirowana'],
+        initialVolume: row['Objętość początkowa roztworu'],
+        sampleId: parseInt(row['Numer identyfikacyjny próbki']),
+      };
+    }
+  }
+
+  return newMeasurements
 };

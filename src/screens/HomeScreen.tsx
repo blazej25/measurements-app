@@ -138,7 +138,6 @@ export const HomeScreen = ({ navigation }: { navigation: any }) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={resetState}
-        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <WelcomeHeader />
@@ -311,4 +310,50 @@ export const exportPersonnelAsCSV = (personnel: Person[]) => {
   const csvFileContents = PERSONNEL_CSV_HEADING + jsonToCSV(csvRows);
   console.log(csvFileContents);
   return csvFileContents;
+}
+
+export const restoreStateFromCSV = (fileContents: string) => {
+  // The state is stored in two parts of a csv file.
+  // The first part contains the general common data whereas the
+  // second one contains the list of personnel that carried out the
+  // measurement.
+
+  console.log('Restoring state from a CSV file: ');
+  console.log(fileContents);
+  // First we remove the section header from the file.
+  let [data, personnel] = fileContents.split(PERSONNEL_CSV_HEADING);
+
+  const [_, measurementData] = data.split(HOME_SCREEN_CSV_HEADING);
+  const rows = readString(measurementData, { header: true })[
+    'data'
+  ] as InformationCSVRow[];
+
+  const mapPipeCrossSectionType = (type: string) => {
+    return type === 'Okrągły'
+      ? PipeCrossSectionType.ROUND
+      : PipeCrossSectionType.RECTANGULAR;
+  }
+
+  const personnelRows = readString(personnel, { header: true })[
+    'data'
+  ] as PersonnelCSVRow[];
+
+
+  const personnelData: Person[] = []
+  for (const person of personnelRows) {
+    personnelData.push({ name: person['Imię'], surname: person['Nazwisko'] });
+  }
+
+
+  const restoredData: HomeScreenInformationData = {
+    date: new Date(rows[0]['Data']),
+    measurementRequestor: rows[0]['Zleceniodawca'],
+    emissionSource: rows[0]['Źródło emisji'],
+    pipeCrossSectionType: mapPipeCrossSectionType(rows[0]['Rodzaj przewodu']),
+    staffResponsibleForMeasurement: personnelData,
+    temperature: rows[0]['Temperatura'],
+    pressure: rows[0]['Ciśnienie'],
+  }
+
+  return restoredData
 }

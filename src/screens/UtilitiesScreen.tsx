@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, TouchableOpacity, View} from 'react-native';
-import {CommonDataSchema, Screens} from '../constants';
-import {jsonToCSV, readString} from 'react-native-csv';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { CommonDataSchema, Screens } from '../constants';
+import { jsonToCSV, readString } from 'react-native-csv';
 import {
   DateTimeSelectorGroup,
   NumberInputBar,
   TimeSelector,
   StartEndBar,
 } from '../components/input-bars';
-import {useTranslation} from 'react-i18next';
-import {styles} from '../styles/common-styles';
-import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
-import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
-import {ButtonIcon} from '../components/ButtonIcon';
+import { useTranslation } from 'react-i18next';
+import { styles } from '../styles/common-styles';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
+import { ButtonIcon } from '../components/ButtonIcon';
 import FileSystemService from '../services/FileSystemService';
 
 interface SingleMeasurement {
@@ -47,8 +47,8 @@ export const UTILITIES_INTERNAL_STORAGE_FILE_NAME = 'utilities.txt';
 export const UTILITIES_SCREEN_CSV_HEADING = 'Pomocnicze\n';
 const CSV_SECTION_SEPARATOR = '\nPomiary:\n';
 
-export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
-  const {t} = useTranslation();
+export const UtilitiesScreen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   const fileSystemService = new FileSystemService();
 
   /* State variables */
@@ -91,6 +91,8 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
 
   const restoreStateFrom = (loadedMeasurements: Object) => {
     var state = loadedMeasurements as UtilitiesInternalStorageState;
+    console.log("Loading Utilities data from internal storage...")
+    console.log(JSON.stringify(loadedMeasurements, undefined, 2))
 
     setDate(new Date(state.date));
     setMeasurementDuration(parseInt(state.measurementDuration));
@@ -141,10 +143,10 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
     // First we remove the section header from the file.
     fileContents = fileContents.replace(UTILITIES_SCREEN_CSV_HEADING, '');
     const parts = fileContents.split(CSV_SECTION_SEPARATOR);
-    const header = readString(parts[0], {header: true})[
+    const header = readString(parts[0], { header: true })[
       'data'
     ][0] as UtilitiesScreenCSVHeading;
-    const times = readString(parts[1], {header: true})[
+    const times = readString(parts[1], { header: true })[
       'data'
     ] as MeasurementTimesCSVRow[];
 
@@ -161,6 +163,7 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
       };
     });
     setTimes(newTimes);
+    /// create UtilitiesInternalStorageState here
   };
 
   useEffect(loadMeasurements, []);
@@ -169,7 +172,6 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={resetState}
-        fileContentsHandler={restoreStateFromCSV}
       />
       <DateTimeSelectorGroup
         date={date}
@@ -227,7 +229,7 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
           );
         }}
       />
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <TouchableOpacity
           onPress={() => {
             if (times.length !== 0) {
@@ -309,6 +311,7 @@ export const UtilitiesScreen = ({navigation}: {navigation: any}) => {
 export const exportMeasurementsAsCSV = (data: UtilitiesInternalStorageState) => {
   // First we store the heading with all global information.
   console.log("Generating CSV contents for Utilities Screen...")
+  console.log(JSON.stringify(data, undefined, 2));
   const csvHeading: UtilitiesScreenCSVHeading = {
     Data: data.date.toString(),
     'Godzina przyjazdu': data.startingHour.toString(),
@@ -317,23 +320,57 @@ export const exportMeasurementsAsCSV = (data: UtilitiesInternalStorageState) => 
     'Czas rozpoczęcia pomiarów': data.startingHour.toString(),
   };
 
-    const csvHeaderPart = jsonToCSV([csvHeading]);
-    const timesCSVRows: MeasurementTimesCSVRow[] = [];
-    for (var i = 0; i < data.times.length; i++) {
-      timesCSVRows.push({
-        'Numer pomiaru': (i + 1).toString(),
-        Start: data.times[i].startingHour.toString(),
-        Koniec: data.times[i].endingHour.toString(),
-      });
-    }
-    const csvTimesPart = jsonToCSV(timesCSVRows);
-    const csvFileContents =
-      UTILITIES_SCREEN_CSV_HEADING +
-      csvHeaderPart +
-      CSV_SECTION_SEPARATOR +
-      csvTimesPart;
+  const csvHeaderPart = jsonToCSV([csvHeading]);
+  const timesCSVRows: MeasurementTimesCSVRow[] = [];
+  for (var i = 0; i < data.times.length; i++) {
+    timesCSVRows.push({
+      'Numer pomiaru': (i + 1).toString(),
+      Start: data.times[i].startingHour.toString(),
+      Koniec: data.times[i].endingHour.toString(),
+    });
+  }
+  const csvTimesPart = jsonToCSV(timesCSVRows);
+  const csvFileContents =
+    UTILITIES_SCREEN_CSV_HEADING +
+    csvHeaderPart +
+    CSV_SECTION_SEPARATOR +
+    csvTimesPart;
 
-    console.log(csvFileContents);
-    console.log("CSV contents for Utilities Screen created successfully...")
-    return csvFileContents;
+  console.log(csvFileContents);
+  console.log("CSV contents for Utilities Screen created successfully...")
+  return csvFileContents;
+};
+
+/* Logic for saving and loading the file from external storage as CSV */
+
+export const restoreStateFromCSV = (fileContents: string) => {
+  console.log('Restoring state from a CSV file: ');
+  console.log(fileContents);
+  // First we remove the section header from the file.
+  fileContents = fileContents.replace(UTILITIES_SCREEN_CSV_HEADING, '');
+  const parts = fileContents.split(CSV_SECTION_SEPARATOR);
+  const header = readString(parts[0], { header: true })[
+    'data'
+  ][0] as UtilitiesScreenCSVHeading;
+  const times = readString(parts[1], { header: true })[
+    'data'
+  ] as MeasurementTimesCSVRow[];
+
+  const newTimes = times.map((time, index) => {
+    return {
+      startingHour: new Date(time.Start),
+      endingHour: new Date(time.Koniec),
+      key: index,
+    };
+  });
+
+  const result: UtilitiesInternalStorageState = {
+    date: header.Data,
+    measurementDuration: header['Czas trwania pomiaru'],
+    breakTime: header['Przerwa między pomiarami'],
+    startingHour: header['Czas rozpoczęcia pomiarów'],
+    times: newTimes,
+  }
+
+  return result;
 };

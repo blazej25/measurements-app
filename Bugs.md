@@ -2,9 +2,30 @@
 
 ## To Do
 
-- [ ] Changing tabs shouldn't erase data.
+- [ ] GasAnalyzer check saving problem.
+- [ ] Fix home screen loading.
 - [ ] Rework adding workers
 - [ ] Loading data doesn't work
+- [ ] h20 screen not loading.
+- [ ] fix the problem below in flows, dust and H2O
+        Przepływy
+        Przekrój przewodu,Wysokość przewodu,Szerokość przewodu,Średnica przewodu,Ilość osi pomiarowych,Ilość punktów na osi,Numer osi,Punkt na osi,Ciśnienie dynamiczne 1,Ciśnienie dynamiczne 2,Ciśnienie dynamiczne 3,Ciśnienie dynamiczne 4,Ciśnienie statyczne,Temperatura,Kąt
+        Okrągły,2,2,0,1,1,0,0,1,2,3,3,,2,"1
+        """"
+        ""
+        "
+        H2O-14790
+        Numer pomiaru,Godzina przyjazdu,Próba szczelności,Przepływ przez aspirator,Objętość zaaspirowana,Masa początkowa płuczka 1,Masa końcowa płuczka 1,Masa początkowa płuczka 2,Masa końcowa płuczka 2,Masa początkowa płuczka 3,Masa końcowa płuczka 3
+        1,2024-06-07T17:28:57.873Z,11,1,1,11,1,,,,"
+        """"
+        ""
+        "
+        Pyły
+        Numer pomiaru,Dobrana końcówka,Godzina rozpoczęcia,Czas aspiracji,Objętość zaaspirowana,Filtr,Woda
+        1,1,2024-06-07T17:26:28.792Z,1,1,1,"1
+        """"
+        ""
+        "
 
 ## Bugs fixed
 
@@ -28,6 +49,8 @@
 
 ## Done
 
+- [x] utilities time loading.
+- [x] Changing tabs shouldn't erase data.
 - [x] Add csv support for HomeScreen
 - [x] Add csv support for GasAnalyzerCheckScreen
 - [X] UtilitiesScreen

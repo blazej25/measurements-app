@@ -304,7 +304,6 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={resetState}
-        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView
         contentContainerStyle={{
@@ -517,6 +516,7 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
 /* Logic for saving and loading the file from external storage as CSV */
 export const exportMeasurementsAsCSV = (newMeasurements: SingleFlowMeasurement[]) => {
   // First we store the heading with all global information.
+  console.log("Generating CSV contents for Flows Screen...")
 
   const firstMeasurement = newMeasurements[0];
   var mode = false;
@@ -555,7 +555,42 @@ export const exportMeasurementsAsCSV = (newMeasurements: SingleFlowMeasurement[]
   }
 
   const csvFileContents = FLOWS_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
-  console.log('Exporting a CSV file: ');
   console.log(csvFileContents);
+  console.log("CSV contents for Flows Screen created successfully...")
+
   return csvFileContents;
+};
+
+
+export const restoreStateFromCSV = (fileContents: string) => {
+  console.log('Restoring state from a CSV file: ');
+  console.log(fileContents);
+  // First we remove the section header from the file.
+  fileContents = fileContents.replace(FLOWS_SCREEN_CSV_HEADING, '');
+
+  const rows = readString(fileContents, { header: true })[
+    'data'
+  ] as FlowMeasurementCSVRow[];
+  const newMeasurements: SingleFlowMeasurement[] = [];
+
+  for (const row of rows) {
+    newMeasurements.push({
+      dynamicPressure: [
+        row['Ciśnienie dynamiczne 1'],
+        row['Ciśnienie dynamiczne 2'],
+        row['Ciśnienie dynamiczne 3'],
+        row['Ciśnienie dynamiczne 4'],
+      ],
+      staticPressure: row['Ciśnienie statyczne'],
+      temperature: row.Temperatura,
+      angle: row.Kąt,
+      axisNumber: parseInt(row['Numer osi']),
+      pointOnAxis: parseInt(row['Punkt na osi']),
+      pipeDiameter: row['Średnica przewodu'],
+      pipeWidth: row['Szerokość przewodu'],
+      pipeHeight: row['Wysokość przewodu'],
+    });
+  }
+
+  return newMeasurements;
 };

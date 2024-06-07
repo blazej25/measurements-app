@@ -184,6 +184,7 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
       .loadJSONFromInternalStorage(GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
         if (loadedMeasurements) {
+          console.log(loadedMeasurements);
           restoreStateFrom(loadedMeasurements);
         }
       });
@@ -264,7 +265,7 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
 
   const resetState = () => {
     setCurrentMeasurement({ ...emptyMeasurement })
-    setMeasurements([{ ...emptyMeasurement }])
+    setMeasurements([emptyMeasurement])
     setHourOfCheckAfter(new Date)
     setHourOfCheckBefore(new Date)
   }
@@ -288,7 +289,6 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={resetState}
-        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <SelectorBar
@@ -442,3 +442,43 @@ export const exportMeasurementsAsCSV = (newMeasurements: SingleCompoundMeasureme
   console.log('End gas CSV');
   return csvFileContents;
 };
+
+
+export const restoreStateFromCSV = (fileContents: string) => {
+  console.log('Restoring state from a CSV file: ');
+  console.log(fileContents);
+  // First we remove the section header from the file.
+  fileContents = fileContents.replace(ANALYSER_SCREEN_CSV_HEADING, '');
+
+  const rows = readString(fileContents, { header: true })[
+    'data'
+  ] as AnalyserCheckCSVRow[];
+
+  const newMeasurements: SingleCompoundMeasurement[] = [];
+
+  for (const row of rows) {
+    newMeasurements.push({
+      compound: row['Związek'],
+      concentration: row['Stężenie butli'],
+      analyzerRange: row['Zakres analizatora'],
+      readingBeforeAnalyzerZero: row['Odczyt przed analizator zero'],
+      readingBeforeAnalyzerRange: row['Odczyt przed analizator zakres'],
+      readingBeforeSystemZero: row['Odczyt przed system zero'],
+      readingBeforeSystemRange: row['Odczyt przed system zakres'],
+      readingAfterSystemZero: row['Odczyt po system zero'],
+      readingAfterSystemRange: row['Odczyt po system zakres'],
+      twoPCRange: row['2% zakresu'],
+      zeroEvaluationBefore: row['Sprawdzenie zera przed'],
+      rangeEvaluationBefore: row['Sprawdzenie zakresu przed'],
+      fivePCRange: row['5% zakresu'],
+      evaluationAfter: row['Sprawdzenie po'],
+    });
+  }
+
+  const data: GasAnalyzerCheckData = {
+    timeBefore: new Date(rows[0]['Godzina sprawdzenia przed']),
+    timeAfter: new Date(rows[0]['Godzina sprawdzenia po']),
+    measurements: newMeasurements
+  }
+  return data;
+}

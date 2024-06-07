@@ -1,12 +1,12 @@
 import { HomeScreenInformationData } from "../model";
-import { FLOWS_INTERNAL_STORAGE_FILE_NAME, FLOWS_SCREEN_CSV_HEADING, SingleFlowMeasurement, exportMeasurementsAsCSV as getFlowsCSV } from "../screens/FlowsScreen";
-import { GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME, GasAnalyzerCheckData, exportMeasurementsAsCSV as getGasCSV } from "../screens/GasAnalyzerCheckScreen";
-import { DUST_INTERNAL_STORAGE_FILE_NAME, DustMeasurement, exportMeasurementsAsCSV as getDustCSV } from "../screens/DustScreen";
-import { H2O_INTERNAL_STORAGE_FILE_NAME, H2OMeasurement, exportMeasurementsAsCSV as geth2oCSV } from "../screens/H20_14790_Screen";
-import { HOME_SCREEN_CSV_HEADING, HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME, PERSONNEL_CSV_HEADING, exportMeasurementsAsCSV as getHomeCSV, exportPersonnelAsCSV } from "../screens/HomeScreen";
-import { UTILITIES_INTERNAL_STORAGE_FILE_NAME, UtilitiesInternalStorageState, exportMeasurementsAsCSV as getUtilitiesCSV } from "../screens/UtilitiesScreen";
+import { FLOWS_INTERNAL_STORAGE_FILE_NAME, FLOWS_SCREEN_CSV_HEADING, SingleFlowMeasurement, exportMeasurementsAsCSV as getFlowsCSV, restoreStateFromCSV as restoreFlowsDataFromCSV } from "../screens/FlowsScreen";
+import { GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME, ANALYSER_SCREEN_CSV_HEADING, GasAnalyzerCheckData, exportMeasurementsAsCSV as getGasCSV, restoreStateFromCSV as restoreGasDataFromCSV } from "../screens/GasAnalyzerCheckScreen";
+import { DUST_INTERNAL_STORAGE_FILE_NAME, DUST_SCREEN_CSV_HEADING, DustMeasurement, exportMeasurementsAsCSV as getDustCSV, restoreStateFromCSV as restoreDustDataFromCSV } from "../screens/DustScreen";
+import { H2O_INTERNAL_STORAGE_FILE_NAME, H2O_SCREEN_CSV_HEADING, H2OMeasurement, exportMeasurementsAsCSV as geth2oCSV, restoreStateFromCSV as restoreH2ODataFromCSV } from "../screens/H20_14790_Screen";
+import { HOME_SCREEN_CSV_HEADING, HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME, PERSONNEL_CSV_HEADING, exportMeasurementsAsCSV as getHomeCSV, exportPersonnelAsCSV, restoreStateFromCSV as restoreHomeDataFromCSV } from "../screens/HomeScreen";
+import { UTILITIES_INTERNAL_STORAGE_FILE_NAME, UTILITIES_SCREEN_CSV_HEADING, UtilitiesInternalStorageState, exportMeasurementsAsCSV as getUtilitiesCSV, restoreStateFromCSV as restoreUtilitiesDataFromCSV } from "../screens/UtilitiesScreen";
 import FileSystemService from "./FileSystemService";
-import { ASPIRATION_INTERNAL_STORAGE_FILE_NAME, AspirationMeasurement, exportMeasurementsAsCSV as getAspirationCSV } from "../screens/AspirationScreen";
+import { ASPIRATION_INTERNAL_STORAGE_FILE_NAME, ASPIRATION_SCREEN_CSV_HEADING, AspirationMeasurement, exportMeasurementsAsCSV as getAspirationCSV, restoreStateFromCSV as restoreAspirationDataFromCSV } from "../screens/AspirationScreen";
 
 class GlobalSaveService {
     fileSystemService: FileSystemService;
@@ -16,17 +16,17 @@ class GlobalSaveService {
     }
     async getGlobalSaveCSVContents(): Promise<string> {
         const flowsData: SingleFlowMeasurement[] = await this.loadScreenData(FLOWS_INTERNAL_STORAGE_FILE_NAME);
-        const gasAnalyzerCheckData: GasAnalyzerCheckData = await this.loadScreenData(GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME);
+        const gasAnalyzerCheckData: GasAnalyzerCheckData = parseDates(await this.loadScreenData(GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME));
         const dustData: DustMeasurement[] = await this.loadScreenData(DUST_INTERNAL_STORAGE_FILE_NAME);
         const h2oData: H2OMeasurement[] = await this.loadScreenData(H2O_INTERNAL_STORAGE_FILE_NAME);
         const utilitiesData: UtilitiesInternalStorageState = await this.loadScreenData(UTILITIES_INTERNAL_STORAGE_FILE_NAME);
         const aspirationData: AspirationMeasurement[] = await this.loadScreenData(ASPIRATION_INTERNAL_STORAGE_FILE_NAME);
-
-        // TODO: figure out how it is saved
         const homeInformation: HomeScreenInformationData = await this.loadScreenData(HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME);
 
         console.log(utilitiesData)
 
+        // SingleFlowMeasurement[] -> CSV
+        // CSV ->  SingleFlowMeasurement[] 
         const homeCSVContents = getHomeCSV(homeInformation)
         const personnelCSVContents = exportPersonnelAsCSV(homeInformation.staffResponsibleForMeasurement);
         const utilitiesCSVContents = getUtilitiesCSV(utilitiesData);
@@ -35,6 +35,7 @@ class GlobalSaveService {
         const dustCSVContents = getDustCSV(dustData);
         const gasAnalyzerCSVContents = getGasCSV(gasAnalyzerCheckData.measurements, gasAnalyzerCheckData.timeBefore, gasAnalyzerCheckData.timeAfter);
         const aspirationCSVContents = getAspirationCSV(aspirationData)
+
 
         const output = [
             homeCSVContents,
@@ -46,13 +47,50 @@ class GlobalSaveService {
             gasAnalyzerCSVContents,
             aspirationCSVContents]
             .join("\n");
-        
+
         console.log(output)
         return output;
+    }
+
+    async restoreGlobalStateFromCSV(csvContents: string) {
+        // split the file into separate parts
+        console.log("Restoring global state from CSV...")
+        const [homeCSVContents, rest1] = csvContents.split(UTILITIES_SCREEN_CSV_HEADING);
+        console.log("Parsed Home Screen contents: " + homeCSVContents);
+        const [utilitiesCSVContents, rest2] = rest1.split(FLOWS_SCREEN_CSV_HEADING);
+        const [flowsCSVContents, rest3] = rest2.split(H2O_SCREEN_CSV_HEADING);
+        const [h2oCSVContents, rest4] = rest3.split(DUST_SCREEN_CSV_HEADING);
+        const [dustCSVContents, rest5] = rest4.split(ANALYSER_SCREEN_CSV_HEADING);
+        const [gasAnalyzerCSVContents, aspirationCSVContents] = rest5.split(ASPIRATION_SCREEN_CSV_HEADING);
+
+        const utilitiesData: UtilitiesInternalStorageState = restoreUtilitiesDataFromCSV(utilitiesCSVContents);
+        const flowsData: SingleFlowMeasurement[] = restoreFlowsDataFromCSV(flowsCSVContents);
+        const h2oData: H2OMeasurement[] = restoreH2ODataFromCSV(h2oCSVContents);
+        const dustData: DustMeasurement[] = restoreDustDataFromCSV(dustCSVContents);
+        const aspirationData: AspirationMeasurement[] = restoreAspirationDataFromCSV(aspirationCSVContents);
+        const gasAnalyzerCheckData: GasAnalyzerCheckData = restoreGasDataFromCSV(dustCSVContents);
+        const homeData: HomeScreenInformationData = restoreHomeDataFromCSV(homeCSVContents);
+
+        this.persistScreenData(utilitiesData, UTILITIES_INTERNAL_STORAGE_FILE_NAME);
+        this.persistScreenData(flowsData, FLOWS_INTERNAL_STORAGE_FILE_NAME);
+        this.persistScreenData(h2oData, H2O_INTERNAL_STORAGE_FILE_NAME);
+        this.persistScreenData(dustData, DUST_INTERNAL_STORAGE_FILE_NAME);
+        this.persistScreenData(aspirationData, ASPIRATION_INTERNAL_STORAGE_FILE_NAME);
+        this.persistScreenData(gasAnalyzerCheckData, GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME);
+        this.persistScreenData(homeData, HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME);
     }
     async loadScreenData<T>(internalStorageFileName: string): Promise<T> {
         return this.fileSystemService.loadJSONFromInternalStorage(internalStorageFileName).then(loadedData => loadedData as T)
     }
+    async persistScreenData(data: Object, internalStorageFileName: string) {
+        await this.fileSystemService.saveObjectToInternalStorage(data, internalStorageFileName);
+    }
 }
+
+const parseDates = (data: GasAnalyzerCheckData) => {
+    data.timeBefore = new Date(data.timeBefore);
+    data.timeAfter = new Date(data.timeAfter);
+    return data;
+};
 
 export default GlobalSaveService;

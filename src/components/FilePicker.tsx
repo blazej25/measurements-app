@@ -4,15 +4,15 @@ import {styles} from '../styles/common-styles';
 import FileSystemService from '../services/FileSystemService';
 import DocumentPicker from 'react-native-document-picker';
 import {ButtonIcon} from './ButtonIcon';
+import GlobalSaveService from '../services/GlobalSaveService';
 
 export const FilePicker = ({
-  fileContentsProcessor,
   label,
 }: {
-  fileContentsProcessor: (contents: string) => void;
   label: string;
 }) => {
   const fileSystemService = new FileSystemService();
+  const globalSaveService = new GlobalSaveService();
   return (
     <TouchableOpacity
       style={styles.actionButton}
@@ -21,7 +21,11 @@ export const FilePicker = ({
           .then((response: any) => {
             const result: Promise<string> =
               fileSystemService.loadStringFromPath(response['uri']);
-            result.then(fileContentsProcessor);
+            result.then(csvContents => {
+              console.log("Loading state from CSV file inside FilePicker: ");
+              console.log(csvContents);
+              globalSaveService.restoreGlobalStateFromCSV(csvContents);
+            });
           })
           .catch((error: any) => {
             console.log(error);

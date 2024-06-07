@@ -1,19 +1,19 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import {CommonDataSchema} from '../constants';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { CommonDataSchema } from '../constants';
 import {
   DataBar,
   NumberInputBar,
   SelectorBar,
   TimeSelector,
 } from '../components/input-bars';
-import {styles} from '../styles/common-styles';
-import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
-import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
-import {jsonToCSV, readString} from 'react-native-csv';
-import {ButtonIcon} from '../components/ButtonIcon';
+import { styles } from '../styles/common-styles';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
+import { jsonToCSV, readString } from 'react-native-csv';
+import { ButtonIcon } from '../components/ButtonIcon';
 import FileSystemService from '../services/FileSystemService';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 export interface H2OMeasurement {
   id: number;
@@ -40,9 +40,10 @@ interface MeasurementCSVRow {
 }
 
 export const H2O_INTERNAL_STORAGE_FILE_NAME = 'h2o-14790.txt';
+export const H2O_SCREEN_CSV_HEADING = 'H2O-14790\n'
 
-export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
-  const {t} = useTranslation();
+export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
   const fileSystemService = new FileSystemService();
 
   /* State variables */
@@ -82,7 +83,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   );
 
   const updateField = (field: Partial<H2OMeasurement>) => {
-    setCurrentMeasurement({...currentMeasurement, ...field});
+    setCurrentMeasurement({ ...currentMeasurement, ...field });
   };
 
   /* State transitions for the navigation button component */
@@ -96,10 +97,10 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
   };
 
   const addNewMeasurement = () => {
-    const newMeasurements = measurements.concat({...currentMeasurement});
+    const newMeasurements = measurements.concat({ ...currentMeasurement });
     setMeasurements(newMeasurements);
     setDataIndex(dataIndex + 1);
-    setCurrentMeasurement({...initialState, id: currentMeasurement.id + 1});
+    setCurrentMeasurement({ ...initialState, id: currentMeasurement.id + 1 });
     setScrubberIndex(0);
 
     // The modifications are saved to the internal storage.
@@ -113,7 +114,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     // Update the currently selected measurement with the new values.
     const newMeasurements = measurements.map(measurement => {
       return measurement.id == dataIndex
-        ? {...currentMeasurement}
+        ? { ...currentMeasurement }
         : measurement;
     });
     setMeasurements(newMeasurements);
@@ -138,7 +139,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     // We erase the current values only if the user transitions from viewing the
     // last saved measurement to adding the new one.
     if (dataIndex == measurements.length - 1) {
-      setCurrentMeasurement({...initialState, id: measurements.length});
+      setCurrentMeasurement({ ...initialState, id: measurements.length });
     }
 
     if (dataIndex < measurements.length) {
@@ -221,10 +222,9 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={() => {
-          setMeasurements([{...initialState}]);
+          setMeasurements([{ ...initialState }]);
           setDataIndex(0);
         }}
-        fileContentsHandler={restoreStateFromCSV}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar label={t('h20Screen:measurementNumber') + ':'}>
@@ -233,28 +233,28 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
         <TimeSelector
           timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
           date={currentMeasurement.date}
-          setDate={date => updateField({date: date})}
+          setDate={date => updateField({ date: date })}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="l"
           // Value parameter controlls what is displayed in the component
           value={currentMeasurement.leakTightnessTest}
-          onChangeText={text => updateField({leakTightnessTest: text})}
+          onChangeText={text => updateField({ leakTightnessTest: text })}
           label={t('h20Screen:leakTightnessTest') + ':'}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="m3/h"
           value={currentMeasurement.aspiratorFlow}
-          onChangeText={text => updateField({aspiratorFlow: text})}
+          onChangeText={text => updateField({ aspiratorFlow: text })}
           label={t('h20Screen:aspiratorFlow') + ':'}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="m3"
           value={currentMeasurement.aspiratedGases}
-          onChangeText={text => updateField({aspiratedGases: text})}
+          onChangeText={text => updateField({ aspiratedGases: text })}
           label={t('h20Screen:aspiratedVolume') + ':'}
         />
         <SelectorBar
@@ -274,7 +274,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
             const newInitialMass = currentMeasurement.initialMass.map(
               (mass, index) => (index == scrubberIndex ? text : mass),
             );
-            updateField({initialMass: newInitialMass});
+            updateField({ initialMass: newInitialMass });
           }}
           value={initialMassShowingValue}
           label={t('h20Screen:initialMass') + ':'}
@@ -287,7 +287,7 @@ export const H2O_14790_Screen = ({navigation}: {navigation: any}) => {
             const newAfterMass = currentMeasurement.afterMass.map(
               (mass, index) => (index == scrubberIndex ? text : mass),
             );
-            updateField({afterMass: newAfterMass});
+            updateField({ afterMass: newAfterMass });
           }}
           label={t('h20Screen:massAfterMeasurement') + ':'}
         />
@@ -348,8 +348,40 @@ export const exportMeasurementsAsCSV = (measurements: H2OMeasurement[]) => {
       'Masa końcowa płuczka 3': measurement.afterMass[2],
     });
   }
-  const csvString = jsonToCSV(csvRows);
+  const csvString = H2O_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
   console.log(csvString);
   console.log("CSV contents for H2O Screen created successfully...")
   return csvString;
+};
+
+export const restoreStateFromCSV = (fileContents: string) => {
+  const csvRows: MeasurementCSVRow[] = readString(fileContents, {
+    header: true,
+  })['data'] as MeasurementCSVRow[];
+
+  console.log('Restoring state from a CSV file: ');
+  console.log(JSON.stringify(csvRows, null, 2));
+  const newMeasurements: H2OMeasurement[] = [];
+  for (const row of csvRows) {
+    const initialMass = [
+      row['Masa początkowa płuczka 1'],
+      row['Masa początkowa płuczka 2'],
+      row['Masa początkowa płuczka 3'],
+    ];
+    const afterMass = [
+      row['Masa końcowa płuczka 1'],
+      row['Masa końcowa płuczka 2'],
+      row['Masa końcowa płuczka 3'],
+    ];
+    newMeasurements.push({
+      id: parseInt(row['Numer pomiaru']) - 1,
+      date: new Date(row['Godzina przyjazdu']),
+      afterMass: afterMass,
+      initialMass: initialMass,
+      leakTightnessTest: row['Próba szczelności'],
+      aspiratorFlow: row['Przepływ przez aspirator'],
+      aspiratedGases: row['Objętość zaaspirowana'],
+    });
+  }
+  return newMeasurements;
 };
