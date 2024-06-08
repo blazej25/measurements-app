@@ -1,23 +1,23 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import {AspirationDataSchema} from '../constants';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { AspirationDataSchema } from '../constants';
 import {
   DataBar,
   NumberInputBar,
   SelectorBar,
   TimeSelector,
 } from '../components/input-bars';
-import {styles} from '../styles/common-styles';
-import {useTranslation} from 'react-i18next';
+import { styles } from '../styles/common-styles';
+import { useTranslation } from 'react-i18next';
 import FileSystemService from '../services/FileSystemService';
-import {ButtonIcon} from '../components/ButtonIcon';
-import {jsonToCSV, readString} from 'react-native-csv';
-import {LoadDeleteSaveGroup} from '../components/LoadDeleteSaveGroup';
-import {HelpAndSettingsGroup} from '../components/HelpAndSettingsGroup';
+import { ButtonIcon } from '../components/ButtonIcon';
+import { jsonToCSV, readString } from 'react-native-csv';
+import { LoadDeleteSaveGroup } from '../components/LoadDeleteSaveGroup';
+import { HelpAndSettingsGroup } from '../components/HelpAndSettingsGroup';
 
 export interface AspirationMeasurement {
   id: number;
-  compounds: {[compound: string]: MeasurementPerCompound};
+  compounds: { [compound: string]: MeasurementPerCompound };
 }
 
 export interface MeasurementPerCompound {
@@ -64,9 +64,9 @@ const initialState: MeasurementPerCompound = {
 export const ASPIRATION_INTERNAL_STORAGE_FILE_NAME = 'aspiration-measurements.txt';
 export const ASPIRATION_SCREEN_CSV_HEADING = 'Aspiracja\n';
 
-export const AspirationScreen = ({navigation}: {navigation: any}) => {
+export const AspirationScreen = ({ navigation }: { navigation: any }) => {
   // Initialise services
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const fileSystemService = new FileSystemService();
 
   /* State variables */
@@ -95,7 +95,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
   });
 
   // Stores all measurements
-  const [measurements, setMeasurements] = useState([{...emptyMeasurement}]);
+  const [measurements, setMeasurements] = useState([{ ...emptyMeasurement }]);
 
   /* Logic for state transitions when switching between measurements follows */
 
@@ -133,11 +133,11 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     saveModifications();
     setMeasurements([
       ...measurements,
-      {...emptyMeasurement, id: measurements.length},
+      { ...emptyMeasurement, id: measurements.length },
     ]);
     setDataIndex(dataIndex + 1);
     // Erase the fields so that new input can be collected.
-    setCurrentCompoundData({...initialState});
+    setCurrentCompoundData({ ...initialState });
   };
 
   // Responsible for saving the currently modified compound in the UI
@@ -174,7 +174,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     modifiedMeasurement.compounds[currentCompoundData.compoundName] = {
       ...currentCompoundData,
     };
-    setCurrentCompoundData({...modifiedMeasurement.compounds[compound]});
+    setCurrentCompoundData({ ...modifiedMeasurement.compounds[compound] });
   };
 
   // This helper can be used for updating the array by overwriting a single
@@ -290,10 +290,15 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={() => {
-          setMeasurements([{...emptyMeasurement}]);
+          setMeasurements([{ ...emptyMeasurement }]);
           setDataIndex(0);
-          setCurrentCompoundData({...initialState});
+          setCurrentCompoundData({ ...initialState });
+          fileSystemService.saveObjectToInternalStorage(
+            [{...emptyMeasurement}],
+            ASPIRATION_INTERNAL_STORAGE_FILE_NAME,
+          );
         }}
+        reloadScreen={loadMeasurements}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar
@@ -308,7 +313,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="ml"
           value={currentCompoundData.initialVolume}
           onChangeText={text => {
-            updateCurrentCompound({initialVolume: text});
+            updateCurrentCompound({ initialVolume: text });
           }}
           label={
             t(`aspirationScreen:${AspirationDataSchema.initialVolume}`) + ':'
@@ -319,7 +324,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="l/h"
           value={currentCompoundData.aspiratorFlow}
           onChangeText={text => {
-            updateCurrentCompound({aspiratorFlow: text});
+            updateCurrentCompound({ aspiratorFlow: text });
           }}
           label={
             t(`aspirationScreen:${AspirationDataSchema.aspiratorFlow}`) + ':'
@@ -330,7 +335,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit="l/h"
           value={currentCompoundData.leakTightnessTest}
           onChangeText={text =>
-            updateCurrentCompound({leakTightnessTest: text})
+            updateCurrentCompound({ leakTightnessTest: text })
           }
           label={
             t(`aspirationScreen:${AspirationDataSchema.leakTightnessTest}`) +
@@ -342,13 +347,13 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
             t(`aspirationScreen:${AspirationDataSchema.arrivalTime}`) + ':'
           }
           date={currentCompoundData.date}
-          setDate={date => updateCurrentCompound({date: date})}
+          setDate={date => updateCurrentCompound({ date: date })}
         />
         <NumberInputBar
           placeholder="0"
           valueUnit="l"
           value={currentCompoundData.aspiratedVolume}
-          onChangeText={text => updateCurrentCompound({aspiratedVolume: text})}
+          onChangeText={text => updateCurrentCompound({ aspiratedVolume: text })}
           label={
             t(`aspirationScreen:${AspirationDataSchema.aspiratedVolume}`) + ':'
           }
@@ -358,7 +363,7 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
           valueUnit=""
           value={currentCompoundData.sampleId.toString()}
           onChangeText={text =>
-            updateCurrentCompound({sampleId: text == '' ? 0 : parseInt(text)})
+            updateCurrentCompound({ sampleId: text == '' ? 0 : parseInt(text) })
           }
           label={t(`aspirationScreen:${AspirationDataSchema.sampleId}`) + ':'}
         />

@@ -83,6 +83,10 @@ export const HomeScreen = ({ navigation }: { navigation: any }) => {
 
   const resetState = () => {
     setMeasurementData({ ...empty_data })
+    fileSystemService.saveObjectToInternalStorage(
+      {...empty_data},
+      HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME,
+    );
   };
 
 
@@ -138,6 +142,7 @@ export const HomeScreen = ({ navigation }: { navigation: any }) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={resetState}
+        reloadScreen={loadMeasurements}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <WelcomeHeader />
@@ -284,11 +289,11 @@ export const exportMeasurementsAsCSV = (data: HomeScreenInformationData) => {
   const csvRows: InformationCSVRow[] = [];
   csvRows.push({
     'Data': data.date.toString(),
-    'Zleceniodawca': data.measurementRequestor,
-    'Źródło emisji': data.emissionSource,
+    'Zleceniodawca': data.measurementRequestor.trim(),
+    'Źródło emisji': data.emissionSource.trim(),
     'Rodzaj przewodu': data.pipeCrossSectionType == PipeCrossSectionType.ROUND ? 'Okrągły' : 'Prostokątny',
-    'Temperatura': data.temperature,
-    'Ciśnienie': data.pressure
+    'Temperatura': data.temperature.trim(),
+    'Ciśnienie': data.pressure.trim()
   })
 
   const csvFileContents = HOME_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
@@ -302,8 +307,8 @@ export const exportPersonnelAsCSV = (personnel: Person[]) => {
   const csvRows: PersonnelCSVRow[] = [];
   for (const person of personnel) {
     csvRows.push({
-      'Imię': person.name,
-      'Nazwisko': person.surname
+      'Imię': person.name.trim(),
+      'Nazwisko': person.surname.trim()
     })
   };
 
@@ -347,12 +352,12 @@ export const restoreStateFromCSV = (fileContents: string) => {
 
   const restoredData: HomeScreenInformationData = {
     date: new Date(rows[0]['Data']),
-    measurementRequestor: rows[0]['Zleceniodawca'],
-    emissionSource: rows[0]['Źródło emisji'],
+    measurementRequestor: rows[0]['Zleceniodawca'].trim(),
+    emissionSource: rows[0]['Źródło emisji'].trim(),
     pipeCrossSectionType: mapPipeCrossSectionType(rows[0]['Rodzaj przewodu']),
     staffResponsibleForMeasurement: personnelData,
-    temperature: rows[0]['Temperatura'],
-    pressure: rows[0]['Ciśnienie'],
+    temperature: rows[0]['Temperatura'].trim(),
+    pressure: rows[0]['Ciśnienie'].trim(),
   }
 
   return restoredData

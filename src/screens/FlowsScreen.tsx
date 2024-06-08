@@ -78,6 +78,7 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
     setMode(roundMode);
     setCurrentMeasurement({ ...initialState });
     setMeasurements([{ ...initialState }]);
+    persistStateInInternalStorage([{...initialState}])
   };
 
   const updateSingleFlowMeasurement = (field: any) => {
@@ -304,6 +305,7 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={resetState}
+        reloadScreen={loadMeasurements}
       />
       <ScrollView
         contentContainerStyle={{
@@ -544,13 +546,13 @@ export const exportMeasurementsAsCSV = (newMeasurements: SingleFlowMeasurement[]
       'Ilość punktów na osi': pointsOnEachAxis.toString(),
       'Numer osi': measurement.axisNumber.toString(),
       'Punkt na osi': measurement.pointOnAxis.toString(),
-      'Ciśnienie dynamiczne 1': measurement.dynamicPressure[0],
-      'Ciśnienie dynamiczne 2': measurement.dynamicPressure[1],
-      'Ciśnienie dynamiczne 3': measurement.dynamicPressure[2],
-      'Ciśnienie dynamiczne 4': measurement.dynamicPressure[3],
-      'Ciśnienie statyczne': measurement.staticPressure,
-      Temperatura: measurement.temperature,
-      Kąt: measurement.angle,
+      'Ciśnienie dynamiczne 1': measurement.dynamicPressure[0].trim(),
+      'Ciśnienie dynamiczne 2': measurement.dynamicPressure[1].trim(),
+      'Ciśnienie dynamiczne 3': measurement.dynamicPressure[2].trim(),
+      'Ciśnienie dynamiczne 4': measurement.dynamicPressure[3].trim(),
+      'Ciśnienie statyczne': measurement.staticPressure.trim(),
+      Temperatura: measurement.temperature.trim(),
+      Kąt: measurement.angle.trim(),
     });
   }
 
@@ -576,19 +578,19 @@ export const restoreStateFromCSV = (fileContents: string) => {
   for (const row of rows) {
     newMeasurements.push({
       dynamicPressure: [
-        row['Ciśnienie dynamiczne 1'],
-        row['Ciśnienie dynamiczne 2'],
-        row['Ciśnienie dynamiczne 3'],
-        row['Ciśnienie dynamiczne 4'],
+        row['Ciśnienie dynamiczne 1'].trim(),
+        row['Ciśnienie dynamiczne 2'].trim(),
+        row['Ciśnienie dynamiczne 3'].trim(),
+        row['Ciśnienie dynamiczne 4'].trim(),
       ],
-      staticPressure: row['Ciśnienie statyczne'],
-      temperature: row.Temperatura,
+      staticPressure: row['Ciśnienie statyczne'].trim(),
+      temperature: row.Temperatura.trim(),
       angle: row.Kąt,
-      axisNumber: parseInt(row['Numer osi']),
-      pointOnAxis: parseInt(row['Punkt na osi']),
-      pipeDiameter: row['Średnica przewodu'],
-      pipeWidth: row['Szerokość przewodu'],
-      pipeHeight: row['Wysokość przewodu'],
+      axisNumber: parseInt(row['Numer osi'].trim()),
+      pointOnAxis: parseInt(row['Punkt na osi'].trim()),
+      pipeDiameter: row['Średnica przewodu'].trim(),
+      pipeWidth: row['Szerokość przewodu'].trim(),
+      pipeHeight: row['Wysokość przewodu'].trim(),
     });
   }
 

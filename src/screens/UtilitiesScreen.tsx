@@ -172,6 +172,7 @@ export const UtilitiesScreen = ({ navigation }: { navigation: any }) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={resetState}
+        reloadScreen={loadMeasurements}
       />
       <DateTimeSelectorGroup
         date={date}

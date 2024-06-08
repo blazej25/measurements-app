@@ -8,8 +8,10 @@ import GlobalSaveService from '../services/GlobalSaveService';
 
 export const FilePicker = ({
   label,
+  reloadScreen,
 }: {
   label: string;
+  reloadScreen: () => void;
 }) => {
   const fileSystemService = new FileSystemService();
   const globalSaveService = new GlobalSaveService();
@@ -25,6 +27,7 @@ export const FilePicker = ({
               console.log("Loading state from CSV file inside FilePicker: ");
               console.log(csvContents);
               globalSaveService.restoreGlobalStateFromCSV(csvContents);
+              reloadScreen();
             });
           })
           .catch((error: any) => {

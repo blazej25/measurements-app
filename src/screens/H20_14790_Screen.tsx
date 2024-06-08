@@ -70,7 +70,12 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
 
   // Derived state used for displaying the curren scrubber masses.
   const afterMassDisplayValue = useMemo(
-    () => currentMeasurement.afterMass[scrubberIndex],
+    () => {
+      if (currentMeasurement == undefined) {
+        return "0"
+      }
+      return currentMeasurement.afterMass[scrubberIndex];
+    },
     [currentMeasurement, scrubberIndex],
   );
 
@@ -78,7 +83,12 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
   // is the currently showing mass value depending on the number of the 'płuczka' that is currently showing.
   // syntax of use memo: useMemo(() => <expression-for-the-derived-state>, [state arguments from which the target state is derived]);
   const initialMassShowingValue = useMemo(
-    () => currentMeasurement.initialMass[scrubberIndex],
+    () => {
+      if (currentMeasurement == undefined) {
+        return "0"
+      }
+      return currentMeasurement.initialMass[scrubberIndex];
+    },
     [currentMeasurement, scrubberIndex],
   );
 
@@ -92,7 +102,12 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
     if (dataIndex == 0) {
       return;
     }
-    setCurrentMeasurement(measurements[dataIndex - 1]);
+    const indexed_measurement = measurements[dataIndex - 1]
+    if (indexed_measurement == undefined) {
+      setCurrentMeasurement({ ...initialState });
+    } else {
+      setCurrentMeasurement(indexed_measurement);
+    }
     setDataIndex(dataIndex - 1);
   };
 
@@ -154,9 +169,8 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
     fileSystemService
       .loadJSONFromInternalStorage(H2O_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
-        if (loadedMeasurements) {
+        console.log(loadedMeasurements);
           restoreStateFrom(loadedMeasurements);
-        }
       });
   };
 
@@ -164,11 +178,19 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
     var measurements = loadedMeasurements as H2OMeasurement[];
     // Call to pare dates replaces all date fields with the actual Typescript
     // date object so that it can be manipulated correctly by the UI.
+    if (measurements.length == 0) {
+        setCurrentMeasurement({...initialState});
+        setMeasurements([]);
+        setScrubberIndex(0);
+        setDataIndex(0);
+        return;
+    }
     measurements = parseDates(measurements);
 
     // Load state of all measurements and load the current measurement so that the values get
     // loaded appropriately.
     setDataIndex(measurements.length - 1);
+    setCurrentMeasurement(measurements[measurements.length - 1])
     setMeasurements(measurements);
   };
 
@@ -176,7 +198,9 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
   // JSON object with the measurements
   const parseDates = (measurements: H2OMeasurement[]) => {
     for (var measurement of [...measurements]) {
-      measurement.date = new Date(measurement.date);
+      if (measurement != undefined) {
+        measurement.date = new Date(measurement.date);
+      }
     }
     return measurements;
   };
@@ -223,8 +247,15 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
       <LoadDeleteSaveGroup
         onDelete={() => {
           setMeasurements([{ ...initialState }]);
+          setCurrentMeasurement({ ...initialState })
           setDataIndex(0);
+          setScrubberIndex(0);
+          fileSystemService.saveObjectToInternalStorage(
+            [],
+            H2O_INTERNAL_STORAGE_FILE_NAME,
+          );
         }}
+        reloadScreen={loadMeasurements}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <DataBar label={t('h20Screen:measurementNumber') + ':'}>
@@ -232,7 +263,7 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
         </DataBar>
         <TimeSelector
           timeLabel={t(`commonDataForm:${CommonDataSchema.arrivalTime}`) + ':'}
-          date={currentMeasurement.date}
+          date={currentMeasurement ? currentMeasurement.date : new Date}
           setDate={date => updateField({ date: date })}
         />
         <NumberInputBar
@@ -340,12 +371,12 @@ export const exportMeasurementsAsCSV = (measurements: H2OMeasurement[]) => {
       'Próba szczelności': measurement.leakTightnessTest,
       'Przepływ przez aspirator': measurement.aspiratorFlow,
       'Objętość zaaspirowana': measurement.aspiratedGases,
-      'Masa początkowa płuczka 1': measurement.initialMass[0],
-      'Masa końcowa płuczka 1': measurement.afterMass[0],
-      'Masa początkowa płuczka 2': measurement.initialMass[1],
-      'Masa końcowa płuczka 2': measurement.afterMass[1],
-      'Masa początkowa płuczka 3': measurement.initialMass[2],
-      'Masa końcowa płuczka 3': measurement.afterMass[2],
+      'Masa początkowa płuczka 1': measurement.initialMass[0].trim(),
+      'Masa końcowa płuczka 1': measurement.afterMass[0].trim(),
+      'Masa początkowa płuczka 2': measurement.initialMass[1].trim(),
+      'Masa końcowa płuczka 2': measurement.afterMass[1].trim(),
+      'Masa początkowa płuczka 3': measurement.initialMass[2].trim(),
+      'Masa końcowa płuczka 3': measurement.afterMass[2].trim(),
     });
   }
   const csvString = H2O_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
@@ -364,23 +395,23 @@ export const restoreStateFromCSV = (fileContents: string) => {
   const newMeasurements: H2OMeasurement[] = [];
   for (const row of csvRows) {
     const initialMass = [
-      row['Masa początkowa płuczka 1'],
-      row['Masa początkowa płuczka 2'],
-      row['Masa początkowa płuczka 3'],
+      row['Masa początkowa płuczka 1'].trim(),
+      row['Masa początkowa płuczka 2'].trim(),
+      row['Masa początkowa płuczka 3'].trim(),
     ];
     const afterMass = [
-      row['Masa końcowa płuczka 1'],
-      row['Masa końcowa płuczka 2'],
-      row['Masa końcowa płuczka 3'],
+      row['Masa końcowa płuczka 1'].trim(),
+      row['Masa końcowa płuczka 2'].trim(),
+      row['Masa końcowa płuczka 3'].trim(),
     ];
     newMeasurements.push({
       id: parseInt(row['Numer pomiaru']) - 1,
       date: new Date(row['Godzina przyjazdu']),
       afterMass: afterMass,
       initialMass: initialMass,
-      leakTightnessTest: row['Próba szczelności'],
-      aspiratorFlow: row['Przepływ przez aspirator'],
-      aspiratedGases: row['Objętość zaaspirowana'],
+      leakTightnessTest: row['Próba szczelności'].trim(),
+      aspiratorFlow: row['Przepływ przez aspirator'].trim(),
+      aspiratedGases: row['Objętość zaaspirowana'].trim(),
     });
   }
   return newMeasurements;

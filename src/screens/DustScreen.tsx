@@ -119,6 +119,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     setCurrentMeasurement({...initialData});
     setMeasurementIndex(0);
     setNumberOfMeasurements(1);
+    persistStateInInternalStorage([{...initialData}]);
   };
 
   /* Logic for persisting state in the internal storage. */
@@ -162,6 +163,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={flushState}
+        reloadScreen={loadMeasurements}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <NumberInputBar

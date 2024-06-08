@@ -91,24 +91,42 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
   const [hourOfCheckAfter, setHourOfCheckAfter] = useState(new Date);
 
 
-  const compoundExists = (measurement: SingleCompoundMeasurement) => {
+  const compoundExists = (compound: string) => {
     const filtered = measurements.filter(
-      (item: SingleCompoundMeasurement) => measurement.compound === item.compound
+      (item: SingleCompoundMeasurement) => compound === item.compound
     );
     return filtered.length > 0;
   }
 
-  const saveCurrentCompound = () => {
-    if (compoundExists(currentMeasurement)) {
+  const log_enabled = true;
+  const logger = (message: string) => {
+    if (log_enabled) {
+      console.log(message)
+    }
+  }
+
+  const saveMeasurement = (measurement: SingleCompoundMeasurement) => {
+
+    logger("Saving single gas analyzer measurement:")
+    logger(`${JSON.stringify(measurement, undefined, 2)}`)
+    logger(`Measurements before saving: \n${JSON.stringify(measurements, undefined, 2)}`)
+    if (compoundExists(measurement.compound)) {
+      // Remove the old measurement for this compound
       const newMeasurements = measurements.filter(
         (item: SingleCompoundMeasurement) =>
-          currentMeasurement.compound != item.compound
+          measurement.compound !== item.compound
       )
-      newMeasurements.push({ ...currentMeasurement });
+      logger(`Measurements after filtering out old measurement: \n${JSON.stringify(newMeasurements, undefined, 2)}`)
+
+      newMeasurements.push({ ...measurement });
+      logger(`Measurements after adding the new measurement: \n${JSON.stringify(newMeasurements, undefined, 2)}`)
+
+      // measurements
       setMeasurements(newMeasurements);
+      // measurements = newMeasurement
       persistStateInInternalStorage(hourOfCheckAfter, hourOfCheckBefore, newMeasurements);
     } else {
-      measurements.push({ ...currentMeasurement });
+      measurements.push({ ...measurement });
       persistStateInInternalStorage(hourOfCheckAfter, hourOfCheckBefore, measurements);
       setMeasurements(measurements)
     }
@@ -119,7 +137,7 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
     const newMeasurement = { ...currentMeasurement };
     newMeasurement.compound = newCompound;
 
-    if (compoundExists(newMeasurement)) {
+    if (compoundExists(newMeasurement.compound)) {
       const loadedCompound = measurements.filter(
         (item: SingleCompoundMeasurement) =>
           newMeasurement.compound === item.compound
@@ -160,7 +178,7 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
       evaluationRangeAfter = 2;
     }
 
-    setCurrentMeasurement({
+    const newMeasurement = {
       ...currentMeasurement,
       twoPCRange: twoPercent.toFixed(2),
       fivePCRange: fivePercent.toFixed(2),
@@ -174,9 +192,11 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
           : evaluationZeroAfter + evaluationRangeAfter === 1 || 2
             ? 'Korekta o dryft'
             : 'Odrzucenie pomiaru',
-    });
+    }
 
-    console.log(currentMeasurement);
+    setCurrentMeasurement(newMeasurement);
+    console.log(newMeasurement);
+    return newMeasurement;
   }
 
   const loadMeasurements = () => {
@@ -193,13 +213,14 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
   const restoreStateFrom = (loadedMeasurements: Object) => {
     var data = loadedMeasurements as GasAnalyzerCheckData;
     // Extract times and measurements from all data
-    console.log("Restoring state from local storage...");
+    console.log("Restoring Gas Analyzer check state from local storage...");
     console.log(JSON.stringify(loadedMeasurements, undefined, 2));
     data = parseDates(data);
 
     setHourOfCheckAfter(data.timeAfter);
     setHourOfCheckBefore(data.timeBefore);
     setMeasurements(data.measurements);
+    setCurrentMeasurement(data.measurements[0]);
   };
 
   const parseDates = (data: GasAnalyzerCheckData) => {
@@ -208,10 +229,9 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
     return data;
   };
 
-  const persistStateInInternalStorage = (hourOfCheckAfter: Date, hourOfCheckBefore: Date, measurements: SingleCompoundMeasurement[]) => {
-    const allData: GasAnalyzerCheckData = { timeAfter: hourOfCheckAfter, timeBefore: hourOfCheckBefore, measurements: measurements }
+  const persistStateInInternalStorage = (hourOfCheckAfter: Date, hourOfCheckBefore: Date, persisted_measurements: SingleCompoundMeasurement[]) => {
+    const allData: GasAnalyzerCheckData = { timeAfter: hourOfCheckAfter, timeBefore: hourOfCheckBefore, measurements: persisted_measurements }
 
-    console.log(JSON.stringify(allData, undefined, 2));
     fileSystemService.saveObjectToInternalStorage(
       allData,
       GAS_ANALYSER_CHECK_INTERNAL_STORAGE_FILE_NAME,
@@ -268,6 +288,7 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
     setMeasurements([emptyMeasurement])
     setHourOfCheckAfter(new Date)
     setHourOfCheckBefore(new Date)
+    persistStateInInternalStorage(new Date, new Date, [emptyMeasurement])
   }
   /* 
 
@@ -289,13 +310,14 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
     <View style={styles.mainContainer}>
       <LoadDeleteSaveGroup
         onDelete={resetState}
+        reloadScreen={loadMeasurements}
       />
       <ScrollView contentContainerStyle={styles.defaultScrollView}>
         <SelectorBar
           label={t('gasAnalyzerScreen:compound')}
           selections={Compounds}
           onSelect={(selectedItem: string, index: number) => {
-            saveCurrentCompound();
+            saveMeasurement(currentMeasurement)
             changeCurrentCompound(selectedItem);
           }}
         />
@@ -381,7 +403,10 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
           }}>
           <TouchableOpacity
             style={styles.roundedButton1}
-            onPress={() => processingInput()}
+            onPress={() => {
+              const new_measurement = processingInput();
+              saveMeasurement(new_measurement);
+            }}
           >
             <Text style={styles.buttonText1}>{t('gasAnalyzerScreen:processData')}</Text>
           </TouchableOpacity>
@@ -456,7 +481,10 @@ export const restoreStateFromCSV = (fileContents: string) => {
 
   const newMeasurements: SingleCompoundMeasurement[] = [];
 
+
   for (const row of rows) {
+    console.log("parsing csv row:")
+    console.log(row);
     newMeasurements.push({
       compound: row['Związek'],
       concentration: row['Stężenie butli'],
@@ -474,6 +502,9 @@ export const restoreStateFromCSV = (fileContents: string) => {
       evaluationAfter: row['Sprawdzenie po'],
     });
   }
+
+  console.log("Parsed gas analyzer measurements:")
+  console.log(newMeasurements);
 
   const data: GasAnalyzerCheckData = {
     timeBefore: new Date(rows[0]['Godzina sprawdzenia przed']),
