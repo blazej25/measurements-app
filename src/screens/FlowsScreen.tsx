@@ -39,7 +39,7 @@ interface FlowMeasurementCSVRow {
 }
 
 const initialState: SingleFlowMeasurement = {
-  dynamicPressure: [],
+  dynamicPressure: ["", "", "", ""],
   staticPressure: '',
   temperature: '',
   angle: '',
@@ -537,6 +537,7 @@ export const exportMeasurementsAsCSV = (newMeasurements: SingleFlowMeasurement[]
   console.log('Exporting a CSV file: ');
   const csvRows: FlowMeasurementCSVRow[] = [];
   for (const measurement of newMeasurements) {
+    console.log(measurement)
     csvRows.push({
       'Przekrój przewodu': mode ? 'Prostokątny' : 'Okrągły',
       'Wysokość przewodu': measurement.pipeHeight ? measurement.pipeHeight : "0",
@@ -546,10 +547,10 @@ export const exportMeasurementsAsCSV = (newMeasurements: SingleFlowMeasurement[]
       'Ilość punktów na osi': pointsOnEachAxis.toString(),
       'Numer osi': measurement.axisNumber.toString(),
       'Punkt na osi': measurement.pointOnAxis.toString(),
-      'Ciśnienie dynamiczne 1': measurement.dynamicPressure[0].trim(),
-      'Ciśnienie dynamiczne 2': measurement.dynamicPressure[1].trim(),
-      'Ciśnienie dynamiczne 3': measurement.dynamicPressure[2].trim(),
-      'Ciśnienie dynamiczne 4': measurement.dynamicPressure[3].trim(),
+      'Ciśnienie dynamiczne 1': (measurement.dynamicPressure[0] ? measurement.dynamicPressure[0] : "").trim(),
+      'Ciśnienie dynamiczne 2': (measurement.dynamicPressure[1] ? measurement.dynamicPressure[1] : "").trim(),
+      'Ciśnienie dynamiczne 3': (measurement.dynamicPressure[2] ? measurement.dynamicPressure[2] : "").trim(),
+      'Ciśnienie dynamiczne 4': (measurement.dynamicPressure[3] ? measurement.dynamicPressure[3] : "").trim(),
       'Ciśnienie statyczne': measurement.staticPressure.trim(),
       Temperatura: measurement.temperature.trim(),
       Kąt: measurement.angle.trim(),
