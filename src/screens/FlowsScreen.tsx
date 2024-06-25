@@ -39,7 +39,7 @@ interface FlowMeasurementCSVRow {
 }
 
 const initialState: SingleFlowMeasurement = {
-  dynamicPressure: [],
+  dynamicPressure: ["", "", "", ""],
   staticPressure: '',
   temperature: '',
   angle: '',
@@ -476,6 +476,7 @@ export const exportMeasurementsAsCSV = (newMeasurements: SingleFlowMeasurement[]
   console.log('Exporting a CSV file: ');
   const csvRows: FlowMeasurementCSVRow[] = [];
   for (const measurement of newMeasurements) {
+    console.log(measurement)
     csvRows.push({
       'Przekrój przewodu': mode ? 'Prostokątny' : 'Okrągły',
       'Wysokość przewodu': measurement.pipeHeight ? measurement.pipeHeight : "0",

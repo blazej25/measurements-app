@@ -289,6 +289,13 @@ export const exportMeasurementsAsCSV = (data: UtilitiesInternalStorageState) => 
 
   const csvHeaderPart = jsonToCSV([csvHeading]);
   const timesCSVRows: MeasurementTimesCSVRow[] = [];
+  if (data.times.length == 0) {
+    timesCSVRows.push({
+      'Numer pomiaru': "0",
+      Start: (new Date()).toString(),
+      Koniec: (new Date()).toString(),
+    });
+  }
   for (var i = 0; i < data.times.length; i++) {
     timesCSVRows.push({
       'Numer pomiaru': (i + 1).toString(),
