@@ -238,51 +238,6 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
     );
   };
 
-
-  const restoreStateFromCSV = (fileContents: string) => {
-    // The state is stored in two parts of a csv file.
-    // The first one stores the information collected in the
-    // header of the utilities screen, whereas the second one
-    // stores the list of measurements that are displayed in the scrollable view.
-
-    console.log('Restoring state from a CSV file: ');
-    console.log(fileContents);
-    // First we remove the section header from the file.
-    fileContents = fileContents.replace(ANALYSER_SCREEN_CSV_HEADING, '');
-
-    const rows = readString(fileContents, { header: true })[
-      'data'
-    ] as AnalyserCheckCSVRow[];
-
-    const newMeasurements: SingleCompoundMeasurement[] = [];
-
-    for (const row of rows) {
-      newMeasurements.push({
-        compound: row['Związek'],
-        concentration: row['Stężenie butli'],
-        analyzerRange: row['Zakres analizatora'],
-        readingBeforeAnalyzerZero: row['Odczyt przed analizator zero'],
-        readingBeforeAnalyzerRange: row['Odczyt przed analizator zakres'],
-        readingBeforeSystemZero: row['Odczyt przed system zero'],
-        readingBeforeSystemRange: row['Odczyt przed system zakres'],
-        readingAfterSystemZero: row['Odczyt po system zero'],
-        readingAfterSystemRange: row['Odczyt po system zakres'],
-        twoPCRange: row['2% zakresu'],
-        zeroEvaluationBefore: row['Sprawdzenie zera przed'],
-        rangeEvaluationBefore: row['Sprawdzenie zakresu przed'],
-        fivePCRange: row['5% zakresu'],
-        evaluationAfter: row['Sprawdzenie po'],
-      });
-    }
-
-    setHourOfCheckBefore(new Date(rows[0]['Godzina sprawdzenia przed']))
-    setHourOfCheckAfter(new Date(rows[0]['Godzina sprawdzenia po']))
-    setCurrentMeasurement(newMeasurements[newMeasurements.length - 1]);
-    setMeasurements(newMeasurements);
-    persistStateInInternalStorage(new Date(rows[0]['Godzina sprawdzenia po']), new Date(rows[0]['Godzina sprawdzenia przed']), newMeasurements);
-    console.log(newMeasurements[newMeasurements.length - 1]);
-  }
-
   const resetState = () => {
     setCurrentMeasurement({ ...emptyMeasurement })
     setMeasurements([emptyMeasurement])
@@ -292,13 +247,18 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
   }
   /* 
 
-      /_/
+        ___/
+         /
+        /
         \
-          \
-          OOOOO--/
-          /\  /\
+         \ 
+           \
+           OOOOO--/
+           /\  /\
+          /  \/  \
+         /   /\   \
 
-      żyrafa
+      Tallneck
 
   
     */
@@ -442,8 +402,8 @@ export const exportMeasurementsAsCSV = (newMeasurements: SingleCompoundMeasureme
   const csvRows: AnalyserCheckCSVRow[] = [];
   for (const measurement of newMeasurements) {
     csvRows.push({
-      'Godzina sprawdzenia przed': hourBefore.toString(),
-      'Godzina sprawdzenia po': hourAfter.toString(),
+      'Godzina sprawdzenia przed': hourBefore ? hourBefore.toString() : (new Date()).toString(),
+      'Godzina sprawdzenia po': hourAfter ? hourAfter.toString() : (new Date()).toString(),
       Związek: measurement.compound,
       'Stężenie butli': measurement.concentration,
       'Zakres analizatora': measurement.analyzerRange,

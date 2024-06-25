@@ -24,7 +24,7 @@ import FileSystemService from '../services/FileSystemService';
 
 export const HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME = 'home.txt';
 export const HOME_SCREEN_CSV_HEADING = 'Strona główna\n'
-export const PERSONNEL_CSV_HEADING = 'Personel\n'
+export const PERSONNEL_CSV_HEADING = '\nPersonel'
 
 interface InformationCSVRow {
   'Data': string,
@@ -88,53 +88,6 @@ export const HomeScreen = ({ navigation }: { navigation: any }) => {
       HOME_SCREEN_INTERNAL_STORAGE_FILE_NAME,
     );
   };
-
-
-  const restoreStateFromCSV = (fileContents: string) => {
-    // The state is stored in two parts of a csv file.
-    // The first part contains the general common data whereas the
-    // second one contains the list of personnel that carried out the
-    // measurement.
-
-    console.log('Restoring state from a CSV file: ');
-    console.log(fileContents);
-    // First we remove the section header from the file.
-    let [data, personnel] = fileContents.split(PERSONNEL_CSV_HEADING);
-
-    const [_, measurementData] = data.split(HOME_SCREEN_CSV_HEADING);
-    const rows = readString(measurementData, { header: true })[
-      'data'
-    ] as InformationCSVRow[];
-
-    const mapPipeCrossSectionType = (type: string) => {
-      return type === 'Okrągły'
-        ? PipeCrossSectionType.ROUND
-        : PipeCrossSectionType.RECTANGULAR;
-    }
-
-    const personnelRows = readString(personnel, { header: true })[
-      'data'
-    ] as PersonnelCSVRow[];
-
-
-    const personnelData: Person[] = []
-    for (const person of personnelRows) {
-      personnelData.push({ name: person['Imię'], surname: person['Nazwisko'] });
-    }
-
-
-    const restoredData: HomeScreenInformationData = {
-      date: new Date(rows[0]['Data']),
-      measurementRequestor: rows[0]['Zleceniodawca'],
-      emissionSource: rows[0]['Źródło emisji'],
-      pipeCrossSectionType: mapPipeCrossSectionType(rows[0]['Rodzaj przewodu']),
-      staffResponsibleForMeasurement: personnelData,
-      temperature: rows[0]['Temperatura'],
-      pressure: rows[0]['Ciśnienie'],
-    }
-
-    setMeasurementData(restoredData);
-  }
 
   useEffect(loadMeasurements, []);
 
@@ -288,12 +241,12 @@ export const exportMeasurementsAsCSV = (data: HomeScreenInformationData) => {
   console.log("Starting CSV generation for HomeScreen main information...")
   const csvRows: InformationCSVRow[] = [];
   csvRows.push({
-    'Data': data.date.toString(),
-    'Zleceniodawca': data.measurementRequestor.trim(),
-    'Źródło emisji': data.emissionSource.trim(),
+    'Data': data.date ? data.date.toString() : (new Date).toString(),
+    'Zleceniodawca': ('' + data.measurementRequestor).trim(),
+    'Źródło emisji': ('' + data.emissionSource).trim(),
     'Rodzaj przewodu': data.pipeCrossSectionType == PipeCrossSectionType.ROUND ? 'Okrągły' : 'Prostokątny',
-    'Temperatura': data.temperature.trim(),
-    'Ciśnienie': data.pressure.trim()
+    'Temperatura': ('' + data.temperature).trim(),
+    'Ciśnienie': ('' + data.pressure).trim()
   })
 
   const csvFileContents = HOME_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
@@ -307,8 +260,8 @@ export const exportPersonnelAsCSV = (personnel: Person[]) => {
   const csvRows: PersonnelCSVRow[] = [];
   for (const person of personnel) {
     csvRows.push({
-      'Imię': person.name.trim(),
-      'Nazwisko': person.surname.trim()
+      'Imię': ('' + person.name).trim(),
+      'Nazwisko': ('' + person.surname).trim()
     })
   };
 
@@ -329,7 +282,7 @@ export const restoreStateFromCSV = (fileContents: string) => {
   let [data, personnel] = fileContents.split(PERSONNEL_CSV_HEADING);
 
   const [_, measurementData] = data.split(HOME_SCREEN_CSV_HEADING);
-  const rows = readString(measurementData, { header: true })[
+  const rows = readString(measurementData.trim(), { header: true })[
     'data'
   ] as InformationCSVRow[];
 
@@ -338,6 +291,18 @@ export const restoreStateFromCSV = (fileContents: string) => {
       ? PipeCrossSectionType.ROUND
       : PipeCrossSectionType.RECTANGULAR;
   }
+
+  if (personnel == undefined) {
+    return {
+      date: new Date(rows[0]['Data']),
+      measurementRequestor: ('' + rows[0]['Zleceniodawca']).trim(),
+      emissionSource: ('' +rows[0]['Źródło emisji']).trim(),
+      pipeCrossSectionType: mapPipeCrossSectionType(rows[0]['Rodzaj przewodu']),
+      staffResponsibleForMeasurement: [],
+      temperature: ('' + rows[0]['Temperatura']).trim(),
+      pressure: ('' + rows[0]['Ciśnienie']).trim(),
+    };
+  };
 
   const personnelRows = readString(personnel, { header: true })[
     'data'
@@ -352,12 +317,12 @@ export const restoreStateFromCSV = (fileContents: string) => {
 
   const restoredData: HomeScreenInformationData = {
     date: new Date(rows[0]['Data']),
-    measurementRequestor: rows[0]['Zleceniodawca'].trim(),
-    emissionSource: rows[0]['Źródło emisji'].trim(),
+    measurementRequestor: ('' + rows[0]['Zleceniodawca']).trim(),
+    emissionSource: ('' +rows[0]['Źródło emisji']).trim(),
     pipeCrossSectionType: mapPipeCrossSectionType(rows[0]['Rodzaj przewodu']),
     staffResponsibleForMeasurement: personnelData,
-    temperature: rows[0]['Temperatura'].trim(),
-    pressure: rows[0]['Ciśnienie'].trim(),
+    temperature: ('' + rows[0]['Temperatura']).trim(),
+    pressure: ('' + rows[0]['Ciśnienie']).trim(),
   }
 
   return restoredData

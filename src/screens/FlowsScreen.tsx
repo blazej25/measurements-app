@@ -238,67 +238,6 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
     }
   };
 
-  const restoreStateFromCSV = (fileContents: string) => {
-    // The state is stored in two parts of a csv file.
-    // The first one stores the information collected in the
-    // header of the utilities screen, whereas the second one
-    // stores the list of measurements that are displayed in the scrollable view.
-
-    console.log('Restoring state from a CSV file: ');
-    console.log(fileContents);
-    // First we remove the section header from the file.
-    fileContents = fileContents.replace(FLOWS_SCREEN_CSV_HEADING, '');
-
-    const rows = readString(fileContents, { header: true })[
-      'data'
-    ] as FlowMeasurementCSVRow[];
-    const newMeasurements: SingleFlowMeasurement[] = [];
-
-    for (const row of rows) {
-      newMeasurements.push({
-        dynamicPressure: [
-          row['Ciśnienie dynamiczne 1'],
-          row['Ciśnienie dynamiczne 2'],
-          row['Ciśnienie dynamiczne 3'],
-          row['Ciśnienie dynamiczne 4'],
-        ],
-        staticPressure: row['Ciśnienie statyczne'],
-        temperature: row.Temperatura,
-        angle: row.Kąt,
-        axisNumber: parseInt(row['Numer osi']),
-        pointOnAxis: parseInt(row['Punkt na osi']),
-        pipeDiameter: row['Średnica przewodu'],
-        pipeWidth: row['Szerokość przewodu'],
-        pipeHeight: row['Wysokość przewodu'],
-      });
-    }
-
-    // find out if we have a rectangular or circular pipe.
-    const mode = rows[0]['Przekrój przewodu'] === 'Okrągły';
-    setMode(mode);
-    if (mode) {
-      setPipeDiameter(rows[0]['Średnica przewodu']);
-    } else {
-      setPipeDimensions([
-        rows[0]['Wysokość przewodu'],
-        rows[0]['Szerokość przewodu'],
-      ]);
-    }
-
-    const axisNumber =
-      Math.max(...newMeasurements.map(entry => entry.axisNumber)) + 1;
-    const pointsOnEachAxis =
-      Math.max(...newMeasurements.map(entry => entry.pointOnAxis)) + 1;
-
-    setNumberOfSpigots(axisNumber);
-    setNumberOfPoints(pointsOnEachAxis);
-
-    setCurrentMeasurement(newMeasurements[newMeasurements.length - 1]);
-    console.log(newMeasurements[newMeasurements.length - 1]);
-    setMeasurements(newMeasurements);
-    persistStateInInternalStorage(newMeasurements);
-  };
-
   useEffect(loadMeasurements, []);
 
   return (
@@ -542,17 +481,17 @@ export const exportMeasurementsAsCSV = (newMeasurements: SingleFlowMeasurement[]
       'Wysokość przewodu': measurement.pipeHeight ? measurement.pipeHeight : "0",
       'Szerokość przewodu': measurement.pipeWidth ? measurement.pipeWidth : "0",
       'Średnica przewodu': measurement.pipeDiameter ? measurement.pipeDiameter : "0",
-      'Ilość osi pomiarowych': axisNumber.toString(),
+      'Ilość osi pomiarowych': axisNumber ? axisNumber.toString() : "0",
       'Ilość punktów na osi': pointsOnEachAxis.toString(),
       'Numer osi': measurement.axisNumber.toString(),
       'Punkt na osi': measurement.pointOnAxis.toString(),
-      'Ciśnienie dynamiczne 1': measurement.dynamicPressure[0].trim(),
-      'Ciśnienie dynamiczne 2': measurement.dynamicPressure[1].trim(),
-      'Ciśnienie dynamiczne 3': measurement.dynamicPressure[2].trim(),
-      'Ciśnienie dynamiczne 4': measurement.dynamicPressure[3].trim(),
-      'Ciśnienie statyczne': measurement.staticPressure.trim(),
-      Temperatura: measurement.temperature.trim(),
-      Kąt: measurement.angle.trim(),
+      'Ciśnienie dynamiczne 1': ('' + measurement.dynamicPressure[0]).trim(),
+      'Ciśnienie dynamiczne 2': ('' + measurement.dynamicPressure[1]).trim(),
+      'Ciśnienie dynamiczne 3': ('' + measurement.dynamicPressure[2]).trim(),
+      'Ciśnienie dynamiczne 4': ('' + measurement.dynamicPressure[3]).trim(),
+      'Ciśnienie statyczne': ('' + measurement.staticPressure).trim(),
+      Temperatura: ('' + measurement.temperature).trim(),
+      Kąt: (measurement.angle).trim(),
     });
   }
 
@@ -575,22 +514,24 @@ export const restoreStateFromCSV = (fileContents: string) => {
   ] as FlowMeasurementCSVRow[];
   const newMeasurements: SingleFlowMeasurement[] = [];
 
+  
+
   for (const row of rows) {
     newMeasurements.push({
       dynamicPressure: [
-        row['Ciśnienie dynamiczne 1'].trim(),
-        row['Ciśnienie dynamiczne 2'].trim(),
-        row['Ciśnienie dynamiczne 3'].trim(),
-        row['Ciśnienie dynamiczne 4'].trim(),
+        ('' + row['Ciśnienie dynamiczne 1']).trim(),
+        ('' + row['Ciśnienie dynamiczne 2']).trim(),
+        ('' + row['Ciśnienie dynamiczne 3']).trim(),
+        ('' + row['Ciśnienie dynamiczne 4']).trim(),
       ],
-      staticPressure: row['Ciśnienie statyczne'].trim(),
-      temperature: row.Temperatura.trim(),
+      staticPressure: ('' + row['Ciśnienie statyczne']).trim(),
+      temperature: ('' + row.Temperatura).trim(),
       angle: row.Kąt,
-      axisNumber: parseInt(row['Numer osi'].trim()),
-      pointOnAxis: parseInt(row['Punkt na osi'].trim()),
-      pipeDiameter: row['Średnica przewodu'].trim(),
-      pipeWidth: row['Szerokość przewodu'].trim(),
-      pipeHeight: row['Wysokość przewodu'].trim(),
+      axisNumber: parseInt(('' + row['Numer osi']).trim()),
+      pointOnAxis: parseInt(('' + row['Punkt na osi']).trim()),
+      pipeDiameter: ('' + row['Średnica przewodu']).trim(),
+      pipeWidth: ('' + row['Szerokość przewodu']).trim(),
+      pipeHeight: ('' + row['Wysokość przewodu']).trim(),
     });
   }
 

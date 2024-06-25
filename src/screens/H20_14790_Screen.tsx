@@ -207,39 +207,6 @@ export const H2O_14790_Screen = ({ navigation }: { navigation: any }) => {
 
   /* Logic for saving and loading the file from external storage as CSV */
 
-  const restoreStateFromCSV = (fileContents: string) => {
-    const csvRows: MeasurementCSVRow[] = readString(fileContents, {
-      header: true,
-    })['data'] as MeasurementCSVRow[];
-
-    console.log('Restoring state from a CSV file: ');
-    console.log(JSON.stringify(csvRows, null, 2));
-    const newMeasurements: H2OMeasurement[] = [];
-    for (const row of csvRows) {
-      const initialMass = [
-        row['Masa początkowa płuczka 1'],
-        row['Masa początkowa płuczka 2'],
-        row['Masa początkowa płuczka 3'],
-      ];
-      const afterMass = [
-        row['Masa końcowa płuczka 1'],
-        row['Masa końcowa płuczka 2'],
-        row['Masa końcowa płuczka 3'],
-      ];
-      newMeasurements.push({
-        id: parseInt(row['Numer pomiaru']) - 1,
-        date: new Date(row['Godzina przyjazdu']),
-        afterMass: afterMass,
-        initialMass: initialMass,
-        leakTightnessTest: row['Próba szczelności'],
-        aspiratorFlow: row['Przepływ przez aspirator'],
-        aspiratedGases: row['Objętość zaaspirowana'],
-      });
-    }
-    setMeasurements([...newMeasurements]);
-    setDataIndex(0);
-  };
-
   useEffect(loadMeasurements, []);
 
   return (
@@ -367,16 +334,16 @@ export const exportMeasurementsAsCSV = (measurements: H2OMeasurement[]) => {
   for (const measurement of measurements) {
     csvRows.push({
       'Numer pomiaru': (measurement.id + 1).toString(),
-      'Godzina przyjazdu': measurement.date.toString(),
+      'Godzina przyjazdu': measurement.date ? measurement.date.toString() : (new Date()).toString(),
       'Próba szczelności': measurement.leakTightnessTest,
       'Przepływ przez aspirator': measurement.aspiratorFlow,
       'Objętość zaaspirowana': measurement.aspiratedGases,
-      'Masa początkowa płuczka 1': measurement.initialMass[0].trim(),
-      'Masa końcowa płuczka 1': measurement.afterMass[0].trim(),
-      'Masa początkowa płuczka 2': measurement.initialMass[1].trim(),
-      'Masa końcowa płuczka 2': measurement.afterMass[1].trim(),
-      'Masa początkowa płuczka 3': measurement.initialMass[2].trim(),
-      'Masa końcowa płuczka 3': measurement.afterMass[2].trim(),
+      'Masa początkowa płuczka 1': ('' + measurement.initialMass[0]).trim(),
+      'Masa końcowa płuczka 1': ('' + measurement.afterMass[0]).trim(),
+      'Masa początkowa płuczka 2': ('' + measurement.initialMass[1]).trim(),
+      'Masa końcowa płuczka 2': ('' + measurement.afterMass[1]).trim(),
+      'Masa początkowa płuczka 3': ('' + measurement.initialMass[2]).trim(),
+      'Masa końcowa płuczka 3': ('' + measurement.afterMass[2]).trim(),
     });
   }
   const csvString = H2O_SCREEN_CSV_HEADING + jsonToCSV(csvRows);
@@ -395,23 +362,23 @@ export const restoreStateFromCSV = (fileContents: string) => {
   const newMeasurements: H2OMeasurement[] = [];
   for (const row of csvRows) {
     const initialMass = [
-      row['Masa początkowa płuczka 1'].trim(),
-      row['Masa początkowa płuczka 2'].trim(),
-      row['Masa początkowa płuczka 3'].trim(),
+      ('' + row['Masa początkowa płuczka 1']).trim(),
+      ('' + row['Masa początkowa płuczka 2']).trim(),
+      ('' + row['Masa początkowa płuczka 3']).trim(),
     ];
     const afterMass = [
-      row['Masa końcowa płuczka 1'].trim(),
-      row['Masa końcowa płuczka 2'].trim(),
-      row['Masa końcowa płuczka 3'].trim(),
+      ('' + row['Masa końcowa płuczka 1']).trim(),
+      ('' + row['Masa końcowa płuczka 2']).trim(),
+      ('' + row['Masa końcowa płuczka 3']).trim(),
     ];
     newMeasurements.push({
       id: parseInt(row['Numer pomiaru']) - 1,
       date: new Date(row['Godzina przyjazdu']),
       afterMass: afterMass,
       initialMass: initialMass,
-      leakTightnessTest: row['Próba szczelności'].trim(),
-      aspiratorFlow: row['Przepływ przez aspirator'].trim(),
-      aspiratedGases: row['Objętość zaaspirowana'].trim(),
+      leakTightnessTest: ('' + row['Próba szczelności']).trim(),
+      aspiratorFlow: ('' + row['Przepływ przez aspirator']).trim(),
+      aspiratedGases: ('' + row['Objętość zaaspirowana']).trim(),
     });
   }
   return newMeasurements;

@@ -270,7 +270,7 @@ export const exportMeasurementsAsCSV = (savedMeasurements: DustMeasurement[]) =>
     csvRows.push({
       'Numer pomiaru': (measurement.id + 1).toString(),
       'Dobrana końcówka': measurement.selectedEndDiameter,
-      'Godzina rozpoczęcia': measurement.measurementStartTime.toString(),
+      'Godzina rozpoczęcia': measurement.measurementStartTime ? measurement.measurementStartTime.toString() : (new Date()).toString(),
       'Czas aspiracji': measurement.aspirationTime,
       'Objętość zaaspirowana': measurement.aspiratedVolume,
       Filtr: measurement.filterType,

@@ -45,7 +45,7 @@ interface MeasurementTimesCSVRow {
 
 export const UTILITIES_INTERNAL_STORAGE_FILE_NAME = 'utilities.txt';
 export const UTILITIES_SCREEN_CSV_HEADING = 'Pomocnicze\n';
-const CSV_SECTION_SEPARATOR = '\nPomiary:\n';
+const CSV_SECTION_SEPARATOR = '\nPomiary:';
 
 export const UtilitiesScreen = ({ navigation }: { navigation: any }) => {
   const { t } = useTranslation();
@@ -131,40 +131,6 @@ export const UtilitiesScreen = ({ navigation }: { navigation: any }) => {
   };
 
   /* Logic for saving and loading the file from external storage as CSV */
-
-  const restoreStateFromCSV = (fileContents: string) => {
-    // The state is stored in two parts of a csv file.
-    // The first one stores the information collected in the
-    // header of the utilities screen, whereas the second one
-    // stores the list of measurements that are displayed in the scrollable view.
-
-    console.log('Restoring state from a CSV file: ');
-    console.log(fileContents);
-    // First we remove the section header from the file.
-    fileContents = fileContents.replace(UTILITIES_SCREEN_CSV_HEADING, '');
-    const parts = fileContents.split(CSV_SECTION_SEPARATOR);
-    const header = readString(parts[0], { header: true })[
-      'data'
-    ][0] as UtilitiesScreenCSVHeading;
-    const times = readString(parts[1], { header: true })[
-      'data'
-    ] as MeasurementTimesCSVRow[];
-
-    setDate(new Date(header.Data));
-    setStartingHour(new Date(header['Czas rozpoczęcia pomiarów']));
-    setBreakTime(parseInt(header['Przerwa między pomiarami']));
-    setMeasurementDuration(parseInt(header['Czas trwania pomiaru']));
-
-    const newTimes = times.map((time, index) => {
-      return {
-        startingHour: new Date(time.Start),
-        endingHour: new Date(time.Koniec),
-        key: index,
-      };
-    });
-    setTimes(newTimes);
-    /// create UtilitiesInternalStorageState here
-  };
 
   useEffect(loadMeasurements, []);
 
@@ -315,10 +281,10 @@ export const exportMeasurementsAsCSV = (data: UtilitiesInternalStorageState) => 
   console.log(JSON.stringify(data, undefined, 2));
   const csvHeading: UtilitiesScreenCSVHeading = {
     Data: data.date.toString(),
-    'Godzina przyjazdu': data.startingHour.toString(),
-    'Czas trwania pomiaru': data.measurementDuration.toString(),
-    'Przerwa między pomiarami': data.breakTime.toString(),
-    'Czas rozpoczęcia pomiarów': data.startingHour.toString(),
+    'Godzina przyjazdu': data.startingHour ? data.startingHour.toString() : (new Date()).toString(),
+    'Czas trwania pomiaru': data.measurementDuration ? data.measurementDuration.toString() : (new Date()).toString(),
+    'Przerwa między pomiarami': data.breakTime ? data.breakTime.toString() : (new Date()).toString(),
+    'Czas rozpoczęcia pomiarów': data.startingHour ? data.startingHour.toString() : (new Date()).toString(),
   };
 
   const csvHeaderPart = jsonToCSV([csvHeading]);
@@ -326,8 +292,8 @@ export const exportMeasurementsAsCSV = (data: UtilitiesInternalStorageState) => 
   for (var i = 0; i < data.times.length; i++) {
     timesCSVRows.push({
       'Numer pomiaru': (i + 1).toString(),
-      Start: data.times[i].startingHour.toString(),
-      Koniec: data.times[i].endingHour.toString(),
+      Start: data.times[i].startingHour ? data.times[i].startingHour.toString() : (new Date).toString(),
+      Koniec: data.times[i].endingHour ? data.times[i].endingHour.toString() : (new Date).toString(),
     });
   }
   const csvTimesPart = jsonToCSV(timesCSVRows);
@@ -353,7 +319,19 @@ export const restoreStateFromCSV = (fileContents: string) => {
   const header = readString(parts[0], { header: true })[
     'data'
   ][0] as UtilitiesScreenCSVHeading;
-  const times = readString(parts[1], { header: true })[
+  console.log("measurement times")
+  console.log(parts[1])
+
+  if (parts[1] == undefined) {
+    return {
+      date: header.Data,
+      measurementDuration: header['Czas trwania pomiaru'],
+      breakTime: header['Przerwa między pomiarami'],
+      startingHour: header['Czas rozpoczęcia pomiarów'],
+      times: [],
+    }
+  }
+  const times = readString((parts[1].trim()), { header: true })[
     'data'
   ] as MeasurementTimesCSVRow[];
 

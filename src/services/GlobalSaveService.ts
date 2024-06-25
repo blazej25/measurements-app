@@ -69,13 +69,13 @@ class GlobalSaveService {
         console.log("Parsed Gas Analyzer Check Screen contents: " + gasAnalyzerCSVContents.trim());
         console.log("Parsed Aspiration Screen contents: " + aspirationCSVContents.trim());
 
-        const utilitiesData: UtilitiesInternalStorageState = restoreUtilitiesDataFromCSV(utilitiesCSVContents.trim());
-        const flowsData: SingleFlowMeasurement[] = restoreFlowsDataFromCSV(flowsCSVContents.trim());
-        const h2oData: H2OMeasurement[] = restoreH2ODataFromCSV(h2oCSVContents.trim());
-        const dustData: DustMeasurement[] = restoreDustDataFromCSV(dustCSVContents.trim());
-        const aspirationData: AspirationMeasurement[] = restoreAspirationDataFromCSV(aspirationCSVContents.trim());
-        const gasAnalyzerCheckData: GasAnalyzerCheckData = restoreGasDataFromCSV(gasAnalyzerCSVContents.trim());
-        const homeData: HomeScreenInformationData = restoreHomeDataFromCSV(homeCSVContents.trim());
+        const utilitiesData: UtilitiesInternalStorageState = restoreUtilitiesDataFromCSV(('' + utilitiesCSVContents).trim());
+        const flowsData: SingleFlowMeasurement[] = restoreFlowsDataFromCSV(('' + flowsCSVContents).trim());
+        const h2oData: H2OMeasurement[] = restoreH2ODataFromCSV(('' + h2oCSVContents).trim());
+        const dustData: DustMeasurement[] = restoreDustDataFromCSV(('' + dustCSVContents).trim());
+        const aspirationData: AspirationMeasurement[] = restoreAspirationDataFromCSV(('' + aspirationCSVContents).trim());
+        const gasAnalyzerCheckData: GasAnalyzerCheckData = restoreGasDataFromCSV(('' + gasAnalyzerCSVContents).trim());
+        const homeData: HomeScreenInformationData = restoreHomeDataFromCSV(('' + homeCSVContents).trim());
 
         this.persistScreenData(utilitiesData, UTILITIES_INTERNAL_STORAGE_FILE_NAME);
         this.persistScreenData(flowsData, FLOWS_INTERNAL_STORAGE_FILE_NAME);
