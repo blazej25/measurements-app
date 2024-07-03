@@ -29,6 +29,14 @@ export interface UtilitiesInternalStorageState {
   times: SingleMeasurement[];
 }
 
+export const utilitiesInitialState: UtilitiesInternalStorageState = {
+  date: new Date().toString(),
+  measurementDuration: '0',
+  breakTime: '0',
+  startingHour: new Date().toString(),
+  times: []
+}
+
 interface UtilitiesScreenCSVHeading {
   Data: string;
   'Godzina przyjazdu': string;

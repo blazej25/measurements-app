@@ -38,7 +38,7 @@ interface FlowMeasurementCSVRow {
   Kąt: string;
 }
 
-const initialState: SingleFlowMeasurement = {
+export const initialState: SingleFlowMeasurement = {
   dynamicPressure: ["", "", "", ""],
   staticPressure: '',
   temperature: '',
@@ -119,7 +119,9 @@ export const FlowsScreen = ({ navigation }: { navigation: any }) => {
     fileSystemService
       .loadJSONFromInternalStorage(FLOWS_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
-        restoreStateFrom(loadedMeasurements);
+        if (loadedMeasurements) {
+          restoreStateFrom(loadedMeasurements);
+        }
       });
   };
 
@@ -515,7 +517,6 @@ export const restoreStateFromCSV = (fileContents: string) => {
   ] as FlowMeasurementCSVRow[];
   const newMeasurements: SingleFlowMeasurement[] = [];
 
-  
 
   for (const row of rows) {
     newMeasurements.push({

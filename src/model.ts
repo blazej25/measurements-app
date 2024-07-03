@@ -26,3 +26,13 @@ export type HomeScreenInformationData = {
   temperature: string;
   pressure: string;
 };
+
+export const homeScreenEmptyData: HomeScreenInformationData = {
+  date: new Date(),
+  measurementRequestor: '',
+  emissionSource: '',
+  pipeCrossSectionType: PipeCrossSectionType.RECTANGULAR,
+  staffResponsibleForMeasurement: [],
+  temperature: '',
+  pressure: '',
+};

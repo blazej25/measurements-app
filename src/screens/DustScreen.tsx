@@ -35,7 +35,7 @@ interface DustMeasurementCSVRow {
   Woda: string;
 }
 
-const initialData: DustMeasurement = {
+export const dustInitialData: DustMeasurement = {
   id: 0,
   selectedEndDiameter: '',
   measurementStartTime: new Date(),
@@ -54,10 +54,10 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   /* State variables */
 
   const [currentMeasurement, setCurrentMeasurement] = useState({
-    ...initialData,
+    ...dustInitialData,
   });
   const [savedMeasurements, setSavedMeasurements] = useState([
-    {...initialData},
+    {...dustInitialData},
   ]);
   const [measurementIndex, setMeasurementIndex] = useState(0);
   const [numberOfMeasurements, setNumberOfMeasurements] = useState(1);
@@ -87,7 +87,7 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
       return;
     }
 
-    const newMeasurement = {...initialData, id: currentMeasurement.id + 1};
+    const newMeasurement = {...dustInitialData, id: currentMeasurement.id + 1};
     newMeasurements = newMeasurements.concat([newMeasurement]);
     setSavedMeasurements(newMeasurements);
     persistStateInInternalStorage(newMeasurements);
@@ -115,11 +115,11 @@ export const DustScreen = ({navigation}: {navigation: any}) => {
   const isSpaceLeft = () => savedMeasurements.length < numberOfMeasurements;
 
   const flushState = () => {
-    setSavedMeasurements([{...initialData}]);
-    setCurrentMeasurement({...initialData});
+    setSavedMeasurements([{...dustInitialData}]);
+    setCurrentMeasurement({...dustInitialData});
     setMeasurementIndex(0);
     setNumberOfMeasurements(1);
-    persistStateInInternalStorage([{...initialData}]);
+    persistStateInInternalStorage([{...dustInitialData}]);
   };
 
   /* Logic for persisting state in the internal storage. */

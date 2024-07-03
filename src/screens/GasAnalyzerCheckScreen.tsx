@@ -32,6 +32,12 @@ export interface GasAnalyzerCheckData {
   measurements: SingleCompoundMeasurement[],
 }
 
+export const gasEmptyData = {
+  timeBefore: new Date,
+  timeAfter: new Date,
+  measurements: []
+}
+
 interface AnalyserCheckCSVRow {
   'Godzina sprawdzenia przed': string,
   'Godzina sprawdzenia po': string,
@@ -205,7 +211,9 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
       .then(loadedMeasurements => {
         if (loadedMeasurements) {
           console.log(loadedMeasurements);
-          restoreStateFrom(loadedMeasurements);
+          if (loadedMeasurements) {
+            restoreStateFrom(loadedMeasurements);
+          }
         }
       });
   };
@@ -245,13 +253,13 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
     setHourOfCheckBefore(new Date)
     persistStateInInternalStorage(new Date, new Date, [emptyMeasurement])
   }
-  /* 
+  /*
 
         ___/
          /
         /
         \
-         \ 
+         \
            \
            OOOOO--/
            /\  /\
@@ -260,7 +268,7 @@ export const GasAnalyzerScreen = ({ navigation }: { navigation: any }) => {
 
       Tallneck
 
-  
+
     */
 
 
@@ -467,8 +475,8 @@ export const restoreStateFromCSV = (fileContents: string) => {
   console.log(newMeasurements);
 
   const data: GasAnalyzerCheckData = {
-    timeBefore: new Date(rows[0]['Godzina sprawdzenia przed']),
-    timeAfter: new Date(rows[0]['Godzina sprawdzenia po']),
+    timeBefore: rows[0] ? new Date(rows[0]['Godzina sprawdzenia przed']) : new Date(),
+    timeAfter: rows[0] ? new Date(rows[0]['Godzina sprawdzenia po']) : new Date(),
     measurements: newMeasurements
   }
   return data;

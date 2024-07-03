@@ -15,6 +15,7 @@ import {LanguageScreen} from './src/screens/LanguageScreen';
 import {useTranslation} from 'react-i18next';
 import {Screens} from './src/constants';
 import {MenuBar} from './src/components/MenuBar';
+import { PermissionsAndroid } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -81,5 +82,6 @@ function App(): JSX.Element {
     </>
   );
 }
+
 
 export default App;
