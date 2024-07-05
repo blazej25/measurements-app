@@ -33,7 +33,6 @@ export const styles = StyleSheet.create({
     height: 40,
     textAlignVertical: 'center',
     color: 'black',
-    fontSize: 14,
   },
   navigationButton: {
     borderRadius: defaultBorderRadius,

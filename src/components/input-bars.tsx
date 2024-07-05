@@ -117,6 +117,7 @@ export const StaffListInputBar = ({
         style={{
           borderRadius: largeBorderRadius,
           flexDirection: 'row',
+          flexWrap: 'wrap',
           backgroundColor: colors.buttonBlue,
           marginHorizontal: defaultGap,
           justifyContent: 'space-between',
@@ -298,6 +299,7 @@ export const NumberInputBar = ({
         value={value}
         onChangeText={onChangeText}
         textAlign={'right'}
+        textAlignVertical={'center'}
         style={styles.dataSelectorText}
       />
       {valueUnit && <Text style={styles.dataSelectorText}>{valueUnit}</Text>}
