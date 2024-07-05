@@ -20,6 +20,7 @@ export const MenuBar = () => {
     <View
       style={{
         flexDirection: 'row',
+        flexWrap: 'wrap',
         justifyContent: 'center',
         backgroundColor: colors.secondaryBlue,
         padding: defaultPadding,

@@ -179,6 +179,9 @@ class GlobalSaveService {
       ('' + homeCSVContents).trim(),
     );
 
+    console.log('Restored home screen data:');
+    console.log(homeData);
+
     this.persistScreenData(utilitiesData, UTILITIES_INTERNAL_STORAGE_FILE_NAME);
     this.persistScreenData(flowsData, FLOWS_INTERNAL_STORAGE_FILE_NAME);
     this.persistScreenData(h2oData, H2O_INTERNAL_STORAGE_FILE_NAME);

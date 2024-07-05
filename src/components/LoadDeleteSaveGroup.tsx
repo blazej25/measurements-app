@@ -18,7 +18,7 @@ export const LoadDeleteSaveGroup = ({
 }) => {
   const {t} = useTranslation();
   return (
-    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+    <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between'}}>
       <FilePicker
         label={t('aspirationScreen:loadFromStorage')}
         reloadScreen={reloadScreen}

@@ -200,13 +200,15 @@ export const AspirationScreen = ({navigation}: {navigation: any}) => {
     fileSystemService
       .loadJSONFromInternalStorage(ASPIRATION_INTERNAL_STORAGE_FILE_NAME)
       .then(loadedMeasurements => {
-        if (loadedMeasurements) {
+        if (loadedMeasurements && (loadedMeasurements as AspirationMeasurement[]).length > 0) {
           restoreStateFrom(loadedMeasurements);
         }
       });
   };
 
   const restoreStateFrom = (loadedMeasurements: Object) => {
+    console.log("Restoring aspiration measurements.")
+    console.log(JSON.stringify(loadedMeasurements));
     var measurements = loadedMeasurements as AspirationMeasurement[];
     // Call to pare dates replaces all date fields with the actual Typescript
     // date object so that it can be manipulated correctly by the UI.

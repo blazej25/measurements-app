@@ -311,6 +311,9 @@ export const restoreStateFromCSV = (fileContents: string) => {
     'data'
   ] as PersonnelCSVRow[];
 
+  console.log("Personnel rows: " + JSON.stringify(personnelRows, null, 2));
+
+
   const personnelData: Person[] = [];
   for (const person of personnelRows) {
     personnelData.push({name: person['Imię'], surname: person['Nazwisko']});
