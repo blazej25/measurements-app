@@ -536,8 +536,8 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
               ]}
               selectionToText={_selection =>
                 useAlternativePointPositionCalculationMethod
-                  ? t('measurementPointLocationMethod:BASIC')
-                  : t('measurementPointLocationMethod:ALTERNATIVE')
+                  ? t('measurementPointLocationMethod:ALTERNATIVE')
+                  : t('measurementPointLocationMethod:BASIC')
               }
               rowTextForSelection={selection => selection}
               onSelect={(selectedItem: string, _index: number) => {
