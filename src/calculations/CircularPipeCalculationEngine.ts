@@ -14,12 +14,12 @@ class CircularPipeCalculationEngine {
    * required to take on each axis. The rules are determined by the config
    * above.
    */
-  determineMeasurementConstraints(): MeasurementConstraints {
+  determineMeasurementConstraints(): CircularPipeMeasurementConstraints {
     const BOUND_1: number = 0.35;
     const BOUND_2: number = 1.1;
     const BOUND_3: number = 1.6;
 
-    const output: MeasurementConstraints = {
+    const output: CircularPipeMeasurementConstraints = {
       minimumMeasurementAxisCount: 0,
       minimumMeasurementPointCount: 0,
     };
@@ -121,7 +121,7 @@ class CircularPipeCalculationEngine {
   }
 }
 
-type MeasurementConstraints = {
+type CircularPipeMeasurementConstraints = {
   minimumMeasurementAxisCount: number;
   minimumMeasurementPointCount: number;
 };

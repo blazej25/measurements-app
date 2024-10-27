@@ -4,10 +4,14 @@
   - [x] calculate the number of measurement points given the formula in the table
   - [ ] select the method for calculating the measurement point locations
   - [ ] paste the point location diagram drawing (nice to have)
-  - [ ] calculate the point locations (make a separate unit-testable module for that)
+  - [x] calculate the point locations
+  - [ ] make a separate unit-testable module for that
 - [ ] rectangular pipe feature
-  - [ ] calculate the cross section area (and display in the app)
-  - [ ] calculate the number of measurement points given the formula in the table
+  - [x] calculate the cross section area (and display in the app)
+  - [x] calculate the number of measurement points given the formula in the table
+  - [ ] do we need to calculate point positions?
+  - [ ] suggest the number of subdivisions along side length depending on the
+        ratio of l_1/l_2 but allow override if necessary
   - [ ] understand the elaborate logic for figuring out the measurement point
         grid locations
 
