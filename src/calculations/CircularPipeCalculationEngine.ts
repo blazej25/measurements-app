@@ -112,6 +112,9 @@ class CircularPipeCalculationEngine {
     measurementPointCount: number,
     measurementAxisCount: number,
   ): number[] {
+    console.log(
+      `Calculating positions for: axis: ${measurementAxisCount} points: ${measurementPointCount}`,
+    );
     const middle_index = measurementPointCount / 2;
     var positions: number[] = [];
     const radius = this.pipeDiameter / 2;
@@ -122,12 +125,13 @@ class CircularPipeCalculationEngine {
     // Note that in the measurement point position formula the i referring to
     // the index of the measurement point starts from 1.
     for (let i = 1; i <= measurementPointCount; i++) {
+      console.log('Calculating position for point: ' + i);
       if (i <= middle_index) {
         // Case 1: to left of the centre centre of the pipe.
         positions.push(radius * (1 - Math.sqrt(1 - (2 * i - 1) / n)));
       } else {
         // case 3: to the right of the centre of the pipe.
-        positions.push(radius * Math.sqrt((2 * i - 1) / n));
+        positions.push(radius * (1 + Math.sqrt((2 * i - 1) / n - 1)));
       }
     }
     return positions;

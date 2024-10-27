@@ -45,7 +45,31 @@ class RectangularPipeCalculationEngine {
       );
     }
 
+    // If the height/width or width/height ratio exceeds 2 we need to
+    // increase then number of axes / points on each axis to bring that
+    // ratio down below 2.
+
+    // Height is considered to be the 'vertical' edge along which axes are laid out
+    if (this.height / this.width > 2) {
+      output.minimumMeasurementPointCount *= 2;
+    }
+
+    // Width is the axis along which we have measurement points
+    if (this.width / this.height > 2) {
+      output.minimumSectionAlongPipeSideCount *= 2;
+    }
+
     return output;
+  }
+
+  findMeasurementPointPositions(pointCount: number, width: number): number[] {
+    const sectionWidth = width / pointCount;
+
+    const positions: number[] = [];
+    for (let i = 0; i < pointCount; i++) {
+      positions.push(sectionWidth * (i + 0.5));
+    }
+    return positions;
   }
 }
 

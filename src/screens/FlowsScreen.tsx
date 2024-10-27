@@ -242,7 +242,6 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
     );
   };
 
-
   const updatePointMeasurementCalculation = (
     useRectangularPipe: boolean,
     useAlternativePointPositionCalculationMethod: boolean,
@@ -257,7 +256,14 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
         parseInt(height),
         parseInt(width),
       );
-      // TODO: do the rectangle calculation here
+
+      // For now we only determine the distances between points along the width
+      setPointPositions(
+        calculationEngine.findMeasurementPointPositions(
+          numberOfPoints,
+          parseInt(width),
+        ),
+      );
     } else {
       const calculationEngine = new CircularPipeCalculationEngine(
         parseFloat(diameter),
@@ -293,6 +299,19 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
       );
       const measurementConstraints =
         calculationEngine.determineMeasurementConstraints();
+
+      const pointCount = measurementConstraints.minimumMeasurementPointCount;
+      const axisCount = measurementConstraints.minimumSectionAlongPipeSideCount;
+      setNumberOfPoints(pointCount);
+      setNumberOfSpigots(axisCount);
+
+      // For now we only determine the distances between points along the width
+      setPointPositions(
+        calculationEngine.findMeasurementPointPositions(
+          pointCount,
+          parseInt(width),
+        ),
+      );
     } else {
       const calculationEngine = new CircularPipeCalculationEngine(
         parseFloat(diameter),
@@ -417,6 +436,12 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
             t('pipeCrossSectionTypes:ROUND'),
             t('pipeCrossSectionTypes:RECTANGULAR'),
           ]}
+          selectionToText={_selection =>
+            useRectangularPipe
+              ? t('pipeCrossSectionTypes:RECTANGULAR')
+              : t('pipeCrossSectionTypes:ROUND')
+          }
+          rowTextForSelection={selection => selection}
           onSelect={(selectedItem: string, _index: number) => {
             // When the pipe cross-section selector is used, we are dealing
             // with a completely new pipe so we need to flush all changes apart
@@ -472,6 +497,17 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
               }}
               label={t(`flowsScreen:width`) + ':'}
             />
+            <View style={{width: 0.8, height: IMAGE_HEIGHT}}>
+              <Image
+                source={require('../assets/rectangular-cross-section-pipe.png')}
+                style={{
+                  flex: 1,
+                  width: IMAGE_WIDTH,
+                  height: IMAGE_HEIGHT,
+                  resizeMode: 'contain',
+                }}
+              />
+            </View>
           </>
         ) : (
           <>
@@ -498,6 +534,12 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
                 t('measurementPointLocationMethod:BASIC'),
                 t('measurementPointLocationMethod:ALTERNATIVE'),
               ]}
+              selectionToText={_selection =>
+                useAlternativePointPositionCalculationMethod
+                  ? t('measurementPointLocationMethod:BASIC')
+                  : t('measurementPointLocationMethod:ALTERNATIVE')
+              }
+              rowTextForSelection={selection => selection}
               onSelect={(selectedItem: string, _index: number) => {
                 // When the pipe cross-section selector is used, we are dealing
                 // with a completely new pipe so we need to flush all changes apart
@@ -505,33 +547,42 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
                 const newMode =
                   selectedItem !== t('measurementPointLocationMethod:BASIC');
                 setUseAlternativePointPositionCalculationMethod(newMode);
+                updatePointMeasurementCalculation(
+                  useRectangularPipe,
+                  newMode,
+                  pipeDimensions[0],
+                  pipeDimensions[1],
+                  pipeDiameter,
+                  numberOfPoints,
+                  numberOfSpigots,
+                );
               }}
             />
+            <View style={{width: 0.8, height: IMAGE_HEIGHT}}>
+              {useAlternativePointPositionCalculationMethod ? (
+                <Image
+                  source={require('../assets/circular-pipe-diagram-2.png')}
+                  style={{
+                    flex: 1,
+                    width: IMAGE_WIDTH,
+                    height: IMAGE_HEIGHT,
+                    resizeMode: 'contain',
+                  }}
+                />
+              ) : (
+                <Image
+                  source={require('../assets/circular-pipe-diagram-1.png')}
+                  style={{
+                    flex: 1,
+                    width: IMAGE_WIDTH,
+                    height: IMAGE_HEIGHT,
+                    resizeMode: 'contain',
+                  }}
+                />
+              )}
+            </View>
           </>
         )}
-        <View style={{width: 0.8, height: IMAGE_HEIGHT}}>
-          {useAlternativePointPositionCalculationMethod ? (
-            <Image
-              source={require('../assets/circular-pipe-diagram-2.png')}
-              style={{
-                flex: 1,
-                width: IMAGE_WIDTH,
-                height: IMAGE_HEIGHT,
-                resizeMode: 'contain',
-              }}
-            />
-          ) : (
-            <Image
-              source={require('../assets/circular-pipe-diagram-1.png')}
-              style={{
-                flex: 1,
-                width: IMAGE_WIDTH,
-                height: IMAGE_HEIGHT,
-                resizeMode: 'contain',
-              }}
-            />
-          )}
-        </View>
         <MeasurementPointDisplayDropdown
           label={t(`flowsScreen:pointPositions`) + ':'}
           pointPositionList={pointPositions}
@@ -549,7 +600,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
               pipeDimensions[1],
               pipeDiameter,
               numberOfPoints,
-              newNumberOfSpigots
+              newNumberOfSpigots,
             );
           }}
           label={t(`flowsScreen:numberOfSpigots`) + ':'}
@@ -559,7 +610,7 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
           value={numberOfPoints.toString()}
           onChangeText={text => {
             const newNumberOfPoints = text === '' ? 0 : parseInt(text);
-            setNumberOfPoints(newNumberOfPoints)
+            setNumberOfPoints(newNumberOfPoints);
             updatePointMeasurementCalculation(
               useRectangularPipe,
               useAlternativePointPositionCalculationMethod,
@@ -567,10 +618,9 @@ export const FlowsScreen = ({navigation}: {navigation: any}) => {
               pipeDimensions[1],
               pipeDiameter,
               newNumberOfPoints,
-              numberOfSpigots
+              numberOfSpigots,
             );
-          }
-          }
+          }}
           label={t(`flowsScreen:numberOfPoints`) + ':'}
         />
         <SelectorBar
