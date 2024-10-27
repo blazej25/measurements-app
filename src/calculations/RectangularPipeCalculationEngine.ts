@@ -47,17 +47,6 @@ class RectangularPipeCalculationEngine {
 
     return output;
   }
-
-  /**
-   * Calculates the positions of the n_d points along the measurement axis.
-   * TODO: determine if needed
-   */
-  findMeasurementPointPositionsBasicMethod(
-    measurementPointCount: number,
-    measurementAxisCount: number,
-  ): number[] {
-    return [];
-  }
 }
 
 type RectangularPipeMeasurementConstraints = {
