@@ -1,4 +1,4 @@
-class FileSystemService {
+class CircularPipeCalculationEngine {
   pipeDiameter: number;
   constructor(pipeDiameter: number) {
     this.pipeDiameter = pipeDiameter;
@@ -47,6 +47,78 @@ class FileSystemService {
 
     return output;
   }
+
+  /**
+   * Calculates the positions of the n_d points along the measurement axis.
+   */
+  findMeasurementPointPositionsBasicMethod(
+    measurementPointCount: number,
+    measurementAxisCount: number,
+  ): number[] {
+    const middle_point_index = (measurementPointCount + 1) / 2;
+    var positions: number[] = [];
+    const radius = this.pipeDiameter / 2;
+
+    // Input parameters are renamed to make the formula concise.
+    const n = measurementAxisCount;
+    const n_d = measurementPointCount;
+
+    // In both cases of the formula the denominator of the expression under
+    // the square root is the same so we extract it out here
+    const sqrt_fraction_denom = n * (n_d - 1) + 1;
+
+    // Note that in the measurement point position formula the i referring to
+    // the index of the measurement point starts from 1.
+    for (let i = 1; i <= measurementPointCount; i++) {
+      if (i < middle_point_index) {
+        // Case 1: to left of the centre centre of the pipe.
+        positions.push(
+          radius *
+            (1 - Math.sqrt((n * (n_d - 2 * i) + 1) / sqrt_fraction_denom)),
+        );
+      } else if (i === middle_point_index) {
+        // Case 2: at the centre of the pipe.
+        positions.push(radius);
+      } else {
+        // case 3: to the right of the centre of the pipe.
+        positions.push(
+          radius *
+            (1 + Math.sqrt((n * (2 * i - 2 - n_d) + 1) / sqrt_fraction_denom)),
+        );
+      }
+    }
+    return positions;
+  }
+
+  /**
+   * Calculates the positions of the n_d points along the measurement axis using
+   * the alternative method that does not include a measurement in the middle
+   * of the pipe.
+   */
+  findMeasurementPointPositionsAlternativeMethod(
+    measurementPointCount: number,
+    measurementAxisCount: number,
+  ): number[] {
+    const middle_index = measurementPointCount / 2;
+    var positions: number[] = [];
+    const radius = this.pipeDiameter / 2;
+
+    // Input parameters are renamed to make the formula concise.
+    const n = measurementAxisCount;
+
+    // Note that in the measurement point position formula the i referring to
+    // the index of the measurement point starts from 1.
+    for (let i = 1; i <= measurementPointCount; i++) {
+      if (i <= middle_index) {
+        // Case 1: to left of the centre centre of the pipe.
+        positions.push(radius * (1 - Math.sqrt(1 - (2 * i - 1) / n)));
+      } else {
+        // case 3: to the right of the centre of the pipe.
+        positions.push(radius * Math.sqrt((2 * i - 1) / n));
+      }
+    }
+    return positions;
+  }
 }
 
 type MeasurementConstraints = {
@@ -55,4 +127,4 @@ type MeasurementConstraints = {
 };
 
 export const MAXIMUM_MEASUREMENT_POINT_COUNT = 20;
-export default FileSystemService;
+export default CircularPipeCalculationEngine;
