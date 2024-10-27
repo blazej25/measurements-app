@@ -34,6 +34,10 @@ export const pl = {
     ROUND: 'Okrągły',
     RECTANGULAR: 'Prostokątny',
   },
+  measurementPointLocationMethod: {
+    BASIC: 'Metoda Podstawowa',
+    ALTERNATIVE: 'Metoda Alternatywna',
+  },
   // Screen-specific translations
   dustScreen: {
     measurementNumber: 'Numer pomiaru',
@@ -73,6 +77,9 @@ export const pl = {
     scrubberNumber: 'Numer płuczki',
   },
   flowsScreen: {
+    measurementPointLocationMethod: 'Metoda wyliczania rozmieszczenia punktów',
+    pointPositions: 'Rozmieszczenie punktów',
+    pointPosition: 'Położenie punktu',
     pipeCrossSection: 'Przekrój przewodu',
     numberOfSpigots: 'Ilość osi pomiarowych',
     numberOfPoints: 'Ilość punktów na osi',
@@ -131,17 +138,17 @@ export const pl = {
     timeAfter: 'Godzina sprawdzenia po',
     tankConcentration: 'Stężenie butli',
     analyzerRange: 'Zakres analizatora',
-    readingBeforeAnalyzerZero: 'Odczyt przed analizator zero', 
+    readingBeforeAnalyzerZero: 'Odczyt przed analizator zero',
     readingBeforeAnalyzerRange: 'Odczyt przed analizator zakres',
-    readingBeforeSystemZero: 'Odczyt przed system zero', 
+    readingBeforeSystemZero: 'Odczyt przed system zero',
     readingBeforeSystemRange: 'Odczyt przed system zakres',
-    readingAfterSystemZero: 'Odczyt po system zero', 
+    readingAfterSystemZero: 'Odczyt po system zero',
     readingAfterSystemRange: 'Odczyt po system zakres',
     twoPCRange: '2% zakresu',
     zeroEvaluationBefore: 'Sprawdzenie zera przed',
     rangeEvaluationBefore: 'Sprawdzenie zakresu przed',
     fivePCRange: '5% zakresu',
     evaluationAfter: 'Sprawdzenie po',
-    processData: 'Przetwórz dane'
-  }
+    processData: 'Przetwórz dane',
+  },
 };

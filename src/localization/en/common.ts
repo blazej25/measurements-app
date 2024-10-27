@@ -34,6 +34,10 @@ export const en = {
     ROUND: 'Round',
     RECTANGULAR: 'Rectangular',
   },
+  measurementPointLocationMethod: {
+    BASIC: 'Basic Method',
+    ALTERNATIVE: 'Alternative Method',
+  },
   dustScreen: {
     measurementNumber: 'Measurement no.',
     numberOfMeasurements: 'Number of Measurements',
@@ -71,6 +75,8 @@ export const en = {
     scrubberNumber: 'Scrubber no.',
   },
   flowsScreen: {
+    measurementPointLocationMethod: 'Point Position Calculation Method',
+    pointPositions: 'Measurement Point Locations',
     pipeCrossSection: 'Pipe Cross-Section',
     numberOfSpigots: 'Number of Spigots',
     numberOfPoints: 'Number of Points',
@@ -131,17 +137,17 @@ export const en = {
     timeAfter: 'Hour of check after',
     tankConcentration: 'Tank concentration',
     analyzerRange: 'Analyzer range',
-    readingBeforeAnalyzerZero: 'Reading before analyzer zero', 
+    readingBeforeAnalyzerZero: 'Reading before analyzer zero',
     readingBeforeAnalyzerRange: 'Reading before analyzer range',
-    readingBeforeSystemZero: 'Reading before system zero', 
+    readingBeforeSystemZero: 'Reading before system zero',
     readingBeforeSystemRange: 'Reading before system range',
-    readingAfterSystemZero: 'Reading after system zero', 
+    readingAfterSystemZero: 'Reading after system zero',
     readingAfterSystemRange: 'Reading after system range',
     twoPCRange: '2% of range',
     zeroEvaluationBefore: 'Evaluation of zero before',
     rangeEvaluationBefore: 'Evaluation of range before',
     fivePCRange: '5% of range',
     evaluationAfter: 'Evaluation after',
-    processData: 'Process data'
-  }
+    processData: 'Process data',
+  },
 };

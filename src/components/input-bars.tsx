@@ -25,19 +25,22 @@ export const SelectorBar = ({
   onSelect,
   selectionToText,
   rowTextForSelection,
+  maxWidthOverride,
 }: {
   label: string;
   selections: string[];
   onSelect: (selectedItem: string, index: number) => void;
   selectionToText?: (selectedItem: string) => string;
   rowTextForSelection?: (selectedItem: string) => string;
+  maxWidthOverride?: number;
 }) => {
   const selectorItemStyle = {
     borderRadius: defaultBorderRadius,
     backgroundColor: colors.secondaryBlue,
     marginBottom: defaultGap,
     height: 40,
-    maxWidth: 110,
+    maxWidth: maxWidthOverride ? maxWidthOverride : 110,
+    justifySelf: 'flex-end',
   };
 
   const dropdownStyle = {
@@ -94,6 +97,68 @@ export const SelectorBar = ({
         )}
       </View>
     </DataBar>
+  );
+};
+
+export const MeasurementPointDisplayDropdown = ({
+  label,
+  pointPositionList,
+}: {
+  label: string;
+  pointPositionList: number[];
+}) => {
+  const [isCollapsed, setCollapsed] = useState(false);
+  const {t} = useTranslation();
+  return (
+    <>
+      <TouchableOpacity
+        activeOpacity={1.0}
+        style={{
+          borderRadius: largeBorderRadius,
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          backgroundColor: colors.buttonBlue,
+          marginHorizontal: defaultGap,
+          justifyContent: 'space-between',
+        }}>
+        <Text
+          style={{
+            ...styles.buttonText1,
+            alignSelf: 'center',
+            margin: defaultGap,
+            marginLeft: defaultPadding,
+          }}>
+          {label}
+        </Text>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            style={{
+              borderRadius: defaultBorderRadius,
+              flexDirection: 'row',
+              margin: defaultGap,
+              paddingHorizontal: defaultPadding,
+              backgroundColor: colors.secondaryBlue,
+              height: 40,
+            }}
+            onPress={() => setCollapsed(!isCollapsed)}>
+            <Icon
+              name={isCollapsed ? 'arrow-collapse-down' : 'arrow-collapse-up'}
+              style={{marginTop: 10}}
+              size={20}
+              color={colors.buttonBlue}
+            />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+      {!isCollapsed &&
+        pointPositionList.map((x: number, index: number) => (
+          <PointPositionLog
+          key={index + 1}
+          pointPosition={x}
+          index={index + 1}
+          />
+        ))}
+    </>
   );
 };
 
@@ -204,6 +269,62 @@ export const StaffListInputBar = ({
           />
         ))}
     </>
+  );
+};
+
+const PointPositionLog = ({
+  index,
+  pointPosition,
+}: {
+  pointPosition: number;
+  index: number;
+}) => {
+  return (
+    <TouchableOpacity
+      activeOpacity={1.0}
+      style={{
+        borderRadius: largeBorderRadius,
+        flexDirection: 'row',
+        backgroundColor: colors.secondaryBlue,
+        marginHorizontal: defaultGap,
+        justifyContent: 'flex-end',
+        alignSelf: 'flex-end',
+        paddingHorizontal: defaultPadding,
+        gap: defaultGap,
+      }}>
+      <TouchableOpacity
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          backgroundColor: colors.buttonBlue,
+          height: 30,
+        }}>
+        <Text
+          style={{
+            textAlignVertical: 'center',
+            color: 'white',
+            fontSize: 14,
+          }}>
+          {' ' + index.toString() + '. '}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          borderRadius: defaultBorderRadius,
+          flexDirection: 'row',
+          backgroundColor: colors.secondaryBlue,
+          height: 30,
+        }}>
+        <Text
+          style={{
+            textAlignVertical: 'center',
+            color: 'black',
+            fontSize: 14,
+          }}>
+          {pointPosition.toFixed(3)}
+        </Text>
+      </TouchableOpacity>
+    </TouchableOpacity>
   );
 };
 

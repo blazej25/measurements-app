@@ -15,6 +15,10 @@ class CircularPipeCalculationEngine {
    * above.
    */
   determineMeasurementConstraints(): CircularPipeMeasurementConstraints {
+    console.log(
+      'Calculating the measurement constraints for pipe diameter: ' +
+        this.pipeDiameter,
+    );
     const BOUND_1: number = 0.35;
     const BOUND_2: number = 1.1;
     const BOUND_3: number = 1.6;
@@ -29,14 +33,14 @@ class CircularPipeCalculationEngine {
     if (this.pipeDiameter < BOUND_1) {
       output.minimumMeasurementAxisCount = 0;
     } else {
-      output.minimumMeasurementAxisCount = 0;
+      output.minimumMeasurementAxisCount = 2;
     }
 
     if (this.pipeDiameter < BOUND_1) {
       output.minimumMeasurementPointCount = 1;
-    } else if (BOUND_1 <= this.pipeDiameter && this.pipeDiameter < BOUND_2) {
+    } else if (BOUND_1 <= this.pipeDiameter && this.pipeDiameter <= BOUND_2) {
       output.minimumMeasurementPointCount = 4;
-    } else if (BOUND_2 <= this.pipeDiameter && this.pipeDiameter < BOUND_3) {
+    } else if (BOUND_2 < this.pipeDiameter && this.pipeDiameter <= BOUND_3) {
       output.minimumMeasurementPointCount = 8;
     } else {
       output.minimumMeasurementPointCount = Math.min(
@@ -45,6 +49,15 @@ class CircularPipeCalculationEngine {
       );
     }
 
+    // Note that in the output we provide the min number of measurement points
+    // per axis. Because of this we need to divide
+    if (output.minimumMeasurementAxisCount > 0) {
+      output.minimumMeasurementPointCount /= output.minimumMeasurementAxisCount;
+    }
+
+    console.log(
+      'Calculated measurement constraints: ' + JSON.stringify(output),
+    );
     return output;
   }
 
